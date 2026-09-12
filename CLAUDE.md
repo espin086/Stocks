@@ -200,6 +200,23 @@ to `main` that does not change the version publishes nothing.
   `tests/test_packaging.py` pins this, and `tests/test_rebrand.py` fails on
   any residual old name.
 
+## The commit gate
+
+CI's lint, format and type checks run **before** a commit exists, twice over:
+
+- `pre-commit install` (once per clone) wires `.pre-commit-config.yaml` into git:
+  ruff check, ruff format, `mypy --strict`, actionlint and the hygiene hooks run on
+  every `git commit`, from the project's own environment (`pip install -e ".[dev]"`).
+- `.claude/settings.json` adds a Claude Code `PreToolUse` hook
+  (`.claude/hooks/commit-gate.sh`): any `git commit` issued from a Bash tool call
+  first runs `ruff check .`, `ruff format --check .` and `python -m mypy`, and is
+  blocked with the findings if any fails.
+
+A red gate is never worked around: fix the finding (`ruff format .` fixes
+formatting), then commit. `pre-commit run --all-files` runs the same gate by hand.
+Run the test suite with `python -m pytest`; a bare `pytest` on PATH may belong to a
+different interpreter.
+
 ## Commands
 
 ```bash
