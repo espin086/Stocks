@@ -11,7 +11,9 @@ planning_depth: proposal + 2 spec deltas + design (tasks written when 0003 lands
 ## Outcome
 
 ```bash
-qf serve                      # http://127.0.0.1:8787
+qf open                       # starts the server if needed, opens the browser
+qf open doctor                # straight to a view: settings, doctor, runs, run 42, ...
+qf serve                      # http://127.0.0.1:8787, no browser
 qf serve --host 0.0.0.0 --port 8787   # prints a token; required to bind non-local
 ```
 
@@ -48,7 +50,8 @@ show, and "watch the frontier solve" is the demo.
 - **Job execution** — optimizations and backtests run as jobs persisted through
   0003's repositories, with progress streamed over SSE. Trace context and run id
   are persisted with the job, so work that outlives its request stays traceable.
-- `qf serve` as the entry point; `[web]` extra for FastAPI and uvicorn.
+- `qf serve` as the entry point and `qf open` as the one-command path from
+  terminal to browser; `[web]` extra for FastAPI and uvicorn.
 
 ## The parity problem, and how it is solved
 

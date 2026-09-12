@@ -77,6 +77,32 @@ update. `core/` still emits nothing itself.
 SSE over websockets: one direction is all that is needed, it works through every
 proxy, and reconnection is a browser primitive rather than a protocol to write.
 
+## `qf open`: terminal to browser in one command
+
+```
+qf open [target]
+   │
+   ├─ server answering on the port and it is ours?  → launch browser, exit 0
+   ├─ something else on the port?                    → error, suggest --port
+   └─ nothing?                                       → serve on loopback
+                                                        wait for /health
+                                                        launch browser
+                                                        run until Ctrl-C
+```
+
+Launching goes through Python's `webbrowser` module, which honors `BROWSER`
+and knows each platform's opener. Its failure is the signal for headless:
+no display, an SSH session, or the container all end the same way — the URL is
+printed and the command exits 0. The URL is printed *before* the launch attempt
+in every case, so a user whose browser opens on the wrong monitor still has
+it. Printing a URL is never an error; the command's job is to get the user to
+the app, and the URL is the app.
+
+Targets map to the frontend view manifest — the same file the parity test
+reads — so `qf open` can reach exactly the views that exist and rejects
+others with the list. `qf init --web` is `qf open settings`; `qf serve --open`
+is `qf serve` plus the launch. One mechanism, three entry points.
+
 ## Access model
 
 | Bind address | Token |
@@ -125,4 +151,6 @@ not just in the test suite.
 | Single in-process worker | Worker pool, Celery, RQ | Single-user process; one worker answers every concurrency question by construction |
 | SSE | WebSockets | One direction suffices; proxies and reconnection are solved problems |
 | Deployment token | User accounts | Multi-user is out of scope; a fake account model is debt |
+| `qf open` targets from the view manifest | A hand-maintained target list | The manifest already exists for parity; a second list would drift from it |
+| Headless prints the URL and exits 0 | Error when no browser | The URL *is* the app; failing to launch a browser is not failing the user |
 | Frontend manifest for parity | Trusting the view list | Parity must fail Python CI, where the registry is |

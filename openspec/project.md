@@ -92,6 +92,9 @@ site/                       # 0006: animated landing page → GitHub Pages
 
 | Command | Does |
 |---|---|
+| `qf init` | Guided setup of every declared setting; ends by running doctor |
+| `qf doctor` | Every check actionable; `--fix` for safe repairs; `--format json` |
+| `qf upgrade` | Detects the installer and runs the matching upgrade |
 | `qf data prices AAPL MSFT --start 2015-01-01` | Fetch + cache price history |
 | `qf data macro DGS10 CPIAUCSL` | Fetch FRED series |
 | `qf analyze stock NVDA` | Fundamentals, risk, CAPM beta |
@@ -112,6 +115,7 @@ site/                       # 0006: animated landing page → GitHub Pages
 | `qf run list` / `qf run show <id>` | Browse saved analysis runs |
 | `qf db info` / `qf db export --to ...` | Inspect and back up the database |
 | `qf serve --host 0.0.0.0` | Run the web UI and API |
+| `qf open [doctor\|settings\|run 42\|...]` | Start the server if needed and open the browser to a view |
 | `qf deploy compose` / `qf deploy check` | Generate and verify a deployment |
 
 ## Data sources
@@ -128,6 +132,26 @@ site/                       # 0006: animated landing page → GitHub Pages
 `pip install quantfolio-cli` must produce a working tool with **no keys
 configured**. Anything requiring a key degrades with a clear, actionable error —
 never a stack trace.
+
+## Onboarding
+
+Three commands, kept to three by construction:
+
+```
+pip install quantfolio-cli  →  qf init  →  qf doctor
+```
+
+**Settings are declared once**, like commands. Each carries its env var, whether
+it is a secret, how to obtain it, and an optional live validator; `qf init`,
+`qf doctor`, `qf config`, and the 0004 settings page all derive from the
+declaration. A test asserts every env var the code reads is a declared setting.
+
+**Doctor's checks are declared once**, too — a `Check` registry with `run` and
+an optional idempotent `fix`. A milestone that adds a provider, a setting, or a
+runtime dependency registers a check in the same change; a test asserts every
+setting and provider has one. Every failing line carries its next step. `qf
+deploy check` and the container health check call doctor rather than
+re-implementing health.
 
 ## Storage: a port, with SQLite behind it
 
@@ -217,10 +241,10 @@ Each is one OpenSpec change under `openspec/changes/`.
 | # | Change | Ships |
 |---|---|---|
 | 0000 | `release-engineering` | CI gate, version-gated PyPI publishing |
-| 0001 | `foundation-data-and-cli` | Command registry, storage port + SQLite adapter, providers, data quality, currency model, logging + tracing, test scaffolding, `qf data *` |
+| 0001 | `foundation-data-and-cli` | Onboarding (`init`/`doctor`/`upgrade`), command registry, storage port + SQLite adapter, providers, data quality, currency model, logging + tracing, test scaffolding, `qf data *` |
 | 0002 | `portfolio-optimization` | **v1.0.0** — returns/risk, MVO, frontier, backtest |
 | 0003 | `local-persistence` | Schema + migrations, saved portfolios/goals/runs, `qf db` |
-| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `qf serve` |
+| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `qf serve`, `qf open` |
 | 0005 | `docker-distribution` | One image on Docker Hub, CLI entrypoint, `qf deploy` |
 | 0006 | `landing-page` | Animated dark GitHub Pages site |
 | 0007 | `equity-factor-analysis` | Single-stock analysis, CAPM, Fama-French 3/5 + momentum |
@@ -247,5 +271,8 @@ came before it.
    never appear in signatures outside their adapter.
 7. **Observability never changes behavior.** No secret in a log or a span, no
    log on stdout, no instrumentation inside `core/`.
-8. **No forecasting of exchange rates, ever.** PPP is reported as a valuation
+8. **Onboarding stays three commands.** A milestone that adds a key, provider,
+   or dependency declares a setting and a doctor check in the same change, and
+   the build fails if it does not.
+9. **No forecasting of exchange rates, ever.** PPP is reported as a valuation
    gap, never as a signal, a target, or a convergence path.
