@@ -45,7 +45,7 @@ def _container_env(env: dict[str, str], data: Path) -> dict[str, str]:
 
 # --------------------------------------------------------------- the entrypoint
 def test_dockerfile_makes_the_cli_the_entrypoint_with_no_container_code_path() -> None:
-    text = (Path(__file__).resolve().parents[2] / "Dockerfile").read_text()
+    text = (Path(__file__).resolve().parents[2] / "Dockerfile").read_text(encoding="utf-8")
     assert 'ENTRYPOINT ["sobres"]' in text
     assert "CMD [" not in text.split("HEALTHCHECK")[0]  # no default subcommand: --help is help
     assert "USER sobres" in text and "useradd --uid" in text
@@ -71,7 +71,7 @@ def test_the_database_lives_on_the_volume_and_a_missing_mount_fails_loudly(
     # A mount that cannot hold a database: its "directory" is a plain file (tests run as
     # root, so a permission bit alone would not stop the write).
     blocker = tmp_path / "blocker"
-    blocker.write_text("not a directory")
+    blocker.write_text("not a directory", encoding="utf-8")
     unwritable = {**container, "SOBRES_DB_URL": f"sqlite:///{blocker.as_posix()}/sobres.db"}
     missing = cli("db", "info", env_extra=unwritable)
     assert missing.exit_code == 3
@@ -121,10 +121,10 @@ def test_non_root_is_checked_in_the_container(
 ) -> None:
     container = _container_env(env, tmp_path / "data")
     config = resolve(None, container, path=Path(container["SOBRES_CONFIG_FILE"]))
-    monkeypatch.setattr(os, "getuid", lambda: 0)
+    monkeypatch.setattr(os, "getuid", lambda: 0, raising=False)
     root = dep.container_user_status(config)
     assert root.status == "fail" and "uid 1000" in (root.fix_hint or "")
-    monkeypatch.setattr(os, "getuid", lambda: 1000)
+    monkeypatch.setattr(os, "getuid", lambda: 1000, raising=False)
     assert dep.container_user_status(config).status == "ok"
 
 
@@ -340,7 +340,7 @@ def test_upgrade_path_migrates_on_first_open_after_a_backup(
     container = _container_env(env, data)
     old = data / "sobres.db"
     con = sqlite3.connect(old)
-    con.executescript((fixture_dir / "schema" / "v1.sql").read_text())
+    con.executescript((fixture_dir / "schema" / "v1.sql").read_text(encoding="utf-8"))
     con.commit()
     con.close()
     result = cli("db", "info", "--format", "json", env_extra=container)

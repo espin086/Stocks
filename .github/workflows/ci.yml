@@ -246,7 +246,7 @@ jobs:
         run: |
           docker volume create sobres-ci
           docker run -d --name sobres-ci -p 8787:8787 -v sobres-ci:/data sobres:ci serve --host 0.0.0.0
-          for i in $(seq 1 30); do
+          for _ in $(seq 1 30); do
             if curl -fsS http://127.0.0.1:8787/api/v1/health > /tmp/health.json; then break; fi
             sleep 1
           done

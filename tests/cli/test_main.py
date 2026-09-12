@@ -126,4 +126,4 @@ def test_log_file_sink_writes_json(cli: Callable[..., Any], tmp_path: Any) -> No
     log = tmp_path / "logs" / "sobres.log"
     result = cli("-v", "commands", "--format", "json", env_extra={"SOBRES_LOG_FILE": str(log)})
     assert result.exit_code == 0 and log.exists()
-    assert '"command.start"' in log.read_text()
+    assert '"command.start"' in log.read_text(encoding="utf-8")
