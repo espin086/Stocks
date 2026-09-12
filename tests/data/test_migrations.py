@@ -36,7 +36,7 @@ def test_migrations_are_forward_only_and_contiguous() -> None:
 def test_fixture_database_migrates_to_current_intact(version: int, tmp_path: Path) -> None:
     path = tmp_path / f"v{version}.db"
     conn = sqlite3.connect(path)
-    conn.executescript((FIXTURES / f"v{version}.sql").read_text())
+    conn.executescript((FIXTURES / f"v{version}.sql").read_text(encoding="utf-8"))
     conn.close()
     err = io.StringIO()
     configure_logging("INFO", "json", stream=err)
@@ -78,5 +78,5 @@ def test_fixture_database_migrates_to_current_intact(version: int, tmp_path: Pat
 
 def test_fixture_sql_is_the_recorded_version() -> None:
     for version in SHIPPED:
-        text = (FIXTURES / f"v{version}.sql").read_text()
+        text = (FIXTURES / f"v{version}.sql").read_text(encoding="utf-8")
         assert re.search(rf"INSERT INTO \"?schema_version\"? VALUES\({version},", text)

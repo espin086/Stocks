@@ -353,7 +353,7 @@ def create_app(
     def manifest() -> Response:
         path = (static_dir or STATIC_DIR) / "manifest.json"
         if path.exists():
-            return Response(path.read_text(), media_type="application/json")
+            return Response(path.read_text(encoding="utf-8"), media_type="application/json")
         return JSONResponse({"views": {}}, status_code=404)
 
     @app.get("/{path:path}", include_in_schema=False)
@@ -365,7 +365,7 @@ def create_app(
             return Response(candidate.read_bytes(), media_type=media)
         index = root / "index.html"
         if index.exists():
-            return HTMLResponse(index.read_text())
+            return HTMLResponse(index.read_text(encoding="utf-8"))
         return HTMLResponse(_PLACEHOLDER, status_code=200)
 
     return app

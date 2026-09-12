@@ -24,7 +24,7 @@ MANIFEST = Path(__file__).resolve().parents[2] / "frontend" / "public" / "manife
 
 @pytest.fixture(scope="module")
 def manifest() -> dict[str, str]:
-    return json.loads(MANIFEST.read_text())["views"]
+    return json.loads(MANIFEST.read_text(encoding="utf-8"))["views"]
 
 
 @pytest.mark.parametrize("command", all_commands(), ids=lambda c: c.name)
