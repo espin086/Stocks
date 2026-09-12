@@ -52,5 +52,7 @@ def test_fred_live_matches_fixture_shape() -> None:
     if not key:
         pytest.skip("SOBRES_FRED_API_KEY not configured")
     rows = LiveFredSource(str(key)).observations("DGS10", date(2024, 1, 2), date(2024, 1, 10))
-    recorded = json.loads((FIXTURES / "fred" / "DGS10.json").read_text())["observations"][0]
+    recorded = json.loads((FIXTURES / "fred" / "DGS10.json").read_text(encoding="utf-8"))[
+        "observations"
+    ][0]
     assert set(recorded) <= set(rows[0]), RE_RECORD.format(name="fred")

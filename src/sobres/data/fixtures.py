@@ -33,7 +33,7 @@ class FixtureYahooSource:
             raise UnknownTickerError(ticker, provider="yfinance")
         frame = pd.read_csv(path, index_col=0, parse_dates=True)
         frame = frame.loc[str(start) : str(end)]
-        meta_all = json.loads((self.root / "meta.json").read_text())
+        meta_all = json.loads((self.root / "meta.json").read_text(encoding="utf-8"))
         meta = dict(meta_all.get("tickers", {}).get(ticker.upper(), {}))
         return RawHistory(frame=frame, currency=meta.get("currency"), meta=meta)
 
@@ -50,7 +50,7 @@ class FixtureFredSource:
         path = self.root / f"{series_id.upper()}.json"
         if not path.exists():
             raise UnknownTickerError(series_id, provider="fred")
-        payload = json.loads(path.read_text())
+        payload = json.loads(path.read_text(encoding="utf-8"))
         rows = payload.get("observations")
         if not isinstance(rows, list):
             raise ProviderError("fixture has no 'observations' list", provider="fred")
@@ -71,7 +71,7 @@ class FixtureEcbSource:
             raise ProviderError(
                 f"the ECB publishes no reference rate for {currency}", provider="ecb"
             )
-        lines = path.read_text().splitlines()
+        lines = path.read_text(encoding="utf-8").splitlines()
         header, rows = lines[0], lines[1:]
         columns = header.split(",")
         period = columns.index("TIME_PERIOD")
@@ -91,7 +91,7 @@ class FixtureKenFrenchSource:
         path = self.root / f"{file_stem}.CSV"
         if not path.exists():
             raise ProviderError(f"no fixture for {file_stem}", provider="ken_french")
-        return path.read_text()
+        return path.read_text(encoding="utf-8")
 
 
 def fixture_source(provider: str, root: Path) -> Any:
