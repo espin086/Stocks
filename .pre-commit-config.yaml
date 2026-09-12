@@ -24,6 +24,13 @@ repos:
         args: [--fix]
       - id: ruff-format
 
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+        # Workflow expressions are rejected before any job starts, so a bad one
+        # shows up as a failed run with zero jobs and no log. Catch it here.
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.14.1
     hooks:

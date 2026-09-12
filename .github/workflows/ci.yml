@@ -36,6 +36,20 @@ jobs:
       - name: ruff format
         run: ruff format --check --diff .
 
+      - name: Lint GitHub Actions workflows
+        # These workflows are code, and they fail in a way no unit test can
+        # catch: an invalid expression is rejected before any job starts, so the
+        # run reports failure with zero jobs and no log to read.
+        # Pinned release download rather than a third-party action or a
+        # curl-piped-to-bash installer.
+        env:
+          ACTIONLINT_VERSION: "1.7.7"
+        run: |
+          curl -sSfL -o actionlint.tar.gz \
+            "https://github.com/rhysd/actionlint/releases/download/v${ACTIONLINT_VERSION}/actionlint_${ACTIONLINT_VERSION}_linux_amd64.tar.gz"
+          tar xzf actionlint.tar.gz actionlint
+          ./actionlint -color
+
   typecheck:
     name: Type check
     runs-on: ubuntu-latest
@@ -167,17 +181,21 @@ jobs:
     needs: [lint, typecheck, test, build, security]
     runs-on: ubuntu-latest
     steps:
-      - name: Verify every dependency succeeded
-        # `if: always()` means this job runs even when a dependency failed, so
-        # it must inspect the results itself rather than rely on job ordering.
-        # Anything that is not `success` -- failed, cancelled or skipped -- is a
-        # red gate; a skipped required job must never read as passing.
+      # `if: always()` means this job runs even when a dependency failed, so it
+      # must inspect the results itself rather than rely on job ordering.
+      # Anything that is not `success` -- failed, cancelled, or skipped -- is a
+      # red gate; a skipped required job must never read as passing.
+      #
+      # The condition lives on the step, not in shell. A multi-line `${{ }}`
+      # interpolated into an `if` statement expands to a continuation line
+      # starting with `||`, which bash rejects as a syntax error -- so the gate
+      # would fail even when every job passed.
+      - name: Fail if any dependency did not succeed
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
         run: |
-          echo 'Results: ${{ join(needs.*.result, ", ") }}'
-          if ${{ contains(needs.*.result, 'failure')
-              || contains(needs.*.result, 'cancelled')
-              || contains(needs.*.result, 'skipped') }} ; then
-            echo "::error::One or more required jobs did not succeed."
-            exit 1
-          fi
-          echo "All required jobs succeeded."
+          echo "::error::Required jobs did not all succeed: ${{ join(needs.*.result, ', ') }}"
+          exit 1
+
+      - name: All required jobs succeeded
+        run: |
+          echo "Results: ${{ join(needs.*.result, ', ') }}"
