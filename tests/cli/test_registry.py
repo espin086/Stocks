@@ -34,6 +34,8 @@ from sobres.registry import (
 from sobres.results import MessageResult, Result
 
 EXPECTED_COMMANDS = [
+    "analyze.factors",
+    "analyze.stock",
     "cache.clear",
     "cache.info",
     "commands",

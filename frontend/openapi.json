@@ -403,6 +403,155 @@
         "title": "EnvParams",
         "type": "object"
       },
+      "FactorParams": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base currency for a multi-currency universe (e.g. USD).",
+            "title": "Base"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "frequency": {
+            "default": "monthly",
+            "description": "Return frequency; monthly matches the published factors.",
+            "enum": [
+              "monthly",
+              "daily"
+            ],
+            "title": "Frequency",
+            "type": "string"
+          },
+          "hac_lags": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Newey-West lag length; default: the Newey-West (1994) rule.",
+            "title": "Hac Lags"
+          },
+          "model": {
+            "default": "ff3",
+            "description": "Factor model.",
+            "enum": [
+              "capm",
+              "ff3",
+              "ff5",
+              "ff5+mom"
+            ],
+            "title": "Model",
+            "type": "string"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "rolling": {
+            "anyOf": [
+              {
+                "minimum": 6.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Window (in periods) for rolling loadings instead of one fit.",
+            "title": "Rolling"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "ticker": {
+            "anyOf": [
+              {
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "One ticker (or use --tickers for a comparison table).",
+            "positional": true,
+            "title": "Ticker"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Several tickers for a comparison table (or use --portfolio).",
+            "title": "Tickers"
+          }
+        },
+        "required": [
+          "start",
+          "fill"
+        ],
+        "title": "FactorParams",
+        "type": "object"
+      },
       "FactorsParams": {
         "additionalProperties": false,
         "properties": {
@@ -1373,6 +1522,66 @@
         "title": "SettingBody",
         "type": "object"
       },
+      "StockParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate for the risk panel.",
+            "title": "Risk Free"
+          },
+          "start": {
+            "default": "2015-01-01",
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "ticker": {
+            "description": "Ticker symbol, e.g. NVDA.",
+            "minLength": 1,
+            "positional": true,
+            "title": "Ticker",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker",
+          "fill"
+        ],
+        "title": "StockParams",
+        "type": "object"
+      },
       "TokenRotateParams": {
         "additionalProperties": false,
         "properties": {
@@ -1577,6 +1786,86 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/analyze/factors": {
+      "post": {
+        "description": "Regress excess returns on CAPM or Fama-French factors; alpha with its t-statistic.",
+        "operationId": "analyze_factors_api_v1_analyze_factors_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactorParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Regress excess returns on CAPM or Fama-French factors; alpha with its t-statistic.",
+        "tags": [
+          "analyze"
+        ]
+      }
+    },
+    "/api/v1/analyze/stock": {
+      "post": {
+        "description": "Price summary, risk panel, CAPM beta and fundamentals for one stock.",
+        "operationId": "analyze_stock_api_v1_analyze_stock_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StockParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Price summary, risk panel, CAPM beta and fundamentals for one stock.",
+        "tags": [
+          "analyze"
+        ]
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
         "operationId": "login_api_v1_auth_login_post",

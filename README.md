@@ -63,7 +63,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | ✅ Done |
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | ✅ Done |
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | ✅ Done |
-| [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
+| [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | ✅ Done |
 | [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
 | [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
 | [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
@@ -138,6 +138,23 @@ in-sample result is labelled as such. A multi-currency universe needs `--base`;
 returns are converted before any moment is estimated. Read
 [why your backtest looks too good](docs/why-your-backtest-looks-too-good.md)
 before trusting the Sharpe ratio.
+
+## Quickstart: factor analysis
+
+```bash
+sobres analyze stock NVDA --start 2015-01-01 --fill drop
+sobres analyze factors NVDA --model ff5 --start 2015-01-01 --fill drop
+sobres analyze factors --tickers AAPL MSFT NVDA --model ff5+mom --start 2015-01-01 --fill drop --format csv
+sobres analyze factors NVDA --rolling 36 --start 2015-01-01 --fill drop
+```
+
+Excess returns (`r - RF`, with `RF` from the same Ken French file) regressed on
+CAPM, Fama-French 3 or 5 factors, or 5 + momentum, monthly by default. Every
+coefficient carries OLS and Newey-West standard errors, t-statistics and
+p-values; alpha is annualized and, when its HAC p-value exceeds 0.05, the output
+says it is not distinguishable from zero. `analyze stock` adds the price summary,
+the 0002 risk panel, CAPM beta and current fundamentals with the note that they
+are not point-in-time.
 
 ## Quickstart: saved state
 

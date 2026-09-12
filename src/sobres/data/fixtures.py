@@ -37,6 +37,15 @@ class FixtureYahooSource:
         meta = dict(meta_all.get("tickers", {}).get(ticker.upper(), {}))
         return RawHistory(frame=frame, currency=meta.get("currency"), meta=meta)
 
+    def fundamentals(self, ticker: str) -> dict[str, Any] | None:
+        """``<dir>/yfinance/fundamentals.json``: symbol → the vendor's ``info`` keys we use."""
+        path = self.root / "fundamentals.json"
+        if not path.exists():
+            return None
+        docs = json.loads(path.read_text()).get("tickers", {})
+        info = docs.get(ticker.upper())
+        return dict(info) if info else None
+
 
 class FixtureFredSource:
     """``<dir>/fred/<SERIES>.json`` — the API's JSON response body."""

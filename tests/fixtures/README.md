@@ -20,7 +20,7 @@ Run `python scripts/record_fixtures.py` with network access (and
 
 | Directory | Shape | Source of truth |
 |---|---|---|
-| `yfinance/` | `Ticker.history(auto_adjust=False)` CSV + `meta.json` currency | yfinance 1.7 |
+| `yfinance/` | `Ticker.history(auto_adjust=False)` CSV + `meta.json` currency; `fundamentals.json` holds the `Ticker.info` keys `analyze stock` reads (0007) | yfinance 1.7 |
 | `fred/` | `fred/series/observations?file_type=json` body | FRED API |
 | `ecb/` | `EXR/D.<CCY>.EUR.SP00.A?format=csvdata` body | ECB Data Portal |
 | `ken_french/` | the CSV inside `<file>_CSV.zip` | Ken French Data Library |

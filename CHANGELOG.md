@@ -12,6 +12,18 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 ## [Unreleased]
 
 ### Added
+- **Equity and factor analysis (change 0007).** `sobres analyze factors`
+  (CAPM, FF3, FF5, FF5+momentum on excess returns; OLS and Newey-West
+  statistics per term; annualized alpha with an explicit "not distinguishable
+  from zero" statement; `--rolling` loadings; a multi-ticker comparison table
+  in the order supplied) and `sobres analyze stock` (price summary, risk panel,
+  CAPM beta, current fundamentals with the point-in-time caveat).
+  `core/factors.py` is numpy-only; `statsmodels` stays an extra.
+
+### Fixed
+- Cached factor frames came back with an empty `Mkt-RF` column: the
+  observation cache upper-cased symbols before asking the provider. Keys are
+  still stored upper-cased; the caller's casing is now restored on the way out.
 - **Landing page (change 0006).** `site/`: a dark, static Vite + TypeScript page
   at ai-solutions-lab-llc.github.io/sobres with an efficient frontier that draws
   itself, a terminal replaying a recorded `sobres optimize markowitz` transcript,

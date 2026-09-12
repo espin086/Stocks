@@ -120,7 +120,9 @@ class ObservationCache:
         started = time.perf_counter()
         now = self._clock()
         requested = DateRange(start, end)
-        symbols = [s.upper() for s in symbols]
+        # Keys are stored upper-cased; the caller's casing (``Mkt-RF``) is restored on the way out.
+        casing = {s.upper(): s for s in symbols}
+        symbols = list(casing)
         to_fetch: dict[DateRange, list[str]] = {}
         for symbol in symbols:
             key = SeriesKey(provider, dataset, symbol)
@@ -144,7 +146,11 @@ class ObservationCache:
             {"provider": provider, "dataset": dataset, "symbols": len(symbols), "status": status},
         ) as sp:
             for rng, missing in sorted(to_fetch.items()):
-                frame = fetch(missing, rng.start, rng.end)
+                frame = fetch([casing[s] for s in missing], rng.start, rng.end)
+                frame = frame.rename(columns={casing[s]: s for s in missing})
+                frame.attrs["series_meta"] = {
+                    str(k).upper(): v for k, v in frame.attrs.get("series_meta", {}).items()
+                }
                 rows = self._to_observations(provider, dataset, frame, missing)
                 ttl = ttl_for(dataset, rng.end, now.date())
                 self._store.upsert_observations(rows)
@@ -160,9 +166,9 @@ class ObservationCache:
             result = self._store.read_observations(
                 ObservationQuery(provider, dataset, symbols, start, end)
             )
-            result = canonical_frame(result, symbols)
+            result = canonical_frame(result, symbols).rename(columns=casing)
             series_meta_all = {
-                s: m
+                casing[s]: m
                 for s in symbols
                 if (m := self._store.get_series_meta(SeriesKey(provider, dataset, s)))
             }

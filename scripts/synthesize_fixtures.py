@@ -101,6 +101,35 @@ def write_yfinance(rng: np.random.Generator) -> None:
             "exchangeName": "LSE" if currency == "GBp" else "NMS",
             "symbol": ticker,
         }
+    # Fundamentals (0007): the Ticker.info keys sobres reads, invented per ticker; ETFs have none.
+    fundamentals = {
+        t: {
+            "quoteType": "EQUITY",
+            "longName": f"{t} Inc.",
+            "sector": "Technology",
+            "marketCap": float(rng.integers(50, 3000)) * 1e9,
+            "trailingPE": round(float(rng.uniform(10, 60)), 1),
+            "priceToBook": round(float(rng.uniform(1, 50)), 1),
+            "dividendYield": round(float(dy), 4),
+            "currency": currency,
+        }
+        for t, (_, _, _, currency, dy) in TICKERS.items()
+        if t != "GLD"
+    }
+    (out / "fundamentals.json").write_text(
+        json.dumps(
+            {
+                "recorded_at": None,
+                "synthesized_at": datetime.now(UTC).isoformat(),
+                "provider": "yfinance",
+                "note": "synthesized in the shape of Ticker.info (the keys sobres reads); "
+                "GLD is an ETF and has none",
+                "tickers": fundamentals,
+            },
+            indent=2,
+        )
+        + "\n"
+    )
     (out / "meta.json").write_text(
         json.dumps(
             {

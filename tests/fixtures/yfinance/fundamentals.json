@@ -1,0 +1,68 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T19:30:00+00:00",
+  "provider": "yfinance",
+  "note": "synthesized in the shape of Ticker.info (the keys sobres reads); GLD is an ETF and has none",
+  "tickers": {
+    "AAPL": {
+      "quoteType": "EQUITY",
+      "longName": "Apple Inc.",
+      "sector": "Technology",
+      "marketCap": 3400000000000,
+      "trailingPE": 33.2,
+      "priceToBook": 48.1,
+      "dividendYield": 0.0044,
+      "currency": "USD"
+    },
+    "MSFT": {
+      "quoteType": "EQUITY",
+      "longName": "Microsoft Corporation",
+      "sector": "Technology",
+      "marketCap": 3100000000000,
+      "trailingPE": 35.7,
+      "priceToBook": 11.9,
+      "dividendYield": 0.0072,
+      "currency": "USD"
+    },
+    "NVDA": {
+      "quoteType": "EQUITY",
+      "longName": "NVIDIA Corporation",
+      "sector": "Technology",
+      "marketCap": 3300000000000,
+      "trailingPE": 54.0,
+      "priceToBook": 51.3,
+      "dividendYield": 0.0003,
+      "currency": "USD"
+    },
+    "JNJ": {
+      "quoteType": "EQUITY",
+      "longName": "Johnson & Johnson",
+      "sector": "Healthcare",
+      "marketCap": 380000000000,
+      "trailingPE": 22.4,
+      "priceToBook": 5.3,
+      "dividendYield": 0.031,
+      "currency": "USD"
+    },
+    "XOM": {
+      "quoteType": "EQUITY",
+      "longName": "Exxon Mobil Corporation",
+      "sector": "Energy",
+      "marketCap": 470000000000,
+      "trailingPE": 13.6,
+      "priceToBook": 1.8,
+      "dividendYield": 0.035,
+      "currency": "USD"
+    },
+    "VOD.L": {
+      "quoteType": "EQUITY",
+      "longName": "Vodafone Group Plc",
+      "sector": "Communication Services",
+      "marketCap": 18000000000,
+      "trailingPE": null,
+      "priceToBook": 0.4,
+      "dividendYield": 0.055,
+      "currency": "GBp"
+    }
+  }
+}

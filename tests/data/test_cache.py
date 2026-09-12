@@ -52,8 +52,9 @@ def test_hit_avoids_fetch(cache: ObservationCache) -> None:
         "p", "prices_adj_close", ["aapl"], D(2020, 1, 1), D(2020, 1, 31), _fetcher(calls)
     )
     assert second.attrs["cache"]["status"] == "hit" and len(calls) == 1
-    pd.testing.assert_frame_equal(first, second)
-    assert second.attrs["series_meta"] == {"AAPL": {"currency": "USD"}}
+    # Keys are case-insensitive; the frame comes back in the caller's casing.
+    pd.testing.assert_frame_equal(first, second.rename(columns=str.upper))
+    assert second.attrs["series_meta"] == {"aapl": {"currency": "USD"}}
 
 
 def test_subrange_of_cached_range_makes_no_network_call(cache: ObservationCache) -> None:
@@ -149,3 +150,25 @@ def test_fetch_logged_at_debug(cache: ObservationCache, capsys: pytest.CaptureFi
     cache.get("p", "prices_adj_close", ["AAPL"], D(2020, 1, 1), D(2020, 1, 10), _fetcher([]))
     err = capsys.readouterr().err
     assert '"cache.get"' in err and '"status": "miss"' in err and '"elapsed_ms"' in err
+
+
+def test_mixed_case_symbols_round_trip_with_their_casing(cache: ObservationCache) -> None:
+    """Keys are stored upper-cased, but ``Mkt-RF`` must come back as ``Mkt-RF`` with its
+    values — the Ken French provider's columns are mixed case (0007 found them empty)."""
+    calls: list[tuple[list[str], date, date]] = []
+    frame = cache.get(
+        "ken_french",
+        "factors",
+        ["Mkt-RF", "SMB"],
+        date(2024, 1, 1),
+        date(2024, 1, 10),
+        _fetcher(calls),
+    )
+    assert calls[0][0] == ["Mkt-RF", "SMB"]  # the provider is asked in its own casing
+    assert list(frame.columns) == ["Mkt-RF", "SMB"]
+    assert frame["Mkt-RF"].notna().all() and frame["Mkt-RF"].iloc[0] == 1.0
+    assert frame.attrs["series_meta"]["Mkt-RF"] == {"currency": "USD"}
+    again = cache.get(
+        "ken_french", "factors", ["mkt-rf"], date(2024, 1, 1), date(2024, 1, 10), _fetcher(calls)
+    )
+    assert len(calls) == 1 and list(again.columns) == ["mkt-rf"]  # a hit, in the caller's casing

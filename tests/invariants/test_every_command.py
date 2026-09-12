@@ -19,6 +19,28 @@ from tests.conftest import SENTINEL_KEY
 # One runnable, offline invocation per command. A new command must add an entry
 # here or ``test_every_command_has_a_sample`` fails.
 SAMPLE_ARGS: dict[str, list[str]] = {
+    "analyze.factors": [
+        "analyze",
+        "factors",
+        "AAPL",
+        "--start",
+        "2015-01-01",
+        "--end",
+        "2024-12-31",
+        "--fill",
+        "drop",
+    ],
+    "analyze.stock": [
+        "analyze",
+        "stock",
+        "AAPL",
+        "--start",
+        "2020-01-01",
+        "--end",
+        "2024-12-31",
+        "--fill",
+        "drop",
+    ],
     "cache.clear": ["cache", "clear", "--yes"],
     "cache.info": ["cache", "info"],
     "commands": ["commands"],

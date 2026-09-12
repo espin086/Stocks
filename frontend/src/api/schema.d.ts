@@ -4,6 +4,46 @@
  */
 
 export interface paths {
+    "/api/v1/analyze/factors": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Regress excess returns on CAPM or Fama-French factors; alpha with its t-statistic.
+         * @description Regress excess returns on CAPM or Fama-French factors; alpha with its t-statistic.
+         */
+        post: operations["analyze_factors_api_v1_analyze_factors_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/analyze/stock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Price summary, risk panel, CAPM beta and fundamentals for one stock.
+         * @description Price summary, risk panel, CAPM beta and fundamentals for one stock.
+         */
+        post: operations["analyze_stock_api_v1_analyze_stock_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -1213,6 +1253,76 @@ export interface components {
         };
         /** EnvParams */
         EnvParams: Record<string, never>;
+        /** FactorParams */
+        FactorParams: {
+            /**
+             * Base
+             * @description Base currency for a multi-currency universe (e.g. USD).
+             */
+            base?: string | null;
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Fill
+             * @description Provider-gap policy: drop, ffill or raise. No default.
+             * @enum {string}
+             */
+            fill: "drop" | "ffill" | "raise";
+            /**
+             * Frequency
+             * @description Return frequency; monthly matches the published factors.
+             * @default monthly
+             * @enum {string}
+             */
+            frequency: "monthly" | "daily";
+            /**
+             * Hac Lags
+             * @description Newey-West lag length; default: the Newey-West (1994) rule.
+             */
+            hac_lags?: number | null;
+            /**
+             * Model
+             * @description Factor model.
+             * @default ff3
+             * @enum {string}
+             */
+            model: "capm" | "ff3" | "ff5" | "ff5+mom";
+            /**
+             * Portfolio
+             * @description A saved portfolio's name in place of --tickers.
+             */
+            portfolio?: string | null;
+            /**
+             * Rolling
+             * @description Window (in periods) for rolling loadings instead of one fit.
+             */
+            rolling?: number | null;
+            /**
+             * Save Run
+             * @description Record this run in the run history.
+             * @default false
+             */
+            save_run: boolean;
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             */
+            start: string;
+            /**
+             * Ticker
+             * @description One ticker (or use --tickers for a comparison table).
+             */
+            ticker?: string | null;
+            /**
+             * Tickers
+             * @description Several tickers for a comparison table (or use --portfolio).
+             */
+            tickers?: string[] | null;
+        };
         /** FactorsParams */
         FactorsParams: {
             /**
@@ -1736,6 +1846,37 @@ export interface components {
             /** Value */
             value: string;
         };
+        /** StockParams */
+        StockParams: {
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Fill
+             * @description Provider-gap policy: drop, ffill or raise. No default.
+             * @enum {string}
+             */
+            fill: "drop" | "ffill" | "raise";
+            /**
+             * Risk Free
+             * @description Annual decimal risk-free rate for the risk panel.
+             */
+            risk_free?: number | null;
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             * @default 2015-01-01
+             */
+            start: string;
+            /**
+             * Ticker
+             * @description Ticker symbol, e.g. NVDA.
+             */
+            ticker: string;
+        };
         /** TokenRotateParams */
         TokenRotateParams: {
             /**
@@ -1836,6 +1977,72 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    analyze_factors_api_v1_analyze_factors_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["FactorParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    analyze_stock_api_v1_analyze_stock_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StockParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     login_api_v1_auth_login_post: {
         parameters: {
             query?: never;
