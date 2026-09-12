@@ -462,11 +462,17 @@ for _spec in PROVIDERS:
     )
 
 
+def _module_present(name: str) -> bool:
+    """``find_spec`` raises when a dotted name's parent package is absent; absent is absent."""
+    try:
+        return importlib.util.find_spec(name) is not None
+    except ModuleNotFoundError:
+        return False
+
+
 def _extras(ctx: Any) -> CheckResult:
     installed = [
-        name
-        for name, modules in EXTRAS.items()
-        if all(importlib.util.find_spec(m) is not None for m in modules)
+        name for name, modules in EXTRAS.items() if all(_module_present(m) for m in modules)
     ]
     missing = [name for name in EXTRAS if name not in installed]
     text = f"installed extras: {', '.join(installed) or 'none'}"
