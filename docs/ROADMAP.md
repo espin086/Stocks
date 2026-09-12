@@ -14,7 +14,7 @@ far ahead goes stale before it is used.
 | 0001 | Foundation: onboarding, registry, storage port, data layer + quality, currency, observability, testing | 0000 | ~67h | proposal + 8 specs + design + tasks |
 | 0002 | **Portfolio optimization → v1.0.0** | 0001 | ~48h | proposal + spec + design + tasks |
 | 0003 | Local persistence (SQLite) → v1.1 | 0002 | ~25h est. | proposal + spec |
-| 0004 | Web UI (FastAPI + React) → v1.2 | 0003 | ~70h est. | proposal + 2 specs + design |
+| 0004 | Web UI (FastAPI + React) → v1.2 | 0003 | ~72h est. | proposal + 2 specs + design |
 | 0005 | Docker distribution → v1.2 | 0004 | ~25h est. | proposal + spec |
 | 0006 | Landing page (GitHub Pages) → v1.2 | 0005 | ~30h est. | proposal + spec |
 | 0007 | Equity & factor analysis → v1.3 | 0002 | ~35h est. | proposal + spec |

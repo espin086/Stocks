@@ -115,6 +115,7 @@ site/                       # 0006: animated landing page → GitHub Pages
 | `qf run list` / `qf run show <id>` | Browse saved analysis runs |
 | `qf db info` / `qf db export --to ...` | Inspect and back up the database |
 | `qf serve --host 0.0.0.0` | Run the web UI and API |
+| `qf open [doctor\|settings\|run 42\|...]` | Start the server if needed and open the browser to a view |
 | `qf deploy compose` / `qf deploy check` | Generate and verify a deployment |
 
 ## Data sources
@@ -243,7 +244,7 @@ Each is one OpenSpec change under `openspec/changes/`.
 | 0001 | `foundation-data-and-cli` | Onboarding (`init`/`doctor`/`upgrade`), command registry, storage port + SQLite adapter, providers, data quality, currency model, logging + tracing, test scaffolding, `qf data *` |
 | 0002 | `portfolio-optimization` | **v1.0.0** — returns/risk, MVO, frontier, backtest |
 | 0003 | `local-persistence` | Schema + migrations, saved portfolios/goals/runs, `qf db` |
-| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `qf serve` |
+| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `qf serve`, `qf open` |
 | 0005 | `docker-distribution` | One image on Docker Hub, CLI entrypoint, `qf deploy` |
 | 0006 | `landing-page` | Animated dark GitHub Pages site |
 | 0007 | `equity-factor-analysis` | Single-stock analysis, CAPM, Fama-French 3/5 + momentum |

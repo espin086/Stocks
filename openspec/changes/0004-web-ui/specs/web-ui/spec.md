@@ -71,8 +71,55 @@
 
 #### Scenario: `qf init --web`
 - **WHEN** `qf init --web` runs once this change has landed
-- **THEN** it SHALL start the server bound to loopback and open the settings
-  page, as the browser form of the same wizard
+- **THEN** it SHALL behave as `qf open settings`, the browser form of the same
+  wizard
+
+### Requirement: Launching the UI from the CLI
+
+The browser is one command away from the terminal, and never the only way in.
+
+#### Scenario: `qf open`
+- **WHEN** `qf open` runs and no server is listening on the configured port
+- **THEN** it SHALL start the server bound to loopback, wait for the health
+  endpoint to pass, open the default browser to the app, and keep serving until
+  interrupted
+- **AND** the URL SHALL be printed to stderr before the browser is launched, so
+  it is available even if the launch fails
+
+#### Scenario: Server already running
+- **WHEN** `qf open` runs and a quantfolio server already answers on the port
+- **THEN** it SHALL open the browser to that server and exit 0 without starting
+  a second one
+- **AND** a non-quantfolio process on the port SHALL produce an error naming the
+  port and suggesting `--port`
+
+#### Scenario: Targets
+- **WHEN** `qf open <target>` runs
+- **THEN** `target` SHALL accept `settings`, `doctor`, `runs`, `run <id>`,
+  `portfolio <name>`, and any registry command name, opening that view directly
+- **AND** the accepted set SHALL be derived from the frontend view manifest, so
+  a view that exists is always reachable and one that does not is rejected with
+  the list of those that are
+
+#### Scenario: Headless is not an error
+- **WHEN** no browser can be launched — no display, an SSH session, or inside
+  the container
+- **THEN** `qf open` SHALL print the URL and exit 0
+- **AND** `--print-url` SHALL force that behavior anywhere
+
+#### Scenario: Browser choice is respected
+- **WHEN** the `BROWSER` environment variable is set
+- **THEN** it SHALL be honored, via the platform's standard launcher
+
+#### Scenario: Never a token in the URL
+- **WHEN** the server requires a token
+- **THEN** `qf open` SHALL open the app's entry page and the user SHALL paste the
+  token once there, per `http-api`; the token SHALL NOT be placed in the URL
+
+#### Scenario: `qf serve --open`
+- **WHEN** `qf serve --open` runs
+- **THEN** it SHALL behave as `qf serve` followed by the browser launch above,
+  once healthy
 
 ### Requirement: Dark mode
 

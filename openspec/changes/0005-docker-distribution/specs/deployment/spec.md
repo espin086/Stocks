@@ -81,6 +81,13 @@
   non-root user, resolved database URL, configured settings — with the same
   actionable lines as a local install
 
+#### Scenario: `qf open` in the container
+- **WHEN** `docker run <image> open` runs
+- **THEN** it SHALL print the URL to reach the UI from the host — using the
+  published port when it can be determined, and the container port with a note
+  otherwise — and exit 0
+- **AND** SHALL NOT attempt to launch a browser, since there is none
+
 #### Scenario: Non-interactive init in the container
 - **WHEN** `qf init` runs inside the container
 - **THEN** it SHALL default to `--non-interactive`, reading settings from the

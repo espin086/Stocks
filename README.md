@@ -57,7 +57,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | `init`/`doctor` onboarding, command registry, storage port, providers, currency, observability, `qf data` | 📋 Planned |
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `qf db` | 📋 Planned |
-| [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `qf serve` | 📋 Planned |
+| [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `qf serve`, `qf open` | 📋 Planned |
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `qf deploy` | 📋 Planned |
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
@@ -81,7 +81,8 @@ qf doctor                           # every check tells you what's wrong and how
 
 That's the whole onboarding path, and it stays three commands as the tool grows.
 `qf doctor --fix` applies the safe repairs; `qf upgrade` detects how you
-installed and runs the matching upgrade.
+installed and runs the matching upgrade. Once the web UI lands, `qf open` starts
+it and puts it in your browser — `qf open doctor` goes straight to a view.
 
 Or for development:
 
