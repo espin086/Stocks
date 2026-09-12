@@ -65,7 +65,8 @@ def build(version: int) -> Path:
     out.write_text(
         f"-- schema version {version} with sample rows; produced by scripts/schema_fixture.py\n"
         + "\n".join(lines)
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     return out
 

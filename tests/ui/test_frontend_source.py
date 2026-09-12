@@ -28,11 +28,13 @@ SRC = FRONTEND / "src"
 
 
 def _read(rel: str) -> str:
-    return (FRONTEND / rel).read_text()
+    return (FRONTEND / rel).read_text(encoding="utf-8")
 
 
 def _sources() -> dict[str, str]:
-    return {str(p.relative_to(SRC)): p.read_text() for p in SRC.rglob("*.ts*")}
+    return {
+        p.relative_to(SRC).as_posix(): p.read_text(encoding="utf-8") for p in SRC.rglob("*.ts*")
+    }
 
 
 def _tokens(block: str) -> dict[str, str]:
