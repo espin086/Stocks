@@ -1,0 +1,44 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T17:32:49.520505+00:00",
+  "provider": "yfinance",
+  "provider_version": "1.7.0 (shape)",
+  "note": "synthesized in the shape of Ticker.history(auto_adjust=False); see tests/fixtures/README.md",
+  "tickers": {
+    "AAPL": {
+      "currency": "USD",
+      "exchangeName": "NMS",
+      "symbol": "AAPL"
+    },
+    "MSFT": {
+      "currency": "USD",
+      "exchangeName": "NMS",
+      "symbol": "MSFT"
+    },
+    "NVDA": {
+      "currency": "USD",
+      "exchangeName": "NMS",
+      "symbol": "NVDA"
+    },
+    "JNJ": {
+      "currency": "USD",
+      "exchangeName": "NMS",
+      "symbol": "JNJ"
+    },
+    "XOM": {
+      "currency": "USD",
+      "exchangeName": "NMS",
+      "symbol": "XOM"
+    },
+    "GLD": {
+      "currency": "USD",
+      "exchangeName": "NMS",
+      "symbol": "GLD"
+    },
+    "VOD.L": {
+      "currency": "GBp",
+      "exchangeName": "LSE",
+      "symbol": "VOD.L"
+    }
+  }
+}

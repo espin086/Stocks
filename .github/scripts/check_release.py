@@ -61,7 +61,9 @@ def fail(message: str) -> None:
 
 
 def read_version() -> str:
-    match = re.search(r'^__version__\s*=\s*"([^"]+)"', ABOUT.read_text(), re.MULTILINE)
+    match = re.search(
+        r'^__version__\s*=\s*"([^"]+)"', ABOUT.read_text(encoding="utf-8"), re.MULTILINE
+    )
     if not match:
         fail(f"Could not find __version__ in {ABOUT.relative_to(REPO_ROOT)}")
         raise AssertionError("unreachable")  # pragma: no cover
@@ -69,7 +71,7 @@ def read_version() -> str:
 
 
 def read_dist_name() -> str:
-    return str(tomllib.loads(PYPROJECT.read_text())["project"]["name"])
+    return str(tomllib.loads(PYPROJECT.read_text(encoding="utf-8"))["project"]["name"])
 
 
 def released_versions(dist_name: str, target: str) -> set[str] | None:
@@ -132,7 +134,7 @@ def main() -> None:
     # Release discipline: a version that ships must be described. Checked only
     # when actually publishing, so ordinary pushes are never blocked by it.
     if publish and CHANGELOG.exists():
-        changelog = CHANGELOG.read_text()
+        changelog = CHANGELOG.read_text(encoding="utf-8")
         if f"## [{version}]" not in changelog and f"## {version}" not in changelog:
             fail(
                 f"CHANGELOG.md has no section for {version}. "

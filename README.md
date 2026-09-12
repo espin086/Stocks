@@ -45,9 +45,11 @@ sobres ppp adjust-goal --goal fire --to PRT
 
 ## Status
 
-🚧 **Pre-alpha — planning.** The repository currently contains the packaging
-scaffold, the release pipeline, and the full spec-driven development plan. No
-analytical code, UI, or container is implemented yet.
+🚧 **Pre-alpha.** The foundation is in: onboarding (`init`/`doctor`/`upgrade`),
+the command registry the CLI is generated from, the storage port with its SQLite
+adapter, keyless market, factor and exchange-rate providers, the currency model,
+and structured logging. Analytics, the UI and the container follow milestone by
+milestone below.
 
 **Start here: [`openspec/project.md`](openspec/project.md)** for the architecture, then
 the milestone plans in [`openspec/changes/`](openspec/changes/).
@@ -55,7 +57,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | # | Milestone | Ships | State |
 |---|---|---|---|
 | [0000](openspec/changes/0000-release-engineering/) | Release engineering | CI gate, version-gated PyPI publishing | ✅ Done |
-| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | `init`/`doctor` onboarding, command registry, storage port, providers, currency, observability, `sobres data` | 📋 Planned |
+| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | `init`/`doctor` onboarding, command registry, storage port, providers, currency, observability, `sobres data` | ✅ Done |
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `sobres db` | 📋 Planned |
 | [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | 📋 Planned |
@@ -97,6 +99,24 @@ pre-commit install                  # optional: run CI's checks before each comm
 
 > **One name everywhere:** the distribution, the import package, and the console
 > script are all `sobres` — `pip install sobres`, `import sobres`, `sobres --help`.
+
+## Quickstart: the data layer
+
+```bash
+sobres data prices AAPL MSFT NVDA --start 2015-01-01          # Rich table on a TTY
+sobres data prices AAPL --start 2020-01-01 --format csv > p.csv  # CSV when piped
+sobres data factors --model ff5 --frequency monthly            # Fama-French + RF, decimal
+sobres data fx EURUSD GBP/USD --start 2024-01-01               # ECB reference rates
+sobres data macro DGS10 CPIAUCSL --start 2020-01-01            # needs a free FRED key
+sobres cache info                                              # what is on disk, how old
+sobres commands --format json                                  # the whole registry
+```
+
+Every data-emitting command takes `--format table|json|csv` (JSON is one
+document at full precision; logs never touch stdout) and `--refresh` to bypass
+the cache. A second identical call is served from the local SQLite file. Prices
+default to the split- and dividend-adjusted close, state their currency, and
+normalize pence- and cent-quoted listings to the major unit.
 
 **No API key is required** for the core tool. Prices come from yfinance and factor
 returns from the Ken French Data Library, both keyless. A free

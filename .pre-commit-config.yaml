@@ -1,6 +1,7 @@
-# Local parity with CI. Install once:
-#   pip install pre-commit && pre-commit install
-# The hooks here are the same checks CI runs, so a clean commit is a green PR.
+# The same gate CI runs, before a commit exists. Install once per clone:
+#   pip install -e ".[dev]" pre-commit && pre-commit install
+# A commit that fails here would fail the Lint, Format or Type check job, so
+# fixing it locally is always cheaper. `pre-commit run --all-files` runs it by hand.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -12,34 +13,36 @@ repos:
         args: [--allow-multiple-documents]
       - id: detect-private-key
       - id: end-of-file-fixer
-        exclude: ^legacy_code/
+        exclude: ^(legacy_code/|tests/fixtures/)
       - id: mixed-line-ending
       - id: trailing-whitespace
-        exclude: ^legacy_code/
-
-  - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.4
-    hooks:
-      - id: ruff
-        args: [--fix]
-      - id: ruff-format
+        exclude: ^(legacy_code/|tests/fixtures/)
 
   - repo: https://github.com/rhysd/actionlint
     rev: v1.7.7
     hooks:
       - id: actionlint
-        # Workflow expressions are rejected before any job starts, so a bad one
-        # shows up as a failed run with zero jobs and no log. Catch it here.
+        # A bad workflow expression fails the run before any job starts, with no log.
 
-  - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.14.1
+  # ruff and mypy run from the project's own environment (`pip install -e ".[dev]"`),
+  # exactly as CI runs them: same versions, same config, same dependencies for mypy.
+  - repo: local
     hooks:
+      - id: ruff-check
+        name: ruff check
+        entry: ruff check --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
+      - id: ruff-format
+        name: ruff format --check
+        entry: ruff format --check --force-exclude
+        language: system
+        types_or: [python, pyi]
+        require_serial: true
       - id: mypy
-        # Match CI: type-check the package, not stray scripts, and give mypy the
-        # real dependencies so `--strict` means the same thing in both places.
-        files: ^src/sobres/
-        additional_dependencies:
-          - typer>=0.12
-          - rich>=13.7
-          - pydantic>=2.7
-          - pandas-stubs
+        name: mypy --strict (src/sobres)
+        entry: python -m mypy
+        language: system
+        pass_filenames: false
+        files: ^(src/sobres/.*\.py|pyproject\.toml)$

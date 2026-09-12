@@ -11,6 +11,19 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## [Unreleased]
 
+### Added
+- **Foundation (change 0001).** The command registry and the Typer CLI
+  generated from it; the settings registry behind `sobres init`, `sobres doctor`
+  and `sobres config`; `sobres upgrade`; the storage port with its SQLite adapter,
+  forward-only migrations and a shared conformance suite; the observation cache
+  with per-dataset TTL and sub-range reuse; keyless yfinance, ECB and Ken French
+  providers plus FRED behind a free key; the currency model (`CurrencyPair`,
+  `convert`, sub-unit normalization, exact return conversion); structured
+  logging to stderr with redaction and opt-in OpenTelemetry tracing; and the
+  `sobres data`, `sobres cache`, `sobres config` and `sobres commands` groups.
+- Test scaffolding: architecture and invariant suites, recorded-fixture
+  provider tests, a scenario-coverage test, and `scripts/record_fixtures.py`.
+
 ### Changed
 - **Renamed the project to `sobres`** (change 0011). The PyPI distribution,
   the import package, and the console script are all `sobres`; the `qf` and

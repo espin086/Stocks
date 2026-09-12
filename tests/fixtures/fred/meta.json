@@ -1,0 +1,7 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T17:32:49.576259+00:00",
+  "provider": "fred",
+  "api": "fred/series/observations file_type=json",
+  "note": "synthesized in the API's response shape; see tests/fixtures/README.md"
+}

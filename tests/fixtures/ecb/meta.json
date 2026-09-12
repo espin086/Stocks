@@ -1,0 +1,7 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T17:32:49.612959+00:00",
+  "provider": "ecb",
+  "api": "data-api.ecb.europa.eu EXR/D.<CCY>.EUR.SP00.A?format=csvdata",
+  "note": "synthesized in the SDMX csvdata shape; see tests/fixtures/README.md"
+}

@@ -1,0 +1,6 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T17:32:49.676417+00:00",
+  "provider": "ken_french",
+  "note": "synthesized in the Data Library's multi-table CSV layout; the July 1926 FF3 row carries the published values; see tests/fixtures/README.md"
+}

@@ -2,7 +2,7 @@
 change: 0001-foundation-data-and-cli
 milestone: v1 (part 1 of 2)
 depends_on: []
-status: proposed
+status: implemented
 ---
 
 # 0001 — Foundation: data layer and CLI shell
