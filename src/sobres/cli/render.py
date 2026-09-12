@@ -51,6 +51,7 @@ def _index_cell(value: Any) -> str:
 def render_table(result: Result, out: TextIO, *, disclaimer: bool = True) -> None:
     console = Console(file=out, force_terminal=False, width=max(80, _width(out)), highlight=False)
     for line in result.header_lines():
+        # A header line is a path or a one-line message: never wrap it to the console width.
         console.print(line, markup=False, soft_wrap=True)
     custom = getattr(result, "render_rich", None)
     if custom is not None:

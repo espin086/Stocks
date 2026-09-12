@@ -113,7 +113,7 @@ def test_file_sink_writes_json_and_rotates(tmp_path: Path) -> None:
     get_logger("a").info("to file", k=1)
     for handler in logging.getLogger().handlers:
         handler.flush()
-    lines = [json.loads(line) for line in log_file.read_text().splitlines()]
+    lines = [json.loads(line) for line in log_file.read_text(encoding="utf-8").splitlines()]
     assert lines[0]["event"] == "to file" and lines[0]["k"] == 1
     rotating = [
         h

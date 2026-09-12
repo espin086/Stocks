@@ -110,7 +110,8 @@ def main() -> None:
             },
             indent=1,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     metrics = {r["metric"]: r for r in backtest["rows"]}
     (OUT / "backtest.json").write_text(
@@ -132,11 +133,12 @@ def main() -> None:
             },
             indent=1,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
-    (OUT / "terminal.txt").write_text(transcript)
+    (OUT / "terminal.txt").write_text(transcript, encoding="utf-8")
     meta_path = REPO / "tests" / "fixtures" / "yfinance" / "meta.json"
-    fixture_meta = json.loads(meta_path.read_text()) if meta_path.exists() else {}
+    fixture_meta = json.loads(meta_path.read_text(encoding="utf-8")) if meta_path.exists() else {}
     synthetic = not opts.live and fixture_meta.get("recorded_at") is None
     (OUT / "figures-meta.json").write_text(
         json.dumps(
@@ -171,7 +173,8 @@ def main() -> None:
             },
             indent=1,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     print(f"recorded figures into {OUT} (synthetic={synthetic})")
 

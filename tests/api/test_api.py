@@ -268,7 +268,7 @@ def test_settings_endpoints_share_the_config_set_path(api: TestClient, env: dict
     assert again["fred_api_key"]["source"] == "file"
     from pathlib import Path
 
-    assert SENTINEL_KEY in Path(env["SOBRES_CONFIG_FILE"]).read_text()
+    assert SENTINEL_KEY in Path(env["SOBRES_CONFIG_FILE"]).read_text(encoding="utf-8")
     bad = api.put("/api/v1/settings", json={"key": "log_level", "value": "LOUD"})
     assert bad.status_code == 400
     assert api.post("/api/v1/settings/log_level/verify", json={}).status_code == 400
@@ -368,9 +368,9 @@ def test_spa_fallback_and_placeholder(api: TestClient, tmp_path: Any) -> None:
     assert api.get("/manifest.json").status_code in (200, 404)
     static = tmp_path / "static"
     (static / "assets").mkdir(parents=True)
-    (static / "index.html").write_text("<html>built spa</html>")
-    (static / "manifest.json").write_text('{"views": {"home": "/"}}')
-    (static / "assets" / "app.js").write_text("console.log(1)")
+    (static / "index.html").write_text("<html>built spa</html>", encoding="utf-8")
+    (static / "manifest.json").write_text('{"views": {"home": "/"}}', encoding="utf-8")
+    (static / "assets" / "app.js").write_text("console.log(1)", encoding="utf-8")
     app = create_app(state_of(api).environ, start_worker=False, static_dir=static)
     with TestClient(app) as client:
         assert client.get("/runs/42").text == "<html>built spa</html>"

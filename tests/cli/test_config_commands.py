@@ -7,11 +7,15 @@ from __future__ import annotations
 
 import json
 import stat
+import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
+import pytest
 
+
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX file modes")
 def test_set_persists_at_0600(cli: Callable[..., Any], env: dict[str, str]) -> None:
     result = cli("config", "set", "fred_api_key", "ABC123XYZ")
     assert (
@@ -19,7 +23,7 @@ def test_set_persists_at_0600(cli: Callable[..., Any], env: dict[str, str]) -> N
     )
     path = Path(env["SOBRES_CONFIG_FILE"])
     assert stat.S_IMODE(path.stat().st_mode) == 0o600
-    assert 'fred_api_key = "ABC123XYZ"' in path.read_text()
+    assert 'fred_api_key = "ABC123XYZ"' in path.read_text(encoding="utf-8")
     assert cli("config", "path").stdout.strip().endswith("config.toml")
 
 
@@ -45,5 +49,5 @@ def test_set_validates_key_and_value(cli: Callable[..., Any]) -> None:
 def test_unset_removes_key(cli: Callable[..., Any], env: dict[str, str]) -> None:
     cli("config", "set", "log_level", "INFO")
     assert "removed" in cli("config", "unset", "log_level").stdout
-    assert "log_level" not in Path(env["SOBRES_CONFIG_FILE"]).read_text()
+    assert "log_level" not in Path(env["SOBRES_CONFIG_FILE"]).read_text(encoding="utf-8")
     assert "was not set" in cli("config", "unset", "log_level").stdout

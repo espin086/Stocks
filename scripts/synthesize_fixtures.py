@@ -128,7 +128,8 @@ def write_yfinance(rng: np.random.Generator) -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     (out / "meta.json").write_text(
         json.dumps(
@@ -143,7 +144,8 @@ def write_yfinance(rng: np.random.Generator) -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
 
 
@@ -188,7 +190,7 @@ def write_fred(rng: np.random.Generator) -> None:
             "limit": 100000,
             "observations": rows,
         }
-        (out / f"{name}.json").write_text(json.dumps(payload, indent=1) + "\n")
+        (out / f"{name}.json").write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
     (out / "meta.json").write_text(
         json.dumps(
             {
@@ -200,7 +202,8 @@ def write_fred(rng: np.random.Generator) -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
 
 
@@ -227,7 +230,7 @@ def write_ecb(rng: np.random.Generator) -> None:
                 f"A,F,,,P1D,,A,4F0,4F0,,,,,,,,{decimals},,4F0,,{ccy}/EUR,"
                 f"ECB reference exchange rate,{ccy},0"
             )
-        (out / f"{ccy}.csv").write_text("\n".join(lines) + "\n")
+        (out / f"{ccy}.csv").write_text("\n".join(lines) + "\n", encoding="utf-8")
     (out / "meta.json").write_text(
         json.dumps(
             {
@@ -239,7 +242,8 @@ def write_ecb(rng: np.random.Generator) -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
 
 
@@ -285,14 +289,16 @@ def write_ken_french(rng: np.random.Generator) -> None:
             ff3,
             ff3_rows,
             _factor_rows(rng, years, ff3, 15.0),
-        )
+        ),
+        encoding="utf-8",
     )
     (out / "F-F_Research_Data_Factors_daily.CSV").write_text(
         daily_file(
             ["This file was created by CMPT_ME_BEME_RETS using the 202412 CRSP database."],
             ff3,
             _factor_rows(rng, days, ff3, 0.8),
-        )
+        ),
+        encoding="utf-8",
     )
     (out / "F-F_Research_Data_5_Factors_2x3.CSV").write_text(
         file(
@@ -303,14 +309,16 @@ def write_ken_french(rng: np.random.Generator) -> None:
             ff5,
             _factor_rows(rng, months_ff5, ff5, 4.0),
             _factor_rows(rng, years[37:], ff5, 15.0),
-        )
+        ),
+        encoding="utf-8",
     )
     (out / "F-F_Research_Data_5_Factors_2x3_daily.CSV").write_text(
         daily_file(
             ["This file was created by CMPT_ME_BEME_OP_INV_RETS using the 202412 CRSP database."],
             ff5,
             _factor_rows(rng, days, ff5, 0.8),
-        )
+        ),
+        encoding="utf-8",
     )
     (out / "F-F_Momentum_Factor.CSV").write_text(
         file(
@@ -318,14 +326,16 @@ def write_ken_french(rng: np.random.Generator) -> None:
             mom,
             _factor_rows(rng, months_ff3[6:], mom, 4.0),
             _factor_rows(rng, years, mom, 15.0),
-        )
+        ),
+        encoding="utf-8",
     )
     (out / "F-F_Momentum_Factor_daily.CSV").write_text(
         daily_file(
             ["This file was created by CMPT_ME_PRIOR_RETS using the 202412 CRSP database."],
             mom,
             _factor_rows(rng, days, mom, 0.8),
-        )
+        ),
+        encoding="utf-8",
     )
     (out / "meta.json").write_text(
         json.dumps(
@@ -338,7 +348,8 @@ def write_ken_french(rng: np.random.Generator) -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
 
 
