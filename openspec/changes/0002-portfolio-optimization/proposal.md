@@ -60,6 +60,9 @@ the honesty mechanism, so it is part of v1's definition of done.
 - **No taxes, lot tracking, or wash sales.** Out of scope for the whole tool.
 - **No live trading, broker connections, or order generation.** Ever.
 - **No intraday data.** Daily bars throughout.
+- **No currency analytics.** Multi-currency sets are converted to a stated base
+  before estimation, per 0001; decomposing return into asset and currency
+  components, and hedging, are 0010.
 - **No CVaR/robust objectives in v1.** The `cvxpy` extra is wired so they can be
   added without restructuring.
 

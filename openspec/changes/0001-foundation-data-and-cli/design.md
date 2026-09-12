@@ -73,6 +73,41 @@ make it expensive later. The conformance suite is the part that makes the
 difference — it states the contract in executable form while there is exactly one
 implementation and no ambiguity about what the contract *is*.
 
+## Currency, settled at the boundary
+
+Currency is the same shape of problem as timezone, and gets the same treatment:
+carried on every series, converted by one explicit operation, never mixed
+silently. The analytics are 0010; only the model is here — because a return
+computed without a currency concept is a number that has to be recomputed when
+one arrives, and by 0002 that means every risk and optimization function.
+
+**Direction is carried by a type, not by a convention.** `CurrencyPair(base,
+quote)` means units of *quote* per one unit of *base*: `CurrencyPair("EUR","USD")`
+at 1.08 is one euro buying 1.08 dollars. Call sites never see the number — they
+call `convert(amount, from_ccy, to_ccy, on=date)`. Inverting a rate is then
+impossible to get wrong at a call site, because no call site does it.
+
+**Converting returns is not converting prices.** The correct identity is
+
+```
+r_base = (1 + r_local) * (1 + r_fx) - 1
+```
+
+not `r_local + r_fx`. The dropped cross term is small over a day and material
+over a decade, and the additive form is the standard bug. The test asserts the
+identity against converting the price series and differencing it, so the two
+paths cannot diverge.
+
+**Sub-units are a hundred-fold trap.** A London listing quotes in pence, not
+pounds; Johannesburg in cents; Tel Aviv in agorot. Normalization happens in the
+data layer with a test against a real pence-quoted instrument, because this error
+is silent, plausible-looking, and off by 100×.
+
+**The single-currency path stays free.** When every input shares a currency, no
+rate is fetched and nothing is converted; a test asserts results match a build
+with no currency support. Multi-currency correctness should not tax the common
+case.
+
 ## Observability
 
 Structured logging always on (default WARNING); tracing behind an extra.
@@ -244,3 +279,7 @@ must never need a `grep -v`.
 | Instrument adapters | Instrument `core/` | Preserves purity, and adapter-observed timings are what a trace reader wants |
 | OTel API with optional SDK | Always-on tracing, or none | Zero dependency and zero overhead by default, same call sites either way |
 | structlog | stdlib `logging` alone | Typed key/value context and bound scopes; still routes third-party stdlib records through one handler |
+| `CurrencyPair` type carrying direction | A string like `"EURUSD"` plus a convention | Conventions are remembered wrongly; a type is checked |
+| `convert()` as the only rate application | Exposing rates for call sites to apply | Removes the inversion bug by removing the opportunity |
+| Currency model in 0001, analytics in 0010 | All of it in 0010 | Returns computed without a currency concept have to be recomputed with one; that is every risk function by 0002 |
+| ECB reference rates as the keyless default | An FX API needing a key | Holds the no-key promise; ECB publishes daily since 1999 |

@@ -102,19 +102,27 @@ site/                       # 0006: animated landing page → GitHub Pages
 | `qf plan house --price ... --down-pct ...` | Savings path to a down payment |
 | `qf plan goal --target ... --by 2032-01-01` | Generic funding solver |
 | `qf econ forecast CPIAUCSL --model arima` | Time-series forecast |
+| `qf fx rates EURUSD` / `qf fx convert 1000 --from USD --to EUR` | Exchange rates and conversion |
+| `qf fx attribution --tickers ... --base USD` | Split return into asset vs currency |
+| `qf fx hedge --tickers ... --compare unhedged` | What hedging would have cost |
+| `qf ppp compare --base USD --vs EUR MXN` | Market rate vs purchasing-power rate |
+| `qf ppp adjust-goal --goal fire --to PRT` | Restate a goal at another price level |
 | `qf portfolio save core --tickers ...` | Save a named portfolio |
 | `qf run list` / `qf run show <id>` | Browse saved analysis runs |
 | `qf db info` / `qf db export --to ...` | Inspect and back up the database |
 | `qf serve --host 0.0.0.0` | Run the web UI and API |
 | `qf deploy compose` / `qf deploy check` | Generate and verify a deployment |
 
-## Data sources (v1)
+## Data sources
 
-| Source | Key needed | Used for |
-|---|---|---|
-| **yfinance** | no | Prices, dividends, splits, fundamentals |
-| **FRED** | free API key (`FRED_API_KEY`) | Risk-free rate, CPI, macro series |
-| **Ken French Data Library** | no | Fama-French 3/5-factor + momentum returns |
+| Source | Key needed | Used for | From |
+|---|---|---|---|
+| **yfinance** | no | Prices, dividends, splits, fundamentals | 0001 |
+| **ECB reference rates** | no | Daily exchange rates | 0001 |
+| **FRED** | free API key (`FRED_API_KEY`) | Risk-free rate, CPI, macro series | 0001 |
+| **Ken French Data Library** | no | Fama-French 3/5-factor + momentum returns | 0001 |
+| **World Bank ICP / OECD** | no | PPP conversion factors, comparative price levels | 0010 |
+| **BIS** | no | Published real effective exchange rates | 0010 |
 
 `pip install quantfolio-cli` must produce a working tool with **no keys
 configured**. Anything requiring a key degrades with a clear, actionable error —
@@ -151,6 +159,24 @@ lets Docker mount one volume and a backup be one copy.
 
 API keys are the exception: they stay in the config file at mode `0600` and never
 enter the database.
+
+## Currency
+
+Handled like timezone: every monetary series declares its currency, conversion is
+one explicit operation, and mixing is refused rather than guessed.
+
+Direction is carried by `CurrencyPair(base, quote)` — units of *quote* per one
+unit of *base* — and **no call site ever multiplies or divides by a rate**; they
+call `convert()`. That removes the inversion bug by removing the opportunity.
+
+Return conversion uses the exact identity `(1+r_local)(1+r_fx)-1`, never the
+additive approximation. Sub-unit quotations (GBp, ZAc, ILA) are normalized in the
+data layer, with a test against a real pence-quoted listing.
+
+The model lands in 0001 because returns computed without a currency concept must
+be recomputed when one arrives — which by 0002 means every risk and optimization
+function. The analytics are 0010. A single-currency run fetches no rates and is
+identical to a build without any of this.
 
 ## Observability
 
@@ -199,10 +225,13 @@ Each is one OpenSpec change under `openspec/changes/`.
 | 0007 | `equity-factor-analysis` | Single-stock analysis, CAPM, Fama-French 3/5 + momentum |
 | 0008 | `goal-planning` | Retirement/FIRE, house, car, education, Monte Carlo |
 | 0009 | `econometrics-forecasting` | ARIMA/GARCH forecasting, stationarity, macro overlays |
+| 0010 | `currency-and-ppp` | FX attribution and hedging, PPP comparison, PPP-adjusted goals |
 
 0001 → 0002 is the v1.0.0 release. 0003 → 0006 turn it into a deployable product
 with a UI. 0007–0009 then add analytics to a UI that already exists, rather than
-retrofitting one at the end. Each change depends only on what came before it.
+retrofitting one at the end. 0010 makes the whole tool international, last because
+it is the change that touches every earlier one. Each change depends only on what
+came before it.
 
 ## Non-negotiables
 
@@ -217,3 +246,5 @@ retrofitting one at the end. Each change depends only on what came before it.
    never appear in signatures outside their adapter.
 7. **Observability never changes behavior.** No secret in a log or a span, no
    log on stdout, no instrumentation inside `core/`.
+8. **No forecasting of exchange rates, ever.** PPP is reported as a valuation
+   gap, never as a signal, a target, or a convergence path.

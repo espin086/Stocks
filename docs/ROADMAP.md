@@ -9,7 +9,7 @@ before it is used.
 | # | Milestone | Depends on | Est. | Planning depth |
 |---|---|---|---|---|
 | 0000 | Release engineering: CI gate + PyPI pipeline | — | done | proposal + spec + tasks |
-| 0001 | Foundation: storage port, data layer, observability, CLI shell | 0000 | ~46h | proposal + 4 specs + design + tasks |
+| 0001 | Foundation: storage port, data layer, currency, observability, CLI shell | 0000 | ~51h | proposal + 5 specs + design + tasks |
 | 0002 | **Portfolio optimization → v1.0.0** | 0001 | ~48h | proposal + spec + design + tasks |
 | 0003 | Local persistence (SQLite) → v1.1 | 0002 | ~25h est. | proposal + spec |
 | 0004 | Web UI (FastAPI + React) → v1.2 | 0003 | ~70h est. | proposal + specs |
@@ -18,8 +18,9 @@ before it is used.
 | 0007 | Equity & factor analysis → v1.3 | 0002 | ~35h est. | proposal + spec |
 | 0008 | Goal planning → v1.4 | 0002 | ~30h est. | proposal + spec |
 | 0009 | Econometrics & forecasting → v1.5 | 0007 | ~40h est. | proposal + spec |
+| 0010 | Exchange rates & PPP → v1.6 | 0002, 0008 | ~35h est. | proposal + 2 specs |
 
-**v1.0.0 = 0001 + 0002 (~94h).** **v1.2, the deployable product = 0003–0006
+**v1.0.0 = 0001 + 0002 (~99h).** **v1.2, the deployable product = 0003–0006
 (~150h more).**
 
 ## Sequencing rationale
@@ -52,8 +53,14 @@ cannot advertise what does not exist.
 machinery feeds back into 0002 as a candidate expected-return estimator, compounding
 sooner.
 
-**0009 last** because GARCH-based covariance is an *improvement* to the optimizer,
-and improving an optimizer that is not yet trusted is premature.
+**0009 before 0010** because GARCH-based covariance is an *improvement* to the
+optimizer, and improving an optimizer that is not yet trusted is premature.
+
+**0010 last** because it is the only milestone that makes every earlier one
+international, and adding breadth before the domestic case is trustworthy is the
+wrong order. Its foundation is not deferred, though: the currency *model* lands in
+0001, since returns computed without a currency concept have to be recomputed when
+one arrives — which by 0002 is every risk and optimization function.
 
 ## Explicitly out of scope for the whole tool
 
@@ -64,6 +71,12 @@ and improving an optimizer that is not yet trusted is premature.
   and conformance suite exist from 0001 so PostgreSQL or DuckDB is a new adapter
   file and a fixture-list entry, but none is built on speculation
 - A metrics pipeline; logs and traces only
+- Exchange-rate forecasting, currency trading, carry strategies, or FX timing.
+  Rates are near a random walk at these horizons and PPP has no short-run
+  predictive power; a `qf fx forecast` would be the most misleading thing here
+- Derivatives pricing. Hedged returns come from interest-rate differentials under
+  covered interest parity, not from a forward or options model
+- Tax, residency, visa, or healthcare modeling for relocation
 - Live trading, broker connections, order generation
 - Tax modeling (marginal rates, Roth ladders, RMDs, wash sales, lot tracking)
 - Intraday or tick data

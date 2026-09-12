@@ -34,6 +34,12 @@ qf analyze factors NVDA --model ff5
 
 # When can I retire?
 qf plan retire --income 200000 --expenses 90000 --portfolio 400000
+
+# How much of my international return was the company, and how much was the dollar?
+qf fx attribution --tickers NESN.SW 7203.T ASML.AS --base USD
+
+# That FIRE number buys a US lifestyle. What does it buy in Portugal?
+qf ppp adjust-goal --goal fire --to PRT
 ```
 
 ## Status
@@ -57,6 +63,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
 | [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
 | [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
+| [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
 
 Once 0005 lands, the whole tool runs from one container:
 
@@ -99,6 +106,8 @@ qf config set fred_api_key <YOUR_KEY>
 | [yfinance](https://github.com/ranaroussi/yfinance) | — | Prices, dividends, splits, fundamentals |
 | [FRED](https://fred.stlouisfed.org/) | free | Risk-free rate, CPI, macro series |
 | [Ken French Data Library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) | — | Fama-French 3/5-factor + momentum returns |
+| [ECB reference rates](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html) | — | Daily exchange rates |
+| [World Bank ICP](https://data.worldbank.org/indicator/PA.NUS.PPP) / [OECD](https://data.oecd.org/conversion/purchasing-power-parities-ppp.htm) | — | PPP conversion factors and price levels |
 
 ## Architecture
 

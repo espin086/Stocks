@@ -32,6 +32,30 @@ The system SHALL convert price series to returns under one documented convention
 - **THEN** the caller SHALL choose `drop` or `zero` explicitly via a parameter with
   no default, so the choice is never silent
 
+### Requirement: One currency per computation
+
+#### Scenario: Single currency needs no ceremony
+- **WHEN** every asset in a computation shares a currency
+- **THEN** it SHALL proceed with no rate fetch and no conversion
+- **AND** results SHALL be identical to a build without currency support
+
+#### Scenario: Mixed currencies require a base
+- **WHEN** assets span more than one currency and no `--base` is given
+- **THEN** `UsageError` SHALL be raised naming the currencies found
+- **AND** no moment SHALL be estimated on mixed units
+
+#### Scenario: Conversion precedes estimation
+- **WHEN** `--base` is supplied for a multi-currency set
+- **THEN** returns SHALL be converted per 0001's exact identity **before**
+  expected returns or covariance are estimated
+- **AND** converting the resulting statistics instead SHALL NOT be done, since
+  covariance does not transform that way
+
+#### Scenario: Results name their base
+- **WHEN** any result derived from converted returns is rendered
+- **THEN** the base currency SHALL be stated
+- **AND** the output SHALL note that the optimum is specific to that base
+
 ### Requirement: Expected-return and covariance estimators
 
 The system SHALL treat the optimizer's inputs as pluggable estimators.

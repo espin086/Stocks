@@ -100,6 +100,18 @@ Estimates are focused hours. Each task names the test that proves it.
       conversion.
       → `tests/data/test_fred.py::test_missing_key_exits_3_with_guidance`,
         `::test_risk_free_converted_to_decimal`
+- [ ] **B5b. Currency model** (2.5h)
+      `data/currency.py`: `Currency`, `CurrencyPair(base, quote)`, sub-unit
+      normalization, `convert()` as the only way to apply a rate.
+      → `tests/data/test_currency.py::test_round_trip_conversion_is_exact`,
+        `::test_pence_quoted_listing_normalized_to_major_unit`,
+        `::test_cross_rate_consistent_with_its_two_legs`,
+        `::test_mixed_currency_without_target_raises_usage_error`
+- [ ] **B5c. FX provider** (2.5h)
+      `data/ecb_provider.py` implementing `FxProvider`, keyless; FRED `DEX*` as
+      the alternative; carry-forward on non-trading days, recorded.
+      → `tests/data/test_fx.py::test_carry_forward_recorded_not_silent`,
+        plus the shared provider contract suite
 - [ ] **B6. Ken French provider** (3h)
       `data/ken_french.py`: zip fetch, multi-table CSV parsing, `ff3`/`ff5`/`ff5+mom`,
       percent→decimal, loud failure on unexpected layout.
@@ -144,8 +156,9 @@ Estimates are focused hours. Each task names the test that proves it.
       per the placement rule in `design.md`.
       → `tests/test_architecture.py::test_core_imports_no_logging_or_tracing`
 
-**Total: ~46h** (was ~27h; the storage port and observability add ~19h). Wave B is
-the critical path; B6 and B0b are the tasks with real unknowns.
+**Total: ~51h** (was ~27h; the storage port and observability added ~19h, the
+currency model ~5h). Wave B is the critical path; B6 and B0b are the tasks with
+real unknowns.
 
 ## Definition of done
 
@@ -155,6 +168,8 @@ the critical path; B6 and B0b are the tasks with real unknowns.
 - [ ] `core/` imports no logging, tracing, network, or database module
 - [ ] A sentinel credential appears nowhere in stderr at DEBUG, for any command
 - [ ] stdout is byte-identical across log levels and with tracing on and off
+- [ ] No call site outside `data/currency.py` multiplies or divides by a rate
+- [ ] A single-currency run fetches no rates and matches a no-conversion build
 - [ ] `pytest -m "not network"` passes with networking disabled
 - [ ] `mypy --strict` clean
 - [ ] Every scenario in both spec deltas has a test that references it

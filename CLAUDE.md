@@ -100,6 +100,26 @@ no-op unless `OTEL_*` is set.
   levels and with tracing on or off, and that is a test.
 - An unreachable exporter warns once and never fails a command.
 
+## Currency
+
+Treated like timezone: carried on every monetary series, converted once,
+explicitly, never mixed silently.
+
+- **Never multiply or divide by a rate at a call site.** Call
+  `convert(amount, from_ccy, to_ccy, on=date)`. Direction lives in
+  `CurrencyPair(base, quote)` — units of *quote* per one unit of *base*.
+- **Converting returns is `(1 + r_local) * (1 + r_fx) - 1`**, never
+  `r_local + r_fx`. The dropped cross term is the standard bug.
+- Normalize sub-unit quotations (GBp, ZAc, ILA) in the data layer. This error is
+  silent and off by 100×.
+- Mixed currencies with no target raise `UsageError`. Never guess, never default
+  to USD, never infer from an exchange suffix.
+- Convert returns **before** estimating moments. Covariance does not transform
+  by converting the statistic afterwards.
+- A single-currency run must fetch no rates and match a no-conversion build.
+- **Never forecast an exchange rate.** PPP is a valuation gap, not a signal, a
+  target, or a convergence path — and every PPP output says so.
+
 ## Conventions
 
 - **Python 3.11+**, `mypy --strict` clean, `ruff` for lint and format.

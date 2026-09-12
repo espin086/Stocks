@@ -44,6 +44,10 @@ the codebase is small enough that the rule is free to follow.
 - **New capability `observability`** — structured logging on by default and
   OpenTelemetry tracing behind an optional extra, instrumenting the adapters and
   the I/O layer while `core/` stays pure.
+- **New capability `currency`** — every monetary series declares its currency, an
+  `FxProvider` with keyless ECB rates, typed `CurrencyPair` so rate direction
+  cannot be got wrong, and one explicit conversion operation. The FX and PPP
+  analytics are 0010; only the model that makes them possible lands here.
 - **New capability `cli-shell`** — root Typer app, `--format table|json|csv`,
   `-v/-vv` and `--log-format`, a config resolution chain, uniform error handling,
   and the `qf data` / `qf cache` command groups.
@@ -62,6 +66,11 @@ the codebase is small enough that the rule is free to follow.
   is the point of shipping the conformance suite alongside it.
 - No metrics pipeline. Logs and traces only; counters and histograms can be
   derived from spans if they are ever wanted.
+- **No FX or PPP analytics.** Decomposition, hedging, and purchasing-power
+  comparison are 0010. This change ships the currency *model* only, for the same
+  reason timezone handling is settled at the data boundary: retrofitting it after
+  0002 computes returns would mean revisiting every risk and optimization
+  function.
 - No FastAPI surface. The layering keeps the door open; the door stays shut.
 - No survivorship-bias-free or point-in-time fundamentals. yfinance cannot give
   that, and pretending otherwise would be worse than the limitation.
@@ -79,3 +88,6 @@ the codebase is small enough that the rule is free to follow.
 | Abstraction costs more than it saves for a single-user tool | The port is thin — repository protocols plus an expression layer — and no second adapter is built on speculation. If the second backend never arrives, the cost is a few protocol files |
 | Logging leaks an API key | Key-name and URL redaction at the formatter, applied to logs and span attributes alike, asserted by a test that runs every command with a sentinel credential at DEBUG |
 | Instrumentation changes behavior or output | A test asserts stdout is byte-identical across log levels and with tracing on and off |
+| A rate is applied in the wrong direction | Direction is carried by `CurrencyPair(base, quote)`, call sites never touch a raw rate, and round-trip conversion is a test |
+| A listing quoted in a sub-unit (GBp, ZAc) is read as the major unit | The data layer normalizes to the major unit and a test covers a real pence-quoted listing — a silent hundred-fold error otherwise |
+| Currency support slows or complicates the single-currency path | No rate is fetched when every input shares a currency, and results are asserted identical to a build without conversion |
