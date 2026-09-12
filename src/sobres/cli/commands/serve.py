@@ -36,7 +36,7 @@ def load_manifest() -> dict[str, str]:
     """View name → path template, from the built manifest (or the source one in a checkout)."""
     for path in (MANIFEST, SOURCE_MANIFEST):
         if path.exists():
-            data = json.loads(path.read_text())
+            data = json.loads(path.read_text(encoding="utf-8"))
             return {str(k): str(v) for k, v in data.get("views", {}).items()}
     return {}
 
