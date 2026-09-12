@@ -132,6 +132,21 @@ jobs:
           /tmp/smoke/bin/sobres --version
           /tmp/smoke/bin/python -c "import sobres; print(sobres.__version__)"
 
+      - name: The three-command path, in the clean environment
+        # Onboarding is tested end to end: init, doctor, then one data command
+        # served from the recorded fixtures rather than the network.
+        env:
+          SOBRES_CONFIG_FILE: /tmp/smoke-home/config.toml
+          SOBRES_DB_URL: sqlite:////tmp/smoke-home/sobres.db
+          SOBRES_FIXTURE_DIR: ${{ github.workspace }}/tests/fixtures
+        run: |
+          /tmp/smoke/bin/sobres init --non-interactive --offline
+          /tmp/smoke/bin/sobres doctor --offline
+          /tmp/smoke/bin/sobres data prices AAPL MSFT --start 2020-01-01 --end 2020-03-31 --format csv \
+            | head -5
+          /tmp/smoke/bin/sobres data prices AAPL MSFT --start 2020-01-01 --end 2020-03-31 --format json \
+            | /tmp/smoke/bin/python -c "import json,sys; d=json.load(sys.stdin); assert d['columns']==['AAPL','MSFT'], d['columns']; print(len(d['rows']), 'rows')"
+
       - name: Confirm the sdist builds a wheel
         run: |
           python -m venv /tmp/sdist

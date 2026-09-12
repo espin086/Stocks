@@ -15,14 +15,14 @@
 
 ## B. Runtime names
 
-- [ ] **B1. Settings prefix** *(lands with 0001, which introduces the registry)* `QUANTFOLIO_*` → `SOBRES_*` in the settings
+- [x] **B1. Settings prefix** *(lands with 0001, which introduces the registry)* `QUANTFOLIO_*` → `SOBRES_*` in the settings
       registry. → test: every declared setting's env var starts with `SOBRES_`.
-- [ ] **B2. Legacy env guard** *(lands with 0001)* — startup fails with a named replacement when any
+- [x] **B2. Legacy env guard** *(lands with 0001)* — startup fails with a named replacement when any
       `QUANTFOLIO_*` variable is set. → test: a fixture sets `QUANTFOLIO_DB_URL`
       and asserts the error names `SOBRES_DB_URL`.
-- [ ] **B3. Paths** *(lands with 0001)* — `platformdirs` app name, default DB filename `sobres.db`.
+- [x] **B3. Paths** *(lands with 0001)* — `platformdirs` app name, default DB filename `sobres.db`.
       → test: the default DB URL resolves under a `sobres` data dir.
-- [ ] **B4. Legacy data check** *(lands with 0001's doctor)* — a doctor check that finds an old `quantfolio`
+- [x] **B4. Legacy data check** *(lands with 0001's doctor)* — a doctor check that finds an old `quantfolio`
       config or data directory and prints the `mv` to run, without moving it.
       → test: the check reports actionable when a fake legacy dir exists.
 
@@ -49,7 +49,7 @@
 
 - [x] `rg -i quantfolio` and `rg -w qf` return nothing outside `CHANGELOG.md`
       (and the 0011 change documents themselves) — `tests/test_rebrand.py`
-- [ ] `pip install -e .` then `sobres doctor` passes on a clean environment
+- [x] `pip install -e .` then `sobres doctor` passes on a clean environment
 - [x] Every test that passed before the rename passes after it, with identical
       fixture values
 - [ ] `openspec validate` is clean
