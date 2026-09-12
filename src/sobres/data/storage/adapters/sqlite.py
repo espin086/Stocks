@@ -35,14 +35,20 @@ from sobres.core.errors import (
 from sobres.data.storage.adapters import schema
 from sobres.data.storage.adapters.migrations import CURRENT_VERSION, MIGRATIONS
 from sobres.data.storage.base import (
+    TERMINAL_JOB_STATES,
     CacheStats,
     DateRange,
     FetchRecord,
+    GoalRecord,
+    JobRecord,
     Observation,
     ObservationQuery,
     OpenOptions,
+    PortfolioRecord,
+    RunRecord,
     SeriesKey,
     StorageInfo,
+    WatchlistRecord,
     register_backend,
 )
 from sobres.observability import get_logger, span
@@ -112,6 +118,11 @@ class SqliteStorage:
 
         self.observations = _Observations(self)
         self.kv = _KeyValue(self)
+        self.portfolios = _Portfolios(self)
+        self.watchlists = _Watchlists(self)
+        self.goals = _Goals(self)
+        self.runs = _Runs(self)
+        self.jobs = _Jobs(self)
         if options.check_integrity and not self.integrity_check():
             raise CorruptDatabaseError(
                 f"database {self.location} failed its integrity check",
@@ -178,10 +189,11 @@ class SqliteStorage:
             rows = result if isinstance(result, int) else None
             sp.set_attribute("db.rows", rows if rows is not None else -1)
             sp.set_attribute("elapsed_ms", round(elapsed_ms, 3))
+            fields: dict[str, Any] = {"rows": rows, **attrs, "op": op}
             if elapsed_ms > self._options.slow_query_ms:
-                self._log.warning("storage.slow", op=op, elapsed_ms=round(elapsed_ms, 1), rows=rows)
+                self._log.warning("storage.slow", elapsed_ms=round(elapsed_ms, 1), **fields)
             else:
-                self._log.debug("storage.op", op=op, elapsed_ms=round(elapsed_ms, 3), rows=rows)
+                self._log.debug("storage.op", elapsed_ms=round(elapsed_ms, 3), **fields)
         return result
 
     # ------------------------------------------------------------- migrations
@@ -303,6 +315,51 @@ class SqliteStorage:
                 dst.close()
         finally:
             src.close()
+
+
+def recover_sqlite(source: Path, destination: Path) -> dict[str, Any]:
+    """Copy whatever can be read from a damaged file into a fresh one; never touch the source.
+
+    Returns per-table row counts recovered and the tables that could not be
+    read. The destination is a new database with the current schema applied,
+    so anything recovered lands in tables the current code understands.
+    """
+    import sqlite3
+
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.exists():
+        raise StorageError(f"{destination} already exists; choose a new path for the recovery")
+    fresh = SqliteStorage(f"sqlite:///{destination.as_posix()}", OpenOptions(check_integrity=False))
+    fresh.close()
+    src = sqlite3.connect(f"file:{source.as_posix()}?mode=ro", uri=True)
+    dst = sqlite3.connect(destination)
+    recovered: dict[str, int] = {}
+    failed: dict[str, str] = {}
+    try:
+        for table in schema.metadata.sorted_tables:
+            if table.name == "schema_version":
+                continue
+            try:
+                rows = src.execute(f'SELECT * FROM "{table.name}"').fetchall()
+                columns = [c[1] for c in src.execute(f'PRAGMA table_info("{table.name}")')]
+            except sqlite3.DatabaseError as exc:
+                failed[table.name] = str(exc)
+                continue
+            if not rows:
+                recovered[table.name] = 0
+                continue
+            placeholders = ",".join("?" for _ in columns)
+            quoted = ",".join(f'"{c}"' for c in columns)
+            dst.executemany(
+                f'INSERT OR REPLACE INTO "{table.name}" ({quoted}) VALUES ({placeholders})',
+                rows,
+            )
+            recovered[table.name] = len(rows)
+        dst.commit()
+    finally:
+        src.close()
+        dst.close()
+    return {"recovered": recovered, "failed": failed, "destination": str(destination)}
 
 
 class _Observations:
@@ -516,6 +573,378 @@ class _KeyValue:
             }
 
         return self._s._run("kv_items", read)
+
+
+class _Portfolios:
+    def __init__(self, storage: SqliteStorage) -> None:
+        self._s = storage
+
+    def save(self, portfolio: PortfolioRecord, *, force: bool = False) -> PortfolioRecord:
+        now = datetime.now(UTC)
+
+        def write(conn: Connection) -> int:
+            t = schema.portfolio
+            existing = conn.execute(
+                sa.select(t.c.created_at).where(t.c.name == portfolio.name)
+            ).first()
+            if existing is not None and not force:
+                raise sa.exc.IntegrityError(
+                    "portfolio", {}, Exception(f"UNIQUE constraint: portfolio {portfolio.name!r}")
+                )
+            values = {
+                "name": portfolio.name,
+                "tickers": list(portfolio.tickers),
+                "weights": None if portfolio.weights is None else list(portfolio.weights),
+                "updated_at": now,
+            }
+            if existing is None:
+                conn.execute(t.insert().values(created_at=now, **values))
+            else:
+                conn.execute(t.update().where(t.c.name == portfolio.name).values(**values))
+            return 1
+
+        self._s._run("portfolio_save", write, entity="portfolio")
+        saved = self.get(portfolio.name)
+        assert saved is not None
+        return saved
+
+    def get(self, name: str) -> PortfolioRecord | None:
+        def read(conn: Connection) -> PortfolioRecord | None:
+            t = schema.portfolio
+            row = conn.execute(sa.select(t).where(t.c.name == name)).first()
+            return None if row is None else _portfolio(row)
+
+        return self._s._run("portfolio_get", read, entity="portfolio")
+
+    def list(self) -> list[PortfolioRecord]:
+        def read(conn: Connection) -> list[PortfolioRecord]:
+            t = schema.portfolio
+            return [_portfolio(r) for r in conn.execute(sa.select(t).order_by(t.c.name))]
+
+        return self._s._run("portfolio_list", read, entity="portfolio")
+
+    def delete(self, name: str) -> bool:
+        def write(conn: Connection) -> int:
+            t = schema.portfolio
+            return int(conn.execute(sa.delete(t).where(t.c.name == name)).rowcount)
+
+        return self._s._run("portfolio_delete", write, entity="portfolio") > 0
+
+
+def _portfolio(row: Any) -> PortfolioRecord:
+    return PortfolioRecord(
+        name=row.name,
+        tickers=tuple(row.tickers),
+        weights=None if row.weights is None else tuple(float(w) for w in row.weights),
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+    )
+
+
+class _Watchlists:
+    def __init__(self, storage: SqliteStorage) -> None:
+        self._s = storage
+
+    def add(self, name: str, symbols: Sequence[str]) -> WatchlistRecord:
+        def write(conn: Connection) -> int:
+            t = schema.watchlist
+            row = conn.execute(sa.select(t.c.symbols).where(t.c.name == name)).first()
+            current: list[str] = [] if row is None else list(row.symbols)
+            added = 0
+            for symbol in symbols:
+                upper = symbol.upper()
+                if upper not in current:
+                    current.append(upper)
+                    added += 1
+            now = datetime.now(UTC)
+            if row is None:
+                conn.execute(t.insert().values(name=name, symbols=current, updated_at=now))
+            else:
+                conn.execute(
+                    t.update().where(t.c.name == name).values(symbols=current, updated_at=now)
+                )
+            return added
+
+        self._s._run("watchlist_add", write, entity="watchlist")
+        record = self.get(name)
+        assert record is not None
+        return record
+
+    def remove(self, name: str, symbols: Sequence[str]) -> WatchlistRecord | None:
+        def write(conn: Connection) -> int:
+            t = schema.watchlist
+            row = conn.execute(sa.select(t.c.symbols).where(t.c.name == name)).first()
+            if row is None:
+                return 0
+            drop = {s.upper() for s in symbols}
+            kept = [s for s in row.symbols if s not in drop]
+            conn.execute(
+                t.update()
+                .where(t.c.name == name)
+                .values(symbols=kept, updated_at=datetime.now(UTC))
+            )
+            return len(row.symbols) - len(kept)
+
+        self._s._run("watchlist_remove", write, entity="watchlist")
+        return self.get(name)
+
+    def get(self, name: str) -> WatchlistRecord | None:
+        def read(conn: Connection) -> WatchlistRecord | None:
+            t = schema.watchlist
+            row = conn.execute(sa.select(t).where(t.c.name == name)).first()
+            return (
+                None
+                if row is None
+                else WatchlistRecord(row.name, tuple(row.symbols), row.updated_at)
+            )
+
+        return self._s._run("watchlist_get", read, entity="watchlist")
+
+    def list(self) -> list[WatchlistRecord]:
+        def read(conn: Connection) -> list[WatchlistRecord]:
+            t = schema.watchlist
+            return [
+                WatchlistRecord(r.name, tuple(r.symbols), r.updated_at)
+                for r in conn.execute(sa.select(t).order_by(t.c.name))
+            ]
+
+        return self._s._run("watchlist_list", read, entity="watchlist")
+
+    def delete(self, name: str) -> bool:
+        def write(conn: Connection) -> int:
+            t = schema.watchlist
+            return int(conn.execute(sa.delete(t).where(t.c.name == name)).rowcount)
+
+        return self._s._run("watchlist_delete", write, entity="watchlist") > 0
+
+
+class _Goals:
+    def __init__(self, storage: SqliteStorage) -> None:
+        self._s = storage
+
+    def save(self, goal: GoalRecord, *, force: bool = False) -> GoalRecord:
+        now = datetime.now(UTC)
+
+        def write(conn: Connection) -> int:
+            t = schema.goal
+            existing = conn.execute(sa.select(t.c.created_at).where(t.c.name == goal.name)).first()
+            if existing is not None and not force:
+                raise sa.exc.IntegrityError(
+                    "goal", {}, Exception(f"UNIQUE constraint: goal {goal.name!r}")
+                )
+            values = {
+                "name": goal.name,
+                "kind": goal.kind,
+                "params": goal.params,
+                "updated_at": now,
+            }
+            if existing is None:
+                conn.execute(t.insert().values(created_at=now, **values))
+            else:
+                conn.execute(t.update().where(t.c.name == goal.name).values(**values))
+            return 1
+
+        self._s._run("goal_save", write, entity="goal")
+        saved = self.get(goal.name)
+        assert saved is not None
+        return saved
+
+    def get(self, name: str) -> GoalRecord | None:
+        def read(conn: Connection) -> GoalRecord | None:
+            t = schema.goal
+            row = conn.execute(sa.select(t).where(t.c.name == name)).first()
+            return None if row is None else _goal(row)
+
+        return self._s._run("goal_get", read, entity="goal")
+
+    def list(self) -> list[GoalRecord]:
+        def read(conn: Connection) -> list[GoalRecord]:
+            t = schema.goal
+            return [_goal(r) for r in conn.execute(sa.select(t).order_by(t.c.name))]
+
+        return self._s._run("goal_list", read, entity="goal")
+
+    def delete(self, name: str) -> bool:
+        def write(conn: Connection) -> int:
+            t = schema.goal
+            return int(conn.execute(sa.delete(t).where(t.c.name == name)).rowcount)
+
+        return self._s._run("goal_delete", write, entity="goal") > 0
+
+
+def _goal(row: Any) -> GoalRecord:
+    return GoalRecord(
+        name=row.name,
+        kind=row.kind,
+        params=dict(row.params),
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+    )
+
+
+class _Runs:
+    def __init__(self, storage: SqliteStorage) -> None:
+        self._s = storage
+
+    def record(self, run: RunRecord) -> RunRecord:
+        created = run.created_at or datetime.now(UTC)
+
+        def write(conn: Connection) -> int:
+            conn.execute(
+                schema.run.insert().values(
+                    id=run.id,
+                    command=run.command,
+                    params=run.params,
+                    estimators=run.estimators,
+                    window=run.window,
+                    result=run.result,
+                    summary=run.summary,
+                    created_at=created,
+                )
+            )
+            return 1
+
+        self._s._run("run_record", write, entity="run")
+        saved = self.get(run.id)
+        assert saved is not None
+        return saved
+
+    def get(self, run_id: str) -> RunRecord | None:
+        def read(conn: Connection) -> RunRecord | None:
+            t = schema.run
+            row = conn.execute(sa.select(t).where(t.c.id == run_id)).first()
+            return None if row is None else _run_record(row)
+
+        return self._s._run("run_get", read, entity="run")
+
+    def list(self, limit: int = 20, command: str | None = None) -> list[RunRecord]:
+        def read(conn: Connection) -> list[RunRecord]:
+            t = schema.run
+            stmt = sa.select(t).order_by(t.c.created_at.desc(), t.c.id.desc()).limit(limit)
+            if command is not None:
+                stmt = stmt.where(t.c.command == command)
+            return [_run_record(r) for r in conn.execute(stmt)]
+
+        return self._s._run("run_list", read, entity="run")
+
+    def delete(self, run_id: str) -> bool:
+        def write(conn: Connection) -> int:
+            t = schema.run
+            return int(conn.execute(sa.delete(t).where(t.c.id == run_id)).rowcount)
+
+        return self._s._run("run_delete", write, entity="run") > 0
+
+
+def _run_record(row: Any) -> RunRecord:
+    return RunRecord(
+        id=row.id,
+        command=row.command,
+        params=dict(row.params),
+        result=dict(row.result),
+        summary=row.summary,
+        estimators=dict(row.estimators),
+        window=dict(row.window),
+        created_at=row.created_at,
+    )
+
+
+class _Jobs:
+    def __init__(self, storage: SqliteStorage) -> None:
+        self._s = storage
+
+    def create(self, job: JobRecord) -> JobRecord:
+        now = datetime.now(UTC)
+
+        def write(conn: Connection) -> int:
+            conn.execute(
+                schema.job.insert().values(
+                    id=job.id,
+                    command=job.command,
+                    params=job.params,
+                    state=job.state,
+                    progress=job.progress,
+                    result=job.result,
+                    error=job.error,
+                    run_id=job.run_id,
+                    trace_context=job.trace_context,
+                    created_at=job.created_at or now,
+                    updated_at=now,
+                    finished_at=job.finished_at,
+                )
+            )
+            return 1
+
+        self._s._run("job_create", write, entity="job")
+        saved = self.get(job.id)
+        assert saved is not None
+        return saved
+
+    def update(self, job_id: str, **changes: Any) -> JobRecord:
+        allowed = {"state", "progress", "result", "error", "run_id", "trace_context", "finished_at"}
+        unknown = set(changes) - allowed
+        if unknown:
+            raise ValueError(f"cannot update job fields {sorted(unknown)}")
+        now = datetime.now(UTC)
+        if changes.get("state") in TERMINAL_JOB_STATES and "finished_at" not in changes:
+            changes["finished_at"] = now
+
+        def write(conn: Connection) -> int:
+            t = schema.job
+            result = conn.execute(
+                t.update().where(t.c.id == job_id).values(updated_at=now, **changes)
+            )
+            return int(result.rowcount)
+
+        if self._s._run("job_update", write, entity="job") == 0:
+            raise StorageError(f"job {job_id!r} does not exist")
+        saved = self.get(job_id)
+        assert saved is not None
+        return saved
+
+    def get(self, job_id: str) -> JobRecord | None:
+        def read(conn: Connection) -> JobRecord | None:
+            t = schema.job
+            row = conn.execute(sa.select(t).where(t.c.id == job_id)).first()
+            return None if row is None else _job(row)
+
+        return self._s._run("job_get", read, entity="job")
+
+    def list(self, limit: int = 20, state: str | None = None) -> list[JobRecord]:
+        def read(conn: Connection) -> list[JobRecord]:
+            t = schema.job
+            stmt = sa.select(t).order_by(t.c.created_at.desc(), t.c.id.desc()).limit(limit)
+            if state is not None:
+                stmt = stmt.where(t.c.state == state)
+            return [_job(r) for r in conn.execute(stmt)]
+
+        return self._s._run("job_list", read, entity="job")
+
+    def next_queued(self) -> JobRecord | None:
+        def read(conn: Connection) -> JobRecord | None:
+            t = schema.job
+            row = conn.execute(
+                sa.select(t).where(t.c.state == "queued").order_by(t.c.created_at, t.c.id).limit(1)
+            ).first()
+            return None if row is None else _job(row)
+
+        return self._s._run("job_next", read, entity="job")
+
+
+def _job(row: Any) -> JobRecord:
+    return JobRecord(
+        id=row.id,
+        command=row.command,
+        params=dict(row.params),
+        state=row.state,
+        progress=float(row.progress),
+        result=None if row.result is None else dict(row.result),
+        error=None if row.error is None else dict(row.error),
+        run_id=row.run_id,
+        trace_context=None if row.trace_context is None else dict(row.trace_context),
+        created_at=row.created_at,
+        updated_at=row.updated_at,
+        finished_at=row.finished_at,
+    )
 
 
 def _as_date(value: Any) -> date:

@@ -7,6 +7,7 @@ not change results; Machine output stays parseable; stdout is results only.
 from __future__ import annotations
 
 import json
+import re
 from collections.abc import Callable
 from typing import Any
 
@@ -47,6 +48,9 @@ SAMPLE_ARGS: dict[str, list[str]] = {
         "--end",
         "2020-01-31",
     ],
+    "db.export": ["db", "export", "--to", "{tmp}/export.sqlite"],
+    "db.info": ["db", "info"],
+    "db.repair": ["db", "repair"],
     "doctor": ["doctor", "--offline"],
     "init": ["init", "--non-interactive", "--offline"],
     "optimize.backtest": [
@@ -113,13 +117,76 @@ SAMPLE_ARGS: dict[str, list[str]] = {
         "--fill",
         "ffill",
     ],
+    "portfolio.delete": ["portfolio", "delete", "core", "--yes"],
+    "portfolio.list": ["portfolio", "list"],
+    "portfolio.save": ["portfolio", "save", "core", "--tickers", "AAPL", "MSFT", "--force"],
+    "portfolio.show": ["portfolio", "show", "core"],
+    "run.delete": ["run", "delete", "{run}", "--yes"],
+    "run.diff": ["run", "diff", "{run}", "{run}"],
+    "run.list": ["run", "list"],
+    "run.show": ["run", "show", "{run}"],
     "upgrade": ["upgrade", "--check"],
+    "watchlist.add": ["watchlist", "add", "tech", "NVDA", "AMD"],
+    "watchlist.delete": ["watchlist", "delete", "tech", "--yes"],
+    "watchlist.list": ["watchlist", "list"],
+    "watchlist.remove": ["watchlist", "remove", "tech", "AMD"],
+    "watchlist.show": ["watchlist", "show", "tech"],
 }
+# Commands whose sample needs state that an earlier command creates.
+PREPARE: dict[str, list[list[str]]] = {
+    "cache.clear": [["data", "prices", "AAPL", "--start", "2020-01-01", "--end", "2020-01-31"]],
+    "watchlist.add": [["watchlist", "delete", "tech", "--yes"]],
+    "portfolio.show": [["portfolio", "save", "core", "--tickers", "AAPL", "MSFT", "--force"]],
+    "portfolio.delete": [["portfolio", "save", "core", "--tickers", "AAPL", "MSFT", "--force"]],
+    "watchlist.show": [["watchlist", "add", "tech", "NVDA"]],
+    "watchlist.remove": [["watchlist", "add", "tech", "NVDA", "AMD"]],
+    "watchlist.delete": [["watchlist", "add", "tech", "NVDA"]],
+    "run.show": [["portfolio", "save", "core", "--tickers", "AAPL", "MSFT", "--force"]],
+    "run.diff": [["portfolio", "save", "core", "--tickers", "AAPL", "MSFT", "--force"]],
+    "run.delete": [["portfolio", "save", "core", "--tickers", "AAPL", "MSFT", "--force"]],
+}
+RUN_SAMPLE = [
+    "optimize",
+    "risk",
+    "--tickers",
+    "AAPL",
+    "MSFT",
+    "--weights",
+    "0.6",
+    "0.4",
+    "--start",
+    "2019-01-01",
+    "--end",
+    "2019-06-30",
+    "--fill",
+    "ffill",
+    "--save-run",
+    "--format",
+    "json",
+]
 ENV = {"SOBRES_FRED_API_KEY": SENTINEL_KEY}
 
 
 def test_every_command_has_a_sample() -> None:
     assert {c.name for c in all_commands()} == set(SAMPLE_ARGS)
+
+
+def _prepare(name: str, cli: Callable[..., Any], tmp_path: Any) -> list[str]:
+    """Run the state-setting commands a sample needs; return the sample with ids filled in."""
+    for args in PREPARE.get(name, []):
+        cli(*args, env_extra=ENV)
+    args = list(SAMPLE_ARGS[name])
+    if any("{run}" in a for a in args):
+        out = cli(*RUN_SAMPLE, env_extra=ENV)
+        run_id = out.stderr.split("saved run ")[1].split(" ")[0]
+        args = [a.replace("{run}", run_id) for a in args]
+    if any("{tmp}" in a for a in args):
+        target = tmp_path / "exports"
+        if target.exists():
+            for stale in target.glob("*"):
+                stale.unlink()
+        args = [a.replace("{tmp}", str(target)) for a in args]
+    return args
 
 
 @pytest.fixture(autouse=True)
@@ -129,7 +196,32 @@ def _no_pypi(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(doc, "latest_release", lambda: None)
 
 
-VOLATILE_KEYS = {"fetched_at", "updated_at", "elapsed", "changed", "cache"}
+VOLATILE_KEYS = {
+    "fetched_at",
+    "updated_at",
+    "created_at",
+    "elapsed",
+    "changed",
+    "cache",
+    "id",
+    "a",
+    "b",
+    "run",
+}
+STATEFUL = {
+    "cache.clear",
+    "db.export",
+    "db.repair",
+    "portfolio.delete",
+    "portfolio.save",
+    "run.delete",
+    "run.diff",
+    "run.list",
+    "run.show",
+    "watchlist.add",
+    "watchlist.delete",
+    "watchlist.remove",
+}
 VOLATILE_ROWS = {"size_bytes", "oldest_entry_age_days"}
 
 
@@ -144,7 +236,7 @@ def _canon(value: Any) -> Any:
             if not (
                 isinstance(v, dict)
                 and (
-                    v.get("metric") in VOLATILE_ROWS
+                    v.get("metric", v.get("item")) in VOLATILE_ROWS
                     or str(v.get("key", "")).startswith("otel_")
                     or str(v.get("name", v.get("check", ""))).startswith("setting:otel_")
                     or v.get("name", v.get("check")) in {"cache", "disk-space"}
@@ -154,17 +246,24 @@ def _canon(value: Any) -> Any:
     return value
 
 
+_HEX_ID = re.compile(r"\b[0-9a-f]{12}\b")
+
+
 def _strip_volatile(text: str) -> Any:
     try:
         return _canon(json.loads(text))
     except ValueError:
-        return "\n".join(line for line in text.splitlines() if "run id" not in line)
+        kept = [line for line in text.splitlines() if "run id" not in line]
+        return _HEX_ID.sub("<id>", "\n".join(kept))
 
 
 @pytest.mark.parametrize("name", sorted(SAMPLE_ARGS))
-def test_json_is_one_parseable_document_at_debug(name: str, cli: Callable[..., Any]) -> None:
+def test_json_is_one_parseable_document_at_debug(
+    name: str, cli: Callable[..., Any], tmp_path: Any
+) -> None:
     cmd = next(c for c in all_commands() if c.name == name)
-    args = [*SAMPLE_ARGS[name], "--format", "json"] if cmd.emits_data else SAMPLE_ARGS[name]
+    sample = _prepare(name, cli, tmp_path)
+    args = [*sample, "--format", "json"] if cmd.emits_data else sample
     result = cli("-vv", *args, env_extra=ENV)
     assert result.exit_code == 0, result.stderr
     if cmd.emits_data:
@@ -173,37 +272,48 @@ def test_json_is_one_parseable_document_at_debug(name: str, cli: Callable[..., A
 
 
 @pytest.mark.parametrize("name", sorted(SAMPLE_ARGS))
-def test_stdout_identical_across_log_levels_and_tracing(name: str, cli: Callable[..., Any]) -> None:
+def test_stdout_identical_across_log_levels_and_tracing(
+    name: str, cli: Callable[..., Any], tmp_path: Any
+) -> None:
     cmd = next(c for c in all_commands() if c.name == name)
-    args = [*SAMPLE_ARGS[name], "--format", "json"] if cmd.emits_data else SAMPLE_ARGS[name]
-    quiet = cli(*args, env_extra=ENV)
-    loud = cli("-vv", *args, env_extra=ENV)
-    traced = cli(*args, env_extra={**ENV, "OTEL_TRACES_EXPORTER": "console"})
+
+    def args() -> list[str]:
+        sample = _prepare(name, cli, tmp_path)
+        return [*sample, "--format", "json"] if cmd.emits_data else sample
+
+    quiet = cli(*args(), env_extra=ENV)
+    loud = cli("-vv", *args(), env_extra=ENV)
+    traced = cli(*args(), env_extra={**ENV, "OTEL_TRACES_EXPORTER": "console"})
     assert quiet.exit_code == loud.exit_code == traced.exit_code == 0
     assert _strip_volatile(quiet.stdout) == _strip_volatile(loud.stdout)
     assert _strip_volatile(quiet.stdout) == _strip_volatile(traced.stdout)
 
 
 @pytest.mark.parametrize("name", sorted(SAMPLE_ARGS))
-def test_same_inputs_produce_identical_output_twice(name: str, cli: Callable[..., Any]) -> None:
+def test_same_inputs_produce_identical_output_twice(
+    name: str, cli: Callable[..., Any], tmp_path: Any
+) -> None:
     cmd = next(c for c in all_commands() if c.name == name)
-    args = [*SAMPLE_ARGS[name], "--format", "json"] if cmd.emits_data else SAMPLE_ARGS[name]
+    if name in STATEFUL:
+        return  # the second run legitimately differs (rows removed, ids created)
+    sample = _prepare(name, cli, tmp_path)
+    args = [*sample, "--format", "json"] if cmd.emits_data else sample
     first = cli(*args, env_extra=ENV)
+    for a in PREPARE.get(name, []):
+        cli(*a, env_extra=ENV)
     second = cli(*args, env_extra=ENV)
-    if name == "cache.clear":
-        return  # the second run legitimately reports fewer rows removed
     assert _strip_volatile(first.stdout) == _strip_volatile(second.stdout)
 
 
 @pytest.mark.parametrize("name", sorted(SAMPLE_ARGS))
-def test_disclaimer_rule_per_command(name: str, cli: Callable[..., Any]) -> None:
+def test_disclaimer_rule_per_command(name: str, cli: Callable[..., Any], tmp_path: Any) -> None:
     from sobres.cli.render import DISCLAIMER
 
     cmd = next(c for c in all_commands() if c.name == name)
     if not cmd.emits_data:
         return
-    table = cli(*SAMPLE_ARGS[name], "--format", "table", env_extra=ENV)
+    table = cli(*_prepare(name, cli, tmp_path), "--format", "table", env_extra=ENV)
     assert (DISCLAIMER in table.stdout) == cmd.report
     for fmt in ("json", "csv"):
-        out = cli(*SAMPLE_ARGS[name], "--format", fmt, env_extra=ENV)
+        out = cli(*_prepare(name, cli, tmp_path), "--format", fmt, env_extra=ENV)
         assert DISCLAIMER not in out.stdout

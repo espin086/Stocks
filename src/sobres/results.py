@@ -100,6 +100,13 @@ class Result(BaseModel):
     def header_lines(self) -> list[str]:
         return self.provenance.lines()
 
+    def summary_line(self) -> str:
+        """One line for run listings: the first header line, or the row count."""
+        lines = self.header_lines()
+        if lines:
+            return lines[0]
+        return f"{len(self.table())} rows"
+
     def payload(self) -> dict[str, Any]:
         """The JSON document: full precision, never rounded."""
         frame = self.table()
@@ -166,7 +173,7 @@ class MessageResult(Result):
 
     def render_rich(self, console: Any) -> None:
         for key, value in self.detail.items():
-            console.print(f"  {key}: {value}", markup=False)
+            console.print(f"  {key}: {value}", markup=False, soft_wrap=True)
 
 
 # ----------------------------------------------------------------- 0001 results

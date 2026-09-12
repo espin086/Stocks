@@ -133,5 +133,67 @@ kv = Table(
     Column("updated_at", UtcTimestamp, nullable=False),
 )
 
+# --------------------------------------------------------------------- 0003
+portfolio = Table(
+    "portfolio",
+    metadata,
+    Column("name", Text, primary_key=True),
+    Column("tickers", JsonText, nullable=False),
+    Column("weights", JsonText, nullable=True),
+    Column("created_at", UtcTimestamp, nullable=False),
+    Column("updated_at", UtcTimestamp, nullable=False),
+)
+
+watchlist = Table(
+    "watchlist",
+    metadata,
+    Column("name", Text, primary_key=True),
+    Column("symbols", JsonText, nullable=False),
+    Column("updated_at", UtcTimestamp, nullable=False),
+)
+
+goal = Table(
+    "goal",
+    metadata,
+    Column("name", Text, primary_key=True),
+    Column("kind", Text, nullable=False),
+    Column("params", JsonText, nullable=False),
+    Column("created_at", UtcTimestamp, nullable=False),
+    Column("updated_at", UtcTimestamp, nullable=False),
+)
+
+run = Table(
+    "run",
+    metadata,
+    Column("id", Text, primary_key=True),  # application-generated
+    Column("command", Text, nullable=False),
+    Column("params", JsonText, nullable=False),
+    Column("estimators", JsonText, nullable=False),
+    Column("window", JsonText, nullable=False),
+    Column("result", JsonText, nullable=False),
+    Column("summary", Text, nullable=False),
+    Column("created_at", UtcTimestamp, nullable=False),
+)
+
+job = Table(
+    "job",
+    metadata,
+    Column("id", Text, primary_key=True),  # application-generated
+    Column("command", Text, nullable=False),
+    Column("params", JsonText, nullable=False),
+    Column("state", Text, nullable=False),
+    Column("progress", Float, nullable=False),
+    Column("result", JsonText, nullable=True),
+    Column("error", JsonText, nullable=True),
+    Column("run_id", Text, nullable=True),
+    Column("trace_context", JsonText, nullable=True),
+    Column("created_at", UtcTimestamp, nullable=False),
+    Column("updated_at", UtcTimestamp, nullable=False),
+    Column("finished_at", UtcTimestamp, nullable=True),
+)
+
 CACHE_TABLES: tuple[str, ...] = ("observation", "fetch_log", "series_meta")
 """Tables ``sobres cache clear`` may touch. Everything else is user-authored."""
+
+USER_TABLES: tuple[str, ...] = ("portfolio", "watchlist", "goal", "run", "job")
+"""Tables that hold user-authored state: never touched by cache maintenance."""

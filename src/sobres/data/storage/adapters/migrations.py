@@ -37,6 +37,17 @@ def _v1_initial(conn: Any) -> None:
     )
 
 
-MIGRATIONS: tuple[Migration, ...] = (Migration(1, "initial-cache-and-kv", _v1_initial),)
+def _v2_application_state(conn: Any) -> None:
+    """0003: saved portfolios, watchlists, goals, run history and job records."""
+    schema.metadata.create_all(
+        conn,
+        tables=[schema.portfolio, schema.watchlist, schema.goal, schema.run, schema.job],
+    )
+
+
+MIGRATIONS: tuple[Migration, ...] = (
+    Migration(1, "initial-cache-and-kv", _v1_initial),
+    Migration(2, "application-state", _v2_application_state),
+)
 
 CURRENT_VERSION = MIGRATIONS[-1].version
