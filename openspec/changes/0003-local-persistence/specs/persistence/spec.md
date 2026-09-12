@@ -125,10 +125,33 @@ The database SHALL carry a schema version and upgrade itself on open.
 - **THEN** the system SHALL attempt recovery into a new file, leaving the original
   in place, and report what was and was not recovered
 
+### Requirement: Repositories sit behind the storage port
+
+#### Scenario: Backend-agnostic repositories
+- **WHEN** a repository is defined for portfolios, watchlists, goals, runs, or jobs
+- **THEN** it SHALL be a protocol in `data/storage/base.py` with its
+  implementation under `data/storage/adapters/`
+- **AND** no call site SHALL name a backend or construct a connection
+
+#### Scenario: New repositories join the conformance suite
+- **WHEN** a repository is added
+- **THEN** 0001's shared conformance suite SHALL gain coverage for it
+- **AND** that coverage SHALL run against every registered adapter
+
+#### Scenario: Portability guards apply to new tables
+- **WHEN** a table is added for application state
+- **THEN** it SHALL use only the portable type set, application-generated
+  identifiers, explicit UTC timestamps, and JSON encoded as text
+
+#### Scenario: Switching backends is configuration
+- **WHEN** `QUANTFOLIO_DB_URL` names a different registered backend
+- **THEN** every command in this change SHALL behave identically
+- **AND** no module outside `data/storage/adapters/` SHALL require modification
+
 ### Requirement: Storage layer purity
 
 #### Scenario: Repositories perform no computation
-- **WHEN** any module under `data/store/` is reviewed
+- **WHEN** any module under `data/storage/` is reviewed
 - **THEN** it SHALL contain persistence logic only
 - **AND** SHALL NOT import from `quantfolio.core`
 
@@ -138,11 +161,25 @@ The database SHALL carry a schema version and upgrade itself on open.
 - **AND** a test SHALL assert this by inspecting imports, so the rule is enforced
   rather than remembered
 
+### Requirement: Observability of persistence
+
+#### Scenario: Operations are logged and spanned
+- **WHEN** a repository operation runs
+- **THEN** it SHALL emit a DEBUG record and a span carrying the operation, the
+  entity, and the affected row count, per 0001's observability rules
+- **AND** stored values SHALL be subject to the same redaction as any other
+  logged data
+
+#### Scenario: Migrations are visible
+- **WHEN** a migration runs
+- **THEN** each migration applied SHALL be logged at INFO with its version, and
+  the backup path SHALL be logged at WARNING
+
 ### Requirement: Portability of the database file
 
 #### Scenario: One file is the whole state
-- **WHEN** the database file is copied to another machine and `QUANTFOLIO_DB`
-  points at it
+- **WHEN** the database file is copied to another machine and
+  `QUANTFOLIO_DB_URL` points at it
 - **THEN** every saved portfolio, watchlist, goal, run and cached observation
   SHALL be available there
 

@@ -38,11 +38,14 @@ cache into a database: schema versioning, migrations, and the application tables
 ## What changes
 
 - **New capability `persistence`.**
-- `data/db.py` grows a forward-only migration runner keyed on `schema_version`,
-  applied automatically on open.
-- `data/store/` — repositories for portfolios, watchlists, goals, analysis runs
-  and job records. Plain data in, plain data out; no math, matching 0001's rule
-  that `data/**` performs I/O and `core/**` performs computation.
+- `data/storage/migrations/` gains a forward-only migration set keyed on
+  `schema_version`, applied automatically on open by the adapter — one set, no
+  branching on backend.
+- `data/storage/` gains repository protocols for portfolios, watchlists, goals,
+  analysis runs and job records, behind 0001's storage port. Plain data in, plain
+  data out; no math, and no driver import outside the adapters.
+- The conformance suite from 0001 grows to cover the new repositories, so a
+  future backend is still proven by one shared suite rather than by inspection.
 - **New CLI groups** `qf portfolio`, `qf watchlist`, `qf run`, and `qf db`.
 - `--save-run` on the analytical commands; `--portfolio <name>` accepted wherever
   `--tickers` is, so saved state substitutes for typing.
@@ -52,10 +55,14 @@ cache into a database: schema versioning, migrations, and the application tables
 - **No multi-user data model.** One database is one person's data. Adding a
   `user_id` column "just in case" would shape every query for a use case that is
   explicitly out of scope (see 0004's access model).
-- No cloud sync, no remote database backends. Postgres is not on the roadmap;
-  the single-file property is the point.
-- No ORM. The schema is small and hand-written SQL keeps the migration story
-  legible.
+- **No second backend is implemented here either.** 0001 ships the port, the
+  registry, and the conformance suite; this change adds repositories behind them.
+  A PostgreSQL or DuckDB adapter remains a later change — one that should be a
+  new file and a fixture-list entry, which is the whole point of the port.
+- No cloud sync. Running against a remote backend becomes possible through the
+  port, but nothing in this change assumes or requires it.
+- No ORM. SQLAlchemy Core sits below the repositories as the dialect layer; object
+  mapping would hide the migration story that has to stay legible.
 - No automatic scheduled refresh of saved portfolios. That is a cron job the user
   writes with the CLI they already have.
 - No encryption at rest. The file holds public market data and the user's own
@@ -71,4 +78,5 @@ cache into a database: schema versioning, migrations, and the application tables
 | Schema churn during 0004 and 0005 makes migrations painful early | Version from the first release; treat every shipped schema as immutable even pre-1.0, since the cost of the discipline is far below the cost of a user's lost portfolios |
 | CLI and server write concurrently and one wedges | WAL plus a busy timeout from 0001; writes are short transactions; the job table is the only hot row and is written by a single worker |
 | The database grows without bound as price history accumulates | `qf db info` reports size by table; `qf cache clear` prunes cached observations while leaving user-authored rows untouched — the two must never be conflated |
+| Repositories accrete SQLite-shaped assumptions now that there is real application state | Every repository is added to the shared conformance suite as it is written, and the portability guards from 0001 (portable types, application-generated ids, explicit UTC, JSON as text) apply to every new table |
 | Saved runs reference market data that later gets revised | A run records the inputs and the resolved parameters it used, so it stays interpretable; it is a record of an analysis, not a promise of reproducibility against a mutable index |

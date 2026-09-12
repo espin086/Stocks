@@ -30,9 +30,17 @@ Do not implement a behavior that has no scenario. Add the scenario first.
 registry.py  One declaration per command (0004). CLI, API and UI derive from it.
 cli/    Typer adapters — argv → data → core → render.    NO business logic.
 api/    FastAPI adapters (0004).                          NO business logic.
-core/   Pure, I/O-free math over frames and dataclasses.  NO network, NO disk.
-data/   Providers + SQLite → pandas objects.              NO math.
+        ^ logs and spans are emitted at this layer
+core/   Pure, I/O-free math over frames and dataclasses.  NO network, NO disk,
+                                                          NO logging, NO tracing.
+data/   Providers + storage port → pandas objects.        NO math.
+        storage/adapters/ is the only place a DB driver is imported.
 ```
+
+Anything swappable sits behind a `Protocol` in our own namespace — data
+providers, the storage backend, the solver — and its library types never appear
+in a signature outside its adapter. Where more than one implementation is
+plausible, a shared conformance suite defines the contract.
 
 If you find yourself computing something in `cli/` or `api/`, it belongs in
 `core/`. If you find yourself calling a provider or opening a connection from
@@ -42,18 +50,55 @@ From 0004 on, never add a command to only one surface. Declare it in
 `registry.py`; the CLI, the HTTP route, and the UI form come from that. A parity
 test fails the build if a registered command lacks a route or a view.
 
-## Storage
+## Storage is a port, not a database
 
-One SQLite file is the whole local state — cached observations, saved portfolios,
-goals, runs, jobs. Path from `QUANTFOLIO_DB`, `/data/quantfolio.db` in Docker.
+Persistence goes through repository protocols in `data/storage/base.py`. The
+SQLite adapter is one implementation; `QUANTFOLIO_DB_URL` selects it.
 
-- Never add a second store (a cache directory, a JSON sidecar, a pickle). The
-  single-file property is what makes the container one volume and a backup one copy.
-- Migrations are forward-only and never edited after release; a correction is a new
-  migration.
+- **Never import a database driver outside `data/storage/adapters/`** — not
+  `sqlite3`, not `sqlalchemy`. A test enforces this.
+- **Phrase ports in domain terms** (observations, date ranges, portfolios), never
+  as SQL execution. A SQL-shaped port makes switching a rewrite.
+- Stay inside the SQLite / PostgreSQL / DuckDB intersection: portable column
+  types, application-generated ids, explicit UTC timestamps, JSON as text. No
+  backend-specific SQL in shared code — if something cannot be expressed
+  portably, it becomes a named adapter method every adapter implements.
+- **Add every new repository to the shared conformance suite.** That suite is
+  what makes a second backend a new file rather than a project.
+- SQLAlchemy Core sits below the protocols as the dialect layer. Not the ORM, and
+  never visible to a call site.
+- Migrations are forward-only and never edited after release; a correction is a
+  new migration. One migration set, applied by the adapter, no branching on
+  backend.
+- One SQLite file holding everything is a property of the *default backend*, not
+  of the system. Don't add a second store (a cache directory, a JSON sidecar, a
+  pickle) — that would break it for no gain.
 - `qf cache clear` removes cached observations only. It must never touch
   user-authored rows.
-- API keys live in the config file at `0600`, never in the database.
+- API keys and database URLs are secrets: config file at `0600`, never in the
+  database, always redacted in output.
+
+## Logging and tracing
+
+structlog always on (default WARNING); OpenTelemetry behind the `otel` extra,
+no-op unless `OTEL_*` is set.
+
+- **Logs go to stderr. Always.** stdout carries results only — `--format json`
+  must stay a single parseable document at any log level.
+- **Never import logging or tracing inside `core/`.** Instrumentation lives in
+  the adapters, which observe the calls they make. A test enforces this.
+- For a computation long enough to need intermediate visibility, add an
+  **optional progress callback** to the core function and let the caller decide
+  whether it becomes a log line, a span event, or a job update. With no callback,
+  nothing changes.
+- **Redact at the formatter, not at call sites.** Keys matching key/token/secret/
+  password/authorization, and credentials inside URLs.
+- An assumption that changes a number — fallback risk-free rate, repaired
+  covariance matrix, shifted backtest start — logs at **WARNING**, not INFO.
+  These are the lines that explain a surprising result.
+- Observability may never change behavior: stdout is byte-identical across log
+  levels and with tracing on or off, and that is a test.
+- An unreachable exporter warns once and never fails a command.
 
 ## Conventions
 

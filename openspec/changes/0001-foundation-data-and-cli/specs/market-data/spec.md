@@ -125,8 +125,10 @@ Docker deployment in 0005 a single mounted volume.
 
 #### Scenario: Database location
 - **WHEN** no override is configured
-- **THEN** the database SHALL live in the platform user-data dir via `platformdirs`
-- **AND** SHALL be overridable by `QUANTFOLIO_DB`, which 0005 sets to `/data/quantfolio.db`
+- **THEN** the default backend SHALL be SQLite in the platform user-data dir via
+  `platformdirs`
+- **AND** the backend and location SHALL be overridable by `QUANTFOLIO_DB_URL`,
+  which 0005 sets to `sqlite:////data/quantfolio.db`
 
 #### Scenario: Cache hit
 - **WHEN** an identical request is made within the dataset's TTL

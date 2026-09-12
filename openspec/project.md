@@ -19,10 +19,15 @@ or notebook can sit on top later without moving any logic.
                       │                  │
               ┌───────▼──────────────────▼───────────────────┐
   adapters →  │  cli/ (Typer)   api/ (FastAPI)   frontend/   │  no business logic
+              │      ↑ logs and spans are emitted here        │
               ├──────────────────────────────────────────────┤
-  math     →  │  core/  pure, I/O-free, deterministic        │  no network, no disk
+  math     →  │  core/  pure, I/O-free, deterministic        │  no network, no disk,
+              │         optional progress callback            │  no logging
               ├──────────────────────────────────────────────┤
-  I/O      →  │  data/  providers + SQLite → pandas objects  │  no math
+  I/O      →  │  data/  providers ─┐                          │  no math
+              │         storage/base.py  ← port               │
+              │         storage/adapters/  ← only place a     │
+              │              database driver is imported      │
               └──────────────────────────────────────────────┘
 ```
 
@@ -57,11 +62,15 @@ src/quantfolio/
 │   ├── simulate.py         # Monte Carlo + bootstrap engines
 │   └── backtest.py         # walk-forward rebalancing evaluation
 ├── registry.py             # 0004: every command declared once
+├── observability/          # logging + tracing setup, redaction
 ├── data/
 │   ├── base.py             # PriceProvider / FactorProvider / MacroProvider protocols
-│   ├── db.py               # SQLite connection, pragmas, migrations
-│   ├── cache.py            # observation cache w/ per-dataset TTL
-│   ├── store/              # 0003: portfolios, watchlists, goals, runs, jobs
+│   ├── cache.py            # observation cache w/ per-dataset TTL, over the port
+│   ├── storage/
+│   │   ├── base.py         # repository protocols + backend registry
+│   │   ├── migrations/     # one backend-neutral migration set
+│   │   └── adapters/       # the ONLY place a DB driver is imported
+│   │       └── sqlite.py
 │   ├── yfinance_provider.py
 │   ├── fred_provider.py
 │   └── ken_french.py
@@ -111,20 +120,57 @@ site/                       # 0006: animated landing page → GitHub Pages
 configured**. Anything requiring a key degrades with a clear, actionable error —
 never a stack trace.
 
-## Storage
+## Storage: a port, with SQLite behind it
 
-**One SQLite file is the entire local state** — cached observations, saved
-portfolios, goals, run history, and jobs. Not a cache directory plus a database
-plus a config of saved things.
+Persistence is reachable only through repository protocols in
+`data/storage/base.py`, phrased in domain terms — observations, date ranges,
+portfolios — never as SQL execution. A port phrased as SQL is a SQL port, and
+swapping it would still be a rewrite.
 
-That single decision pays three times: sub-range cache reuse (asking for 2015–2024
-after caching 2015–2025 costs nothing), one thing for Docker to mount as a volume,
-and one file to copy to back up or move machines. Location is `QUANTFOLIO_DB`,
-defaulting to the platform data dir locally and `/data/quantfolio.db` in the
-container.
+`QUANTFOLIO_DB_URL` selects the adapter, defaulting to
+`sqlite:///<user-data-dir>/quantfolio.db`. **No database driver is imported
+outside `data/storage/adapters/`**, and a test enforces it.
+
+SQLAlchemy Core (the expression language, not the ORM) sits *below* the
+protocols as the dialect layer, with Alembic for migrations. Call sites never see
+a `Session`, a `Table`, or a `Row`, so even that choice stays reversible.
+
+The schema stays inside the capability intersection of **SQLite, PostgreSQL, and
+DuckDB**: portable column types, application-generated identifiers, explicit UTC
+timestamps, JSON stored as text, and no backend-specific SQL in shared code.
+
+**Only the SQLite adapter is implemented.** The port, the registry, and a shared
+**conformance suite** ship with it. The suite is the part that makes a second
+backend cheap — it states the contract in executable form while there is exactly
+one implementation, and adding a backend means a new adapter file plus one
+fixture-list entry.
+
+With SQLite, one file is the entire local state — cache, portfolios, goals, runs,
+jobs. That is a property of the default backend, not of the system: it is what
+lets Docker mount one volume and a backup be one copy.
 
 API keys are the exception: they stay in the config file at mode `0600` and never
 enter the database.
+
+## Observability
+
+Structured logging always (default WARNING); OpenTelemetry tracing behind the
+`otel` extra, no-op unless `OTEL_*` is configured.
+
+Three rules that everything else follows from:
+
+1. **Logs go to stderr, always.** `--format json` must stay a single parseable
+   document on stdout at any log level.
+2. **`core/` imports no logging or tracing.** Instrumentation lives in the
+   adapters, which observe the calls they make. Long computations take an
+   optional progress callback; the caller decides whether that becomes a log
+   line, a span event, or a job progress update.
+3. **Redaction happens at the formatter**, not at call sites — a test runs every
+   command with a sentinel credential at DEBUG and asserts it appears nowhere.
+
+Observability may never change a result: stdout is byte-identical across log
+levels and with tracing on or off, and that is a test. An unreachable exporter
+warns once and never fails a command.
 
 ## Prior art in JJ's repos (reuse, don't rebuild)
 
@@ -144,7 +190,7 @@ Each is one OpenSpec change under `openspec/changes/`.
 | # | Change | Ships |
 |---|---|---|
 | 0000 | `release-engineering` | CI gate, version-gated PyPI publishing |
-| 0001 | `foundation-data-and-cli` | Provider layer, SQLite cache, config, CLI shell, `qf data *` |
+| 0001 | `foundation-data-and-cli` | Provider layer, storage port + SQLite adapter, cache, logging + tracing, CLI shell, `qf data *` |
 | 0002 | `portfolio-optimization` | **v1.0.0** — returns/risk, MVO, frontier, backtest |
 | 0003 | `local-persistence` | Schema + migrations, saved portfolios/goals/runs, `qf db` |
 | 0004 | `web-ui` | Command registry, FastAPI, React SPA, jobs + SSE, `qf serve` |
@@ -166,3 +212,8 @@ retrofitting one at the end. Each change depends only on what came before it.
 4. **Cite the math.** Each core function's docstring names the formula and a source.
 5. **The UI never diverges from the CLI.** Both are generated from one registry,
    and a parity test fails the build if they drift.
+6. **Swappable things sit behind ports.** Data providers, the storage backend,
+   and the solver are protocols in this codebase's namespace; their library types
+   never appear in signatures outside their adapter.
+7. **Observability never changes behavior.** No secret in a log or a span, no
+   log on stdout, no instrumentation inside `core/`.

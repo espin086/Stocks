@@ -34,11 +34,19 @@ the codebase is small enough that the rule is free to follow.
 ## What changes
 
 - **New capability `market-data`** — provider protocols, a yfinance price provider,
-  a FRED macro provider, a Ken French factor provider, and a SQLite-backed cache
-  with per-dataset TTL and sub-range reuse.
+  a FRED macro provider, a Ken French factor provider, and a cache with
+  per-dataset TTL and sub-range reuse.
+- **New capability `storage`** — repository protocols and a backend registry, so
+  the database is reachable only through a port. SQLite is the first adapter, not
+  the interface. A shared conformance suite defines what "a supported backend"
+  means, and the schema stays inside the capability intersection of SQLite,
+  PostgreSQL, and DuckDB.
+- **New capability `observability`** — structured logging on by default and
+  OpenTelemetry tracing behind an optional extra, instrumenting the adapters and
+  the I/O layer while `core/` stays pure.
 - **New capability `cli-shell`** — root Typer app, `--format table|json|csv`,
-  a config resolution chain, uniform error handling, and the `qf data` /
-  `qf cache` command groups.
+  `-v/-vv` and `--log-format`, a config resolution chain, uniform error handling,
+  and the `qf data` / `qf cache` command groups.
 - `src/quantfolio/config.py` — settings from env → config file → defaults.
 - Test fixtures: recorded provider payloads under `tests/fixtures/` so the whole
   suite runs offline.
@@ -48,6 +56,12 @@ the codebase is small enough that the rule is free to follow.
 - No optimization, factor regression, forecasting, or goal math. That is 0002+.
 - No paid providers (Polygon/Tiingo/FMP). The protocols are designed to admit one
   later; no adapter is written now.
+- **No second storage backend is implemented.** The port, the registry, and the
+  conformance suite ship; PostgreSQL and DuckDB adapters do not. An abstraction
+  with one implementation is a guess — but a guess made cheap to correct, which
+  is the point of shipping the conformance suite alongside it.
+- No metrics pipeline. Logs and traces only; counters and histograms can be
+  derived from spans if they are ever wanted.
 - No FastAPI surface. The layering keeps the door open; the door stays shut.
 - No survivorship-bias-free or point-in-time fundamentals. yfinance cannot give
   that, and pretending otherwise would be worse than the limitation.
@@ -61,3 +75,7 @@ the codebase is small enough that the rule is free to follow.
 | Cached data goes stale mid-analysis | Per-dataset TTL, `qf cache info` shows age, `--refresh` forces a re-fetch |
 | One SQLite file becomes a single point of failure for user-authored state | 0003 adds `qf db export` and a migration story; a corrupt database refuses to be silently recreated |
 | Silent timezone/calendar misalignment across sources | One rule, enforced at the data boundary: all series are tz-naive dates on a trading-day index; alignment is an explicit, tested operation |
+| The storage abstraction is designed around SQLite and leaks when a real second backend arrives | The schema is constrained to a documented three-way capability intersection now, not later; identifiers are application-generated; timestamps are explicit UTC; the conformance suite is written against the contract rather than against SQLite's behavior |
+| Abstraction costs more than it saves for a single-user tool | The port is thin — repository protocols plus an expression layer — and no second adapter is built on speculation. If the second backend never arrives, the cost is a few protocol files |
+| Logging leaks an API key | Key-name and URL redaction at the formatter, applied to logs and span attributes alike, asserted by a test that runs every command with a sentinel credential at DEBUG |
+| Instrumentation changes behavior or output | A test asserts stdout is byte-identical across log levels and with tracing on and off |

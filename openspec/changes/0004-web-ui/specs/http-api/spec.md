@@ -109,6 +109,35 @@ Every capability SHALL be declared once and consumed by all three surfaces.
 - **AND** SHALL NOT be accepted as a query parameter, where proxies and browser
   history would record it
 
+### Requirement: Observability across the request and job boundary
+
+#### Scenario: Every request is a trace
+- **WHEN** a request arrives
+- **THEN** a span SHALL cover it, carrying the route, the registry command, and
+  the response status
+- **AND** a run id SHALL be bound to every log record produced while serving it
+
+#### Scenario: Inbound trace context is honored
+- **WHEN** a request carries W3C `traceparent`
+- **THEN** the request's span SHALL be a child of that context, so the API
+  appears inside a caller's trace rather than starting a disconnected one
+
+#### Scenario: Context crosses into the job
+- **WHEN** a request dispatches a job
+- **THEN** the trace context and run id SHALL be persisted with the job record
+- **AND** the job's execution span SHALL link to the request that created it,
+  so work that outlives its request is still traceable to its origin
+
+#### Scenario: The trace id reaches the client
+- **WHEN** a response is returned
+- **THEN** it SHALL carry the correlation id in a response header
+- **AND** an error response SHALL include it in the body, so a user can quote it
+
+#### Scenario: Job progress is not a log
+- **WHEN** a job reports progress
+- **THEN** it SHALL come from the optional progress callback 0001 defined
+- **AND** the core computation SHALL remain free of logging and tracing imports
+
 ### Requirement: API hygiene
 
 #### Scenario: Documented

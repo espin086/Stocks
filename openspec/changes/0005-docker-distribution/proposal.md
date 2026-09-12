@@ -78,7 +78,7 @@ variable set in compose behaves exactly as it does in a shell.
 
 | Risk | Mitigation |
 |---|---|
-| The container writes the database to its own filesystem and the user loses everything on `docker rm` | `QUANTFOLIO_DB` defaults to `/data/quantfolio.db`; the image declares `/data` as a volume; startup fails loudly if `/data` is not writable, rather than silently persisting into the container layer |
+| The container writes the database to its own filesystem and the user loses everything on `docker rm` | `QUANTFOLIO_DB_URL` defaults to `sqlite:////data/quantfolio.db`; the image declares `/data` as a volume; startup fails loudly if `/data` is not writable, rather than silently persisting into the container layer |
 | Root-owned files in a mounted volume become unusable from the host | The image runs as a non-root user with a fixed, documented uid/gid |
 | Secrets baked into an image layer | Nothing is copied into the image but built artifacts; the build is proven secret-free by scanning the published image, and API keys arrive only as runtime environment or a mounted config |
 | Image bloat from a Node toolchain and scientific wheels | Multi-stage build discards both toolchains; a size budget is a CI gate |

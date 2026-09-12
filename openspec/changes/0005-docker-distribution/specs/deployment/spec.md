@@ -28,8 +28,8 @@
 ### Requirement: Data persistence in the container
 
 #### Scenario: Database lives on a volume
-- **WHEN** the image runs with no `QUANTFOLIO_DB` set
-- **THEN** the database SHALL be `/data/quantfolio.db`
+- **WHEN** the image runs with no `QUANTFOLIO_DB_URL` set
+- **THEN** the database SHALL be SQLite at `/data/quantfolio.db`
 - **AND** `/data` SHALL be declared as a volume
 
 #### Scenario: A missing volume fails loudly
@@ -122,6 +122,45 @@
 - **WHEN** an image is built for release
 - **THEN** it SHALL be scanned, and a fixable high or critical finding SHALL fail
   the run, with the same named-exception discipline 0000 applies to `pip-audit`
+
+### Requirement: Observability in the container
+
+#### Scenario: Logs are the container's stream
+- **WHEN** the container runs
+- **THEN** logs SHALL go to stderr in JSON, since stderr is not a TTY there
+- **AND** no log file SHALL be written inside the container by default, where it
+  would grow unbounded in a layer nobody inspects
+
+#### Scenario: Log level is configurable at runtime
+- **WHEN** `QUANTFOLIO_LOG_LEVEL` is set in the environment
+- **THEN** it SHALL take effect with no image rebuild
+
+#### Scenario: Tracing is configured, not built in
+- **WHEN** standard `OTEL_*` variables are supplied to the container
+- **THEN** tracing SHALL activate, the image having the `otel` extra installed
+- **AND** with those variables unset, tracing SHALL be inert
+
+#### Scenario: An unreachable collector never breaks the container
+- **WHEN** an exporter endpoint is configured but unreachable
+- **THEN** the container SHALL start, serve, and pass its health check
+- **AND** SHALL warn once rather than per span
+
+### Requirement: The storage backend is a container concern too
+
+#### Scenario: The default stays SQLite on a volume
+- **WHEN** no `QUANTFOLIO_DB_URL` is supplied
+- **THEN** the container SHALL use SQLite at `/data/quantfolio.db`
+
+#### Scenario: An external backend needs no different image
+- **WHEN** `QUANTFOLIO_DB_URL` names another registered backend
+- **THEN** the same image SHALL use it without rebuild
+- **AND** the `/data` volume SHALL become unnecessary, which
+  `qf deploy check` SHALL report rather than leave implied
+
+#### Scenario: A database URL is a secret
+- **WHEN** a connection URL containing credentials is supplied
+- **THEN** it SHALL be redacted in logs, spans, and every `qf deploy` output,
+  under 0001's redaction rules
 
 ### Requirement: The CLI generates the deployment
 

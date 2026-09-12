@@ -42,8 +42,9 @@ show, and "watch the frontier solve" is the demo.
   the HTTP API, and the UI's forms are all generated from it. This is what makes
   "the UI has all the features of the CLI" a tested invariant rather than an
   intention.
-- **Job execution** — optimizations and backtests run as jobs persisted in 0003's
-  database, with progress streamed over SSE.
+- **Job execution** — optimizations and backtests run as jobs persisted through
+  0003's repositories, with progress streamed over SSE. Trace context and run id
+  are persisted with the job, so work that outlives its request stays traceable.
 - `qf serve` as the entry point; `[web]` extra for FastAPI and uvicorn.
 
 ## The parity problem, and how it is solved
