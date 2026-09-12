@@ -55,7 +55,7 @@ def record_yfinance(start: date, end: date) -> None:
         raw.frame.round(6).to_csv(out / f"{ticker}.csv")
         tickers[ticker] = {k: raw.meta.get(k) for k in ("currency", "exchangeName", "symbol")}
     (out / "meta.json").write_text(
-        _meta("yfinance", provider_version=yf.__version__, tickers=tickers)
+        _meta("yfinance", provider_version=yf.__version__, tickers=tickers), encoding="utf-8"
     )
 
 
@@ -78,8 +78,12 @@ def record_fred(start: date, end: date, api_key: str) -> None:
         )
         response.raise_for_status()
         payload = response.json()
-        (out / f"{series_id}.json").write_text(json.dumps(payload, indent=1) + "\n")
-    (out / "meta.json").write_text(_meta("fred", api="fred/series/observations file_type=json"))
+        (out / f"{series_id}.json").write_text(
+            json.dumps(payload, indent=1) + "\n", encoding="utf-8"
+        )
+    (out / "meta.json").write_text(
+        _meta("fred", api="fred/series/observations file_type=json"), encoding="utf-8"
+    )
 
 
 def record_ecb(start: date, end: date) -> None:
@@ -89,8 +93,10 @@ def record_ecb(start: date, end: date) -> None:
     out.mkdir(parents=True, exist_ok=True)
     source = LiveEcbSource()
     for currency in ECB_CURRENCIES:
-        (out / f"{currency}.csv").write_text(source.csv(currency, start, end))
-    (out / "meta.json").write_text(_meta("ecb", api="EXR/D.<CCY>.EUR.SP00.A?format=csvdata"))
+        (out / f"{currency}.csv").write_text(source.csv(currency, start, end), encoding="utf-8")
+    (out / "meta.json").write_text(
+        _meta("ecb", api="EXR/D.<CCY>.EUR.SP00.A?format=csvdata"), encoding="utf-8"
+    )
 
 
 def record_ken_french() -> None:
@@ -100,8 +106,8 @@ def record_ken_french() -> None:
     out.mkdir(parents=True, exist_ok=True)
     source = LiveKenFrenchSource()
     for stem in KEN_FRENCH_FILES:
-        (out / f"{stem}.CSV").write_text(source.csv_text(stem))
-    (out / "meta.json").write_text(_meta("ken_french"))
+        (out / f"{stem}.CSV").write_text(source.csv_text(stem), encoding="utf-8")
+    (out / "meta.json").write_text(_meta("ken_french"), encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

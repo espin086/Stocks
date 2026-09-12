@@ -25,11 +25,11 @@ def _scenarios() -> dict[str, tuple[str, list[str]]]:
         proposal = change / "proposal.md"
         status = "proposed"
         if proposal.exists():
-            match = STATUS.search(proposal.read_text())
+            match = STATUS.search(proposal.read_text(encoding="utf-8"))
             status = match.group(1) if match else "proposed"
         names: list[str] = []
         for spec in change.glob("specs/*/spec.md"):
-            names.extend(SCENARIO.findall(spec.read_text()))
+            names.extend(SCENARIO.findall(spec.read_text(encoding="utf-8")))
         out[change.name] = (status, names)
     return out
 
@@ -39,7 +39,7 @@ def _squash(text: str) -> str:
 
 
 def _test_corpus() -> str:
-    return _squash("\n".join(p.read_text() for p in TESTS.rglob("*.py")))
+    return _squash("\n".join(p.read_text(encoding="utf-8") for p in TESTS.rglob("*.py")))
 
 
 def test_every_scenario_has_a_test() -> None:
@@ -60,6 +60,6 @@ def test_every_scenario_has_a_test() -> None:
 
 def test_scenario_names_are_unique_within_a_spec() -> None:
     for spec in CHANGES.glob("*/specs/*/spec.md"):
-        names = SCENARIO.findall(spec.read_text())
+        names = SCENARIO.findall(spec.read_text(encoding="utf-8"))
         dupes = {n for n in names if names.count(n) > 1}
         assert not dupes, f"{spec} repeats scenario titles: {dupes}"
