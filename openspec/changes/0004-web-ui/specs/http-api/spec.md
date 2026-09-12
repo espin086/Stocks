@@ -9,7 +9,7 @@ consumers of those declarations and changes nothing about how a command is
 declared.
 
 #### Scenario: One declaration, three surfaces
-- **WHEN** a command exists in `quantfolio/registry.py` per 0001
+- **WHEN** a command exists in `sobres/registry.py` per 0001
 - **THEN** an HTTP route, an OpenAPI schema entry, and a UI form SHALL all exist
   for it without further code
 
@@ -80,7 +80,7 @@ declared.
 ### Requirement: Access control
 
 #### Scenario: Loopback by default
-- **WHEN** `qf serve` runs with no `--host`
+- **WHEN** `sobres serve` runs with no `--host`
 - **THEN** it SHALL bind `127.0.0.1` only
 - **AND** no token SHALL be required, since the socket is not reachable remotely
 
@@ -106,7 +106,7 @@ declared.
 - **THEN** the response SHALL be 401 with no detail about what was wrong
 
 #### Scenario: Rotation and revocation
-- **WHEN** `qf serve token rotate` runs
+- **WHEN** `sobres serve token rotate` runs
 - **THEN** a new token SHALL replace the old one and every existing session SHALL
   stop working
 

@@ -10,12 +10,12 @@ status: proposed
 ## Outcome
 
 ```bash
-qf optimize markowitz --tickers AAPL MSFT NVDA JNJ XOM GLD \
+sobres optimize markowitz --tickers AAPL MSFT NVDA JNJ XOM GLD \
     --start 2015-01-01 --objective max-sharpe --max-weight 0.35
 
-qf optimize frontier --tickers ... --points 50 --format csv > frontier.csv
+sobres optimize frontier --tickers ... --points 50 --format csv > frontier.csv
 
-qf optimize backtest --tickers ... --objective max-sharpe \
+sobres optimize backtest --tickers ... --objective max-sharpe \
     --rebalance quarterly --lookback 36m --start 2015-01-01
 ```
 
@@ -33,7 +33,7 @@ base.
 The backtest ships **with** the optimizer, not after it, and that is deliberate.
 In-sample mean-variance optimization produces beautiful, useless numbers: it
 maximizes a Sharpe ratio on data it has already seen. Shipping the optimizer alone
-would make the tool's flagship output actively misleading. `qf optimize backtest` is
+would make the tool's flagship output actively misleading. `sobres optimize backtest` is
 the honesty mechanism, so it is part of v1's definition of done.
 
 ## What changes
@@ -47,7 +47,7 @@ the honesty mechanism, so it is part of v1's definition of done.
   - `core/optimize.py` — min-variance, max-Sharpe, target-return/target-risk,
     risk parity, equal weight; the efficient frontier
   - `core/backtest.py` — walk-forward rebalancing with transaction costs
-- **New CLI group `qf optimize`** — `markowitz`, `frontier`, `backtest`, `risk`.
+- **New CLI group `sobres optimize`** — `markowitz`, `frontier`, `backtest`, `risk`.
 - Port this repository's own prior implementation
   (`legacy_code/Financial Portfolio Optimization.R`) to `core/optimize.py`, with its
   results as regression fixtures.

@@ -20,7 +20,7 @@ The release gate SHALL be the same workflow as the pull-request gate, not a copy
 ### Requirement: Version-gated publishing
 
 Publishing SHALL be driven by the version declared in
-`src/quantfolio/__about__.py`, because index versions are immutable.
+`src/sobres/__about__.py`, because index versions are immutable.
 
 #### Scenario: New version on main
 - **WHEN** a push to `main` declares a version absent from the target index
@@ -56,17 +56,64 @@ Publishing SHALL be driven by the version declared in
 - **WHEN** the workflow is dispatched manually with target `testpypi`
 - **THEN** it SHALL publish to TestPyPI regardless of `RELEASE_ENABLED`
 
-### Requirement: No long-lived publishing credential
+### Requirement: `main` is reachable only through a reviewed pull request
 
-#### Scenario: Trusted Publishing
-- **WHEN** the pipeline uploads to an index
-- **THEN** it SHALL authenticate via OIDC with `id-token: write`
-- **AND** no PyPI API token SHALL exist in repository secrets
+`main` SHALL be a protected branch. Every commit SHALL arrive through a pull
+request that passed the gate, and merging SHALL be restricted to repository
+administrators.
 
-#### Scenario: Attested artifacts
-- **WHEN** a distribution is published
-- **THEN** PEP 740 attestations SHALL be generated, binding the artifact to the
-  workflow and repository that built it
+#### Scenario: No direct push
+- **WHEN** anyone pushes directly to `main`
+- **THEN** the push SHALL be rejected
+
+#### Scenario: The gate is required, not advisory
+- **WHEN** a pull request targets `main`
+- **THEN** the `All checks passed` status SHALL be required
+- **AND** the branch SHALL be required to be up to date with `main` before merging
+- **AND** unresolved review conversations SHALL block the merge
+
+#### Scenario: Only administrators merge
+- **WHEN** a non-administrator attempts to merge a pull request into `main`
+- **THEN** the merge SHALL be refused
+
+#### Scenario: History stays linear and recoverable
+- **WHEN** `main` is updated
+- **THEN** linear history SHALL be required
+- **AND** force pushes and branch deletion SHALL be refused
+
+### Requirement: Publishing credentials come from organization secrets
+
+Publishing SHALL authenticate with organization-level secrets. The
+`AI-Solutions-Lab-LLC` organization holds one PyPI API token per index, shared by
+every repository in it; no repository SHALL store its own copy.
+
+#### Scenario: Production upload
+- **WHEN** the pipeline uploads to PyPI
+- **THEN** it SHALL authenticate with the organization secret `PYPI_PROD`
+- **AND** SHALL NOT read any repository-level PyPI secret
+
+#### Scenario: Rehearsal upload
+- **WHEN** the pipeline uploads to TestPyPI
+- **THEN** it SHALL authenticate with the organization secret `PYPI_TEST`
+
+#### Scenario: One definition of the credential
+- **WHEN** the repository's own Actions secrets are listed
+- **THEN** neither `PYPI_PROD` nor `PYPI_TEST` SHALL appear there
+- **AND** a repository-level secret of either name SHALL be treated as a
+  configuration error, because it silently shadows the organization value
+
+#### Scenario: The token never reaches a log
+- **WHEN** any job runs at any log level
+- **THEN** the token SHALL be passed only as the upload action's password input
+- **AND** SHALL NOT be echoed, written to a file, or exported to a step that
+  prints its environment
+
+#### Scenario: No attestations under token auth
+- **WHEN** a distribution is published with an API token
+- **THEN** PEP 740 attestations SHALL NOT be claimed or expected, since they are
+  produced only by Trusted Publishing's OIDC identity
+- **AND** the release notes SHALL NOT assert provenance the pipeline does not
+  generate
 
 #### Scenario: Least privilege
 - **WHEN** any workflow runs

@@ -7,8 +7,8 @@ it, not the interface itself.
 
 ### Requirement: Storage port
 
-All persistence SHALL go through protocols in `quantfolio.data.storage.base`.
-No module outside `quantfolio.data.storage.adapters` SHALL import a database
+All persistence SHALL go through protocols in `sobres.data.storage.base`.
+No module outside `sobres.data.storage.adapters` SHALL import a database
 driver.
 
 #### Scenario: Drivers are confined to adapters
@@ -25,8 +25,8 @@ driver.
 
 #### Scenario: Backend selection is configuration
 - **WHEN** the storage backend is chosen
-- **THEN** it SHALL come from a URL in configuration (`QUANTFOLIO_DB_URL`),
-  defaulting to `sqlite:///<user-data-dir>/quantfolio.db`
+- **THEN** it SHALL come from a URL in configuration (`SOBRES_DB_URL`),
+  defaulting to `sqlite:///<user-data-dir>/sobres.db`
 - **AND** switching backends SHALL require no change to any call site
 
 #### Scenario: Unknown backend
@@ -111,7 +111,7 @@ and DuckDB — the named candidate backends.
 
 #### Scenario: Errors are translated
 - **WHEN** a backend raises a driver-specific exception
-- **THEN** the adapter SHALL translate it into quantfolio's own error taxonomy
+- **THEN** the adapter SHALL translate it into sobres's own error taxonomy
 - **AND** no driver exception SHALL escape `data/storage/adapters/`
 
 #### Scenario: Contention
@@ -122,7 +122,7 @@ and DuckDB — the named candidate backends.
 ### Requirement: SQLite as the default adapter
 
 #### Scenario: Default backend
-- **WHEN** no `QUANTFOLIO_DB_URL` is configured
+- **WHEN** no `SOBRES_DB_URL` is configured
 - **THEN** SQLite SHALL be used, requiring no server and no additional install
 
 #### Scenario: SQLite-specific tuning stays in its adapter

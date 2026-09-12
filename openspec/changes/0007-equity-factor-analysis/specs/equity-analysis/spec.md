@@ -51,7 +51,7 @@ The system SHALL regress an asset's excess returns on published factor returns.
 ### Requirement: Single-stock analysis
 
 #### Scenario: Stock dashboard
-- **WHEN** `qf analyze stock NVDA` runs
+- **WHEN** `sobres analyze stock NVDA` runs
 - **THEN** the output SHALL include price summary, annualized return and volatility,
   the full risk panel from 0002, CAPM beta against `Mkt-RF`, and a fundamentals
   block (market cap, P/E, P/B, dividend yield, sector)
@@ -69,7 +69,7 @@ The system SHALL regress an asset's excess returns on published factor returns.
 ### Requirement: Multi-ticker factor comparison
 
 #### Scenario: Comparison table
-- **WHEN** `qf analyze factors --tickers AAPL MSFT NVDA --model ff5` runs
+- **WHEN** `sobres analyze factors --tickers AAPL MSFT NVDA --model ff5` runs
 - **THEN** one row per ticker SHALL print with its factor loadings, alpha,
   alpha t-statistic, and R²
 - **AND** rows SHALL be ordered as supplied, so output is diffable across runs

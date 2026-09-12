@@ -11,20 +11,20 @@ planning_depth: proposal + spec deltas (design and tasks written when 0009 lands
 ## Outcome
 
 ```bash
-qf fx rates EURUSD USDJPY --start 2015-01-01
-qf fx convert 100000 --from USD --to EUR --on 2026-09-01
+sobres fx rates EURUSD USDJPY --start 2015-01-01
+sobres fx convert 100000 --from USD --to EUR --on 2026-09-01
 
 # How much of my international return was the company, and how much was the dollar?
-qf fx attribution --tickers NESN.SW 7203.T ASML.AS --base USD --start 2015-01-01
+sobres fx attribution --tickers NESN.SW 7203.T ASML.AS --base USD --start 2015-01-01
 
 # What would hedging have cost, and would it have helped?
-qf fx hedge --tickers ... --base USD --compare unhedged
+sobres fx hedge --tickers ... --base USD --compare unhedged
 
 # Is the dollar expensive against the euro right now, by PPP?
-qf ppp compare --base USD --vs EUR GBP MXN PTE
+sobres ppp compare --base USD --vs EUR GBP MXN PTE
 
 # My FIRE number is $2.1M for a US lifestyle. What is it in Portugal?
-qf ppp adjust-goal --goal fire --to PRT
+sobres ppp adjust-goal --goal fire --to PRT
 ```
 
 Two related things: **exchange rates**, which change what an international
@@ -40,7 +40,7 @@ correct; this change makes the currency component *visible* — how much of the
 return was the business and how much was the exchange rate, and what hedging would
 have cost.
 
-**For the plan.** This is the more useful half. `qf plan retire` produces a number
+**For the plan.** This is the more useful half. `sobres plan retire` produces a number
 for a lifestyle in one country. The question people actually have is whether that
 number goes further somewhere else, and PPP is the right tool for exactly that
 question — comparing what a currency *buys* rather than what it *trades for*.
@@ -60,7 +60,7 @@ building breadth on an unproven base.
 - **New capability `purchasing-power`** — `core/ppp.py`: absolute and relative PPP,
   real exchange rates, over/undervaluation against market rates, and PPP-adjusted
   restatement of any goal from 0008.
-- **New CLI groups** `qf fx` and `qf ppp`.
+- **New CLI groups** `sobres fx` and `sobres ppp`.
 - New `PppProvider` behind a protocol: World Bank ICP (`PA.NUS.PPP`, keyless) as
   the default, OECD PPP and comparative price levels as an alternative, and BIS
   published real effective exchange rates.
@@ -71,7 +71,7 @@ building breadth on an unproven base.
 
 - **No FX forecasting.** Exchange rates are close to a random walk at the horizons
   this tool works on, and PPP has essentially no short-run predictive power. A
-  `qf fx forecast` would be the single most misleading thing in the codebase.
+  `sobres fx forecast` would be the single most misleading thing in the codebase.
   PPP is reported as a *valuation gap*, never as a signal.
 - **No currency trading, carry strategies, or FX-timing backtests.** Reporting
   what the currency did is in scope; recommending a currency position is not.

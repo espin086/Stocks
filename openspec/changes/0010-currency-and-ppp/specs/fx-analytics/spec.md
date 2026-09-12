@@ -24,7 +24,7 @@ The system SHALL separate what the asset did from what the currency did.
 - **AND** the compounded components SHALL reconcile to the compounded total
 
 #### Scenario: Per-asset attribution
-- **WHEN** `qf fx attribution --tickers NESN.SW 7203.T --base USD` runs
+- **WHEN** `sobres fx attribution --tickers NESN.SW 7203.T --base USD` runs
 - **THEN** one row per ticker SHALL print with its local return, currency return,
   cross term, total, and the currency it is denominated in
 - **AND** a portfolio-level row SHALL aggregate them by weight
@@ -65,7 +65,7 @@ The system SHALL separate what the asset did from what the currency did.
 - **AND** SHALL NOT present it as an achievable realized return
 
 #### Scenario: Comparison
-- **WHEN** `qf fx hedge --tickers ... --base USD --compare unhedged` runs
+- **WHEN** `sobres fx hedge --tickers ... --base USD --compare unhedged` runs
 - **THEN** the risk panel from 0002 SHALL print for both hedged and unhedged
   series side by side
 - **AND** the hedge's cumulative cost or benefit over the window SHALL be reported
@@ -78,7 +78,7 @@ The system SHALL separate what the asset did from what the currency did.
 ### Requirement: Optimization in a base currency
 
 #### Scenario: Base currency is explicit
-- **WHEN** any `qf optimize` command receives assets in more than one currency
+- **WHEN** any `sobres optimize` command receives assets in more than one currency
 - **THEN** `--base` SHALL be required
 - **AND** returns SHALL be converted per 0001 before any moment is estimated
 
@@ -96,15 +96,15 @@ The system SHALL separate what the asset did from what the currency did.
 ### Requirement: FX commands
 
 #### Scenario: Rates
-- **WHEN** `qf fx rates EURUSD USDJPY --start 2015-01-01` runs
+- **WHEN** `sobres fx rates EURUSD USDJPY --start 2015-01-01` runs
 - **THEN** a date-indexed table of those pairs SHALL print, with the provider and
   any carried-forward dates noted
 
 #### Scenario: Conversion
-- **WHEN** `qf fx convert 100000 --from USD --to EUR --on 2026-09-01` runs
+- **WHEN** `sobres fx convert 100000 --from USD --to EUR --on 2026-09-01` runs
 - **THEN** the converted amount, the rate used, its date, and its source SHALL print
 - **AND** if the rate was carried forward from an earlier date, that SHALL be stated
 
 #### Scenario: No forecasting surface
-- **WHEN** the `qf fx` group is listed
+- **WHEN** the `sobres fx` group is listed
 - **THEN** no subcommand SHALL project, forecast, or recommend a future rate

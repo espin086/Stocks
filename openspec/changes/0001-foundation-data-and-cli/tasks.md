@@ -19,7 +19,7 @@ Estimates are focused hours. Each task names the test that proves it.
         `::test_non_tty_defaults_to_csv`
 - [ ] **A3b. Command registry** (3h)
       `registry.py`: `Command`, `register`, shared parameter types (`TickerList`,
-      `Frequency`, `Weights`, `Currency`), the Typer generator, `qf commands`.
+      `Frequency`, `Weights`, `Currency`), the Typer generator, `sobres commands`.
       → `tests/cli/test_registry.py::test_typer_app_has_one_subcommand_per_registration`,
         `::test_defaults_come_only_from_param_model`,
         `::test_cross_field_validator_rejects_weight_count_mismatch`,
@@ -59,7 +59,7 @@ Estimates are focused hours. Each task names the test that proves it.
 
 - [ ] **B0. Storage port** (3h)
       `data/storage/base.py`: `ObservationStore` / `KeyValueStore` protocols
-      phrased in domain terms, the backend registry, and `QUANTFOLIO_DB_URL`
+      phrased in domain terms, the backend registry, and `SOBRES_DB_URL`
       resolution.
       → `tests/data/test_storage_port.py::test_unknown_url_scheme_exits_3_listing_backends`
       → `tests/test_architecture.py::test_db_drivers_imported_only_in_adapters`
@@ -149,25 +149,25 @@ Estimates are focused hours. Each task names the test that proves it.
 
 - [ ] **C1. Root app and error boundary** (1.5h)
       `cli/main.py`: `--version`, `--debug`, `--format`, `--refresh`, `-v/-vv`,
-      `--log-level`, `--log-format`; a single handler mapping `QuantfolioError` →
+      `--log-level`, `--log-format`; a single handler mapping `SobresError` →
       message + exit code, with the run id in the message.
       → `tests/cli/test_main.py::test_version`, `::test_bare_shows_help_exit_0`,
         `::test_provider_error_exits_4_without_traceback`
-- [ ] **C2. `qf data` group** (2h) — `prices`, `macro`, `factors`, `fx`, each a
+- [ ] **C2. `sobres data` group** (2h) — `prices`, `macro`, `factors`, `fx`, each a
       registry declaration; no hand-written Typer command.
       → `tests/cli/test_data_commands.py` (one test per subcommand × 3 formats)
-- [ ] **C3. `qf cache` group** (1h) — `info`, `clear` (with confirm + `--yes`).
-      Cache-only; the wider `qf db` group arrives with 0003.
+- [ ] **C3. `sobres cache` group** (1h) — `info`, `clear` (with confirm + `--yes`).
+      Cache-only; the wider `sobres db` group arrives with 0003.
       → `tests/cli/test_cache_commands.py::test_clear_requires_confirmation`
-- [ ] **C4. `qf config` group** (1h) — `set`, `show` (masked), `path`.
+- [ ] **C4. `sobres config` group** (1h) — `set`, `show` (masked), `path`.
       → `tests/cli/test_config_commands.py::test_show_masks_api_keys`
 - [ ] **C4b. Settings registry** (2h)
       `settings.py`: `@setting` declarations with env, secret, required,
-      description, obtain, optional live validator; `qf config set|show`
+      description, obtain, optional live validator; `sobres config set|show`
       re-pointed at it.
       → `tests/cli/test_settings.py::test_every_env_var_read_is_a_declared_setting`,
         `::test_config_show_masks_secrets_to_last_four`
-- [ ] **C4c. `qf init`** (3h)
+- [ ] **C4c. `sobres init`** (3h)
       Rich-prompt wizard over the registry; no-echo secrets; idempotent re-run
       showing masked current values; live validation with consent;
       `--non-interactive`; sets up storage; ends by running doctor and printing
@@ -176,7 +176,7 @@ Estimates are focused hours. Each task names the test that proves it.
         `::test_non_interactive_missing_required_exits_3_naming_it`,
         `::test_failed_live_validation_never_stores_silently`,
         `::test_ends_by_running_doctor`
-- [ ] **C4d. `qf doctor`** (3h)
+- [ ] **C4d. `sobres doctor`** (3h)
       `Check` registry with `run` and optional `fix`; the 0001 check set;
       grouped TTY rendering and `--format json`; exit 0/1 with `--strict`;
       `--offline`; 5s network caps; `--fix` never touches secrets.
@@ -185,7 +185,7 @@ Estimates are focused hours. Each task names the test that proves it.
         `::test_offline_skips_rather_than_fails`,
         `::test_fix_never_writes_a_secret`,
         `::test_warnings_do_not_change_exit_code_without_strict`
-- [ ] **C4e. `qf upgrade`** (1h)
+- [ ] **C4e. `sobres upgrade`** (1h)
       Installer detection (pip / pipx / uv / container); exact command;
       confirmation; `--check`.
       → `tests/cli/test_upgrade.py::test_detects_installer_and_prints_matching_command`
@@ -197,11 +197,11 @@ Estimates are focused hours. Each task names the test that proves it.
 - [ ] **D1. Fixture recording script** (1h)
       `scripts/record_fixtures.py` — regenerates `tests/fixtures/` deliberately, so
       re-recording is a reviewable diff rather than an ad-hoc action.
-- [ ] **D2. README quickstart** (1h) — install, the three `qf data` commands, the
+- [ ] **D2. README quickstart** (1h) — install, the three `sobres data` commands, the
       no-key promise, and the not-advice disclaimer.
 - [ ] **D3. CI green** (1.5h) — ruff, ruff format, mypy --strict, pytest; the
-      build job's clean-venv smoke extended to `qf init --non-interactive` →
-      `qf doctor --offline` → one data command on a fixture.
+      build job's clean-venv smoke extended to `sobres init --non-interactive` →
+      `sobres doctor --offline` → one data command on a fixture.
 - [ ] **D4. Port reuse audit** (1h)
       Diff `NewsWaveMetrics/fetch_yfinance.py` and `extract_economic_data.py` against
       B4/B5; lift anything that handles a real-world edge case these specs missed.
@@ -218,7 +218,7 @@ real unknowns.
 
 ## Definition of done
 
-- [ ] `pip install quantfolio-cli` with no keys → `qf data prices AAPL` works
+- [ ] `pip install sobres` with no keys → `sobres data prices AAPL` works
 - [ ] No database driver is imported outside `data/storage/adapters/`
 - [ ] The conformance suite passes against the SQLite adapter
 - [ ] `core/` imports no logging, tracing, network, or database module
@@ -226,11 +226,11 @@ real unknowns.
 - [ ] stdout is byte-identical across log levels and with tracing on and off
 - [ ] No call site outside `data/currency.py` multiplies or divides by a rate
 - [ ] A single-currency run fetches no rates and matches a no-conversion build
-- [ ] `pip install` → `qf init --non-interactive` → `qf doctor --offline` exits 0 in a clean venv, in CI
+- [ ] `pip install` → `sobres init --non-interactive` → `sobres doctor --offline` exits 0 in a clean venv, in CI
 - [ ] Every env var the code reads is a declared setting; every setting and provider has a doctor check
 - [ ] No Typer command exists that is not a registry declaration
 - [ ] `tests/architecture/` and `tests/invariants/` run against every registered command
 - [ ] `pytest -m "not network"` passes with networking disabled
 - [ ] `mypy --strict` clean
 - [ ] Every scenario in both spec deltas has a test that references it
-- [ ] A second identical `qf data prices` call is served from cache in < 1s
+- [ ] A second identical `sobres data prices` call is served from cache in < 1s

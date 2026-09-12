@@ -39,7 +39,7 @@ them separate and each output names which it used.
   levels, with the index and base period named
 
 #### Scenario: Over- and undervaluation
-- **WHEN** `qf ppp compare --base USD --vs EUR GBP MXN` runs
+- **WHEN** `sobres ppp compare --base USD --vs EUR GBP MXN` runs
 - **THEN** each row SHALL show the market rate, the PPP rate, and the percentage
   gap between them
 - **AND** the gap SHALL be labelled as a valuation gap, not as an expected move
@@ -75,7 +75,7 @@ them separate and each output names which it used.
 ### Requirement: PPP-adjusted goal planning
 
 #### Scenario: Restating a goal
-- **WHEN** `qf ppp adjust-goal --goal fire --to PRT` runs
+- **WHEN** `sobres ppp adjust-goal --goal fire --to PRT` runs
 - **THEN** the goal's target from 0008 SHALL be restated at the destination's
   price level, showing the original, the PPP factor, and the adjusted target
 - **AND** the equivalent figure at the market exchange rate SHALL be shown

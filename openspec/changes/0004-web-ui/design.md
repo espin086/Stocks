@@ -24,7 +24,7 @@ handler)`. From that:
 
 | Surface | Generated | Mechanism |
 |---|---|---|
-| CLI | `qf <group> <name> --field ...` | Typer options from `params.model_fields` |
+| CLI | `sobres <group> <name> --field ...` | Typer options from `params.model_fields` |
 | API | `POST /api/v1/<group>/<name>` | FastAPI route with `params` as the body model |
 | OpenAPI | schema entry | FastAPI, for free |
 | UI | form + result view | TypeScript types generated from OpenAPI; a form renderer keyed on field type |
@@ -77,10 +77,10 @@ update. `core/` still emits nothing itself.
 SSE over websockets: one direction is all that is needed, it works through every
 proxy, and reconnection is a browser primitive rather than a protocol to write.
 
-## `qf open`: terminal to browser in one command
+## `sobres open`: terminal to browser in one command
 
 ```
-qf open [target]
+sobres open [target]
    │
    ├─ server answering on the port and it is ours?  → launch browser, exit 0
    ├─ something else on the port?                    → error, suggest --port
@@ -99,9 +99,9 @@ it. Printing a URL is never an error; the command's job is to get the user to
 the app, and the URL is the app.
 
 Targets map to the frontend view manifest — the same file the parity test
-reads — so `qf open` can reach exactly the views that exist and rejects
-others with the list. `qf init --web` is `qf open settings`; `qf serve --open`
-is `qf serve` plus the launch. One mechanism, three entry points.
+reads — so `sobres open` can reach exactly the views that exist and rejects
+others with the list. `sobres init --web` is `sobres open settings`; `sobres serve --open`
+is `sobres serve` plus the launch. One mechanism, three entry points.
 
 ## Access model
 
@@ -132,11 +132,11 @@ frontend/
 └── manifest.json      # registry names this build renders — read by the parity test
 ```
 
-Built assets are copied into the wheel at `quantfolio/api/static/` by the
-release pipeline. `pip install quantfolio-cli[web]` therefore needs no Node; only
+Built assets are copied into the wheel at `sobres/api/static/` by the
+release pipeline. `pip install sobres[web]` therefore needs no Node; only
 a contributor changing `frontend/` does.
 
-**The equivalent command is always shown.** Every form renders the `qf` command
+**The equivalent command is always shown.** Every form renders the `sobres` command
 line it would run, live. The UI is a way of learning the CLI, not a replacement
 for it — and it keeps the two surfaces honest with each other in the user's eyes,
 not just in the test suite.
@@ -151,6 +151,6 @@ not just in the test suite.
 | Single in-process worker | Worker pool, Celery, RQ | Single-user process; one worker answers every concurrency question by construction |
 | SSE | WebSockets | One direction suffices; proxies and reconnection are solved problems |
 | Deployment token | User accounts | Multi-user is out of scope; a fake account model is debt |
-| `qf open` targets from the view manifest | A hand-maintained target list | The manifest already exists for parity; a second list would drift from it |
+| `sobres open` targets from the view manifest | A hand-maintained target list | The manifest already exists for parity; a second list would drift from it |
 | Headless prints the URL and exits 0 | Error when no browser | The URL *is* the app; failing to launch a browser is not failing the user |
 | Frontend manifest for parity | Trusting the view list | Parity must fail Python CI, where the registry is |

@@ -11,10 +11,10 @@ planning_depth: proposal + 2 spec deltas + design (tasks written when 0003 lands
 ## Outcome
 
 ```bash
-qf open                       # starts the server if needed, opens the browser
-qf open doctor                # straight to a view: settings, doctor, runs, run 42, ...
-qf serve                      # http://127.0.0.1:8787, no browser
-qf serve --host 0.0.0.0 --port 8787   # prints a token; required to bind non-local
+sobres open                       # starts the server if needed, opens the browser
+sobres open doctor                # straight to a view: settings, doctor, runs, run 42, ...
+sobres serve                      # http://127.0.0.1:8787, no browser
+sobres serve --host 0.0.0.0 --port 8787   # prints a token; required to bind non-local
 ```
 
 A dark, fast single-page app with **every CLI capability** behind a form: pick or
@@ -36,7 +36,7 @@ show, and "watch the frontier solve" is the demo.
 
 ## What changes
 
-- **New capability `http-api`** — FastAPI app at `quantfolio/api/`, a thin adapter
+- **New capability `http-api`** — FastAPI app at `sobres/api/`, a thin adapter
   over `core` and `data` exactly like `cli/`, holding no business logic.
 - **New capability `web-ui`** — React + TypeScript SPA under `frontend/`, built to
   static assets and served by the same process.
@@ -50,7 +50,7 @@ show, and "watch the frontier solve" is the demo.
 - **Job execution** — optimizations and backtests run as jobs persisted through
   0003's repositories, with progress streamed over SSE. Trace context and run id
   are persisted with the job, so work that outlives its request stays traceable.
-- `qf serve` as the entry point and `qf open` as the one-command path from
+- `sobres serve` as the entry point and `sobres open` as the one-command path from
   terminal to browser; `[web]` extra for FastAPI and uvicorn.
 
 ## The parity problem, and how it is solved

@@ -1,4 +1,20 @@
-# quantfolio — project context
+# sobres — project context
+
+## Where it lives
+
+| What | Value |
+|---|---|
+| Repository | `AI-Solutions-Lab-LLC/sobres` — https://github.com/AI-Solutions-Lab-LLC/sobres |
+| PyPI distribution | `sobres` (unclaimed as of 2026-09-12) |
+| Import package | `sobres` (`src/sobres/`) |
+| Console script | `sobres` |
+| Container image | `aisolutionslab/sobres` on Docker Hub |
+| Landing page | https://ai-solutions-lab-llc.github.io/sobres/ |
+| Env var prefix | `SOBRES_` |
+
+The project was previously `espin086/Stocks`, packaged as `quantfolio` / `quantfolio-cli`
+with a `qf` console script. Change 0011 carries that rename through the code; every
+document here already uses the new names.
 
 ## What this is
 
@@ -49,7 +65,7 @@ makes the UI cheap — it is a third adapter, not a second implementation.
 ## Package layout (target)
 
 ```
-src/quantfolio/
+src/sobres/
 ├── __about__.py
 ├── config.py               # settings: cache dir, API keys from env, defaults
 ├── core/
@@ -92,31 +108,31 @@ site/                       # 0006: animated landing page → GitHub Pages
 
 | Command | Does |
 |---|---|
-| `qf init` | Guided setup of every declared setting; ends by running doctor |
-| `qf doctor` | Every check actionable; `--fix` for safe repairs; `--format json` |
-| `qf upgrade` | Detects the installer and runs the matching upgrade |
-| `qf data prices AAPL MSFT --start 2015-01-01` | Fetch + cache price history |
-| `qf data macro DGS10 CPIAUCSL` | Fetch FRED series |
-| `qf analyze stock NVDA` | Fundamentals, risk, CAPM beta |
-| `qf analyze factors NVDA --model ff5` | Fama-French regression, alpha + t-stats |
-| `qf optimize markowitz --tickers ... --objective max-sharpe` | Optimal weights |
-| `qf optimize frontier --tickers ... --points 50` | Efficient frontier |
-| `qf optimize backtest --weights ... --rebalance quarterly` | Walk-forward test |
-| `qf plan retire --income ... --expenses ...` | FIRE number + date |
-| `qf plan house --price ... --down-pct ...` | Savings path to a down payment |
-| `qf plan goal --target ... --by 2032-01-01` | Generic funding solver |
-| `qf econ forecast CPIAUCSL --model arima` | Time-series forecast |
-| `qf fx rates EURUSD` / `qf fx convert 1000 --from USD --to EUR` | Exchange rates and conversion |
-| `qf fx attribution --tickers ... --base USD` | Split return into asset vs currency |
-| `qf fx hedge --tickers ... --compare unhedged` | What hedging would have cost |
-| `qf ppp compare --base USD --vs EUR MXN` | Market rate vs purchasing-power rate |
-| `qf ppp adjust-goal --goal fire --to PRT` | Restate a goal at another price level |
-| `qf portfolio save core --tickers ...` | Save a named portfolio |
-| `qf run list` / `qf run show <id>` | Browse saved analysis runs |
-| `qf db info` / `qf db export --to ...` | Inspect and back up the database |
-| `qf serve --host 0.0.0.0` | Run the web UI and API |
-| `qf open [doctor\|settings\|run 42\|...]` | Start the server if needed and open the browser to a view |
-| `qf deploy compose` / `qf deploy check` | Generate and verify a deployment |
+| `sobres init` | Guided setup of every declared setting; ends by running doctor |
+| `sobres doctor` | Every check actionable; `--fix` for safe repairs; `--format json` |
+| `sobres upgrade` | Detects the installer and runs the matching upgrade |
+| `sobres data prices AAPL MSFT --start 2015-01-01` | Fetch + cache price history |
+| `sobres data macro DGS10 CPIAUCSL` | Fetch FRED series |
+| `sobres analyze stock NVDA` | Fundamentals, risk, CAPM beta |
+| `sobres analyze factors NVDA --model ff5` | Fama-French regression, alpha + t-stats |
+| `sobres optimize markowitz --tickers ... --objective max-sharpe` | Optimal weights |
+| `sobres optimize frontier --tickers ... --points 50` | Efficient frontier |
+| `sobres optimize backtest --weights ... --rebalance quarterly` | Walk-forward test |
+| `sobres plan retire --income ... --expenses ...` | FIRE number + date |
+| `sobres plan house --price ... --down-pct ...` | Savings path to a down payment |
+| `sobres plan goal --target ... --by 2032-01-01` | Generic funding solver |
+| `sobres econ forecast CPIAUCSL --model arima` | Time-series forecast |
+| `sobres fx rates EURUSD` / `sobres fx convert 1000 --from USD --to EUR` | Exchange rates and conversion |
+| `sobres fx attribution --tickers ... --base USD` | Split return into asset vs currency |
+| `sobres fx hedge --tickers ... --compare unhedged` | What hedging would have cost |
+| `sobres ppp compare --base USD --vs EUR MXN` | Market rate vs purchasing-power rate |
+| `sobres ppp adjust-goal --goal fire --to PRT` | Restate a goal at another price level |
+| `sobres portfolio save core --tickers ...` | Save a named portfolio |
+| `sobres run list` / `sobres run show <id>` | Browse saved analysis runs |
+| `sobres db info` / `sobres db export --to ...` | Inspect and back up the database |
+| `sobres serve --host 0.0.0.0` | Run the web UI and API |
+| `sobres open [doctor\|settings\|run 42\|...]` | Start the server if needed and open the browser to a view |
+| `sobres deploy compose` / `sobres deploy check` | Generate and verify a deployment |
 
 ## Data sources
 
@@ -129,7 +145,7 @@ site/                       # 0006: animated landing page → GitHub Pages
 | **World Bank ICP / OECD** | no | PPP conversion factors, comparative price levels | 0010 |
 | **BIS** | no | Published real effective exchange rates | 0010 |
 
-`pip install quantfolio-cli` must produce a working tool with **no keys
+`pip install sobres` must produce a working tool with **no keys
 configured**. Anything requiring a key degrades with a clear, actionable error —
 never a stack trace.
 
@@ -138,18 +154,18 @@ never a stack trace.
 Three commands, kept to three by construction:
 
 ```
-pip install quantfolio-cli  →  qf init  →  qf doctor
+pip install sobres  →  sobres init  →  sobres doctor
 ```
 
 **Settings are declared once**, like commands. Each carries its env var, whether
-it is a secret, how to obtain it, and an optional live validator; `qf init`,
-`qf doctor`, `qf config`, and the 0004 settings page all derive from the
+it is a secret, how to obtain it, and an optional live validator; `sobres init`,
+`sobres doctor`, `sobres config`, and the 0004 settings page all derive from the
 declaration. A test asserts every env var the code reads is a declared setting.
 
 **Doctor's checks are declared once**, too — a `Check` registry with `run` and
 an optional idempotent `fix`. A milestone that adds a provider, a setting, or a
 runtime dependency registers a check in the same change; a test asserts every
-setting and provider has one. Every failing line carries its next step. `qf
+setting and provider has one. Every failing line carries its next step. `sobres
 deploy check` and the container health check call doctor rather than
 re-implementing health.
 
@@ -160,8 +176,8 @@ Persistence is reachable only through repository protocols in
 portfolios — never as SQL execution. A port phrased as SQL is a SQL port, and
 swapping it would still be a rewrite.
 
-`QUANTFOLIO_DB_URL` selects the adapter, defaulting to
-`sqlite:///<user-data-dir>/quantfolio.db`. **No database driver is imported
+`SOBRES_DB_URL` selects the adapter, defaulting to
+`sqlite:///<user-data-dir>/sobres.db`. **No database driver is imported
 outside `data/storage/adapters/`**, and a test enforces it.
 
 SQLAlchemy Core (the expression language, not the ORM) sits *below* the
@@ -241,22 +257,26 @@ Each is one OpenSpec change under `openspec/changes/`.
 | # | Change | Ships |
 |---|---|---|
 | 0000 | `release-engineering` | CI gate, version-gated PyPI publishing |
-| 0001 | `foundation-data-and-cli` | Onboarding (`init`/`doctor`/`upgrade`), command registry, storage port + SQLite adapter, providers, data quality, currency model, logging + tracing, test scaffolding, `qf data *` |
+| 0001 | `foundation-data-and-cli` | Onboarding (`init`/`doctor`/`upgrade`), command registry, storage port + SQLite adapter, providers, data quality, currency model, logging + tracing, test scaffolding, `sobres data *` |
 | 0002 | `portfolio-optimization` | **v1.0.0** — returns/risk, MVO, frontier, backtest |
-| 0003 | `local-persistence` | Schema + migrations, saved portfolios/goals/runs, `qf db` |
-| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `qf serve`, `qf open` |
-| 0005 | `docker-distribution` | One image on Docker Hub, CLI entrypoint, `qf deploy` |
+| 0003 | `local-persistence` | Schema + migrations, saved portfolios/goals/runs, `sobres db` |
+| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `sobres serve`, `sobres open` |
+| 0005 | `docker-distribution` | One image on Docker Hub, CLI entrypoint, `sobres deploy` |
 | 0006 | `landing-page` | Animated dark GitHub Pages site |
 | 0007 | `equity-factor-analysis` | Single-stock analysis, CAPM, Fama-French 3/5 + momentum |
 | 0008 | `goal-planning` | Retirement/FIRE, house, car, education, Monte Carlo |
 | 0009 | `econometrics-forecasting` | ARIMA/GARCH forecasting, stationarity, macro overlays |
 | 0010 | `currency-and-ppp` | FX attribution and hedging, PPP comparison, PPP-adjusted goals |
+| 0011 | `rebrand-sobres` | Rename through the code: import package, console script, env vars, image, pages URL |
 
 0001 → 0002 is the v1.0.0 release. 0003 → 0006 turn it into a deployable product
 with a UI. 0007–0009 then add analytics to a UI that already exists, rather than
 retrofitting one at the end. 0010 makes the whole tool international, last because
 it is the change that touches every earlier one. Each change depends only on what
 came before it.
+
+0011 is out of band: it renames the project and can land at any point, though the
+longer it waits the more published artifacts carry the old name.
 
 ## Non-negotiables
 

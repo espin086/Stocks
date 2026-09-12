@@ -81,13 +81,13 @@ Depends on 0001. Estimates are focused hours.
 
 ## Wave E — CLI (C, D first)
 
-- [ ] **E1. `qf optimize markowitz`** (2h) — estimator provenance in the header.
+- [ ] **E1. `sobres optimize markowitz`** (2h) — estimator provenance in the header.
       → `tests/cli/test_optimize.py::test_header_names_estimators`
-- [ ] **E2. `qf optimize frontier`** (1.5h)
+- [ ] **E2. `sobres optimize frontier`** (1.5h)
       → `::test_csv_columns_are_ret_vol_sharpe_then_tickers`
-- [ ] **E3. `qf optimize backtest`** (2h) — side-by-side panels, OOS window, costs.
+- [ ] **E3. `sobres optimize backtest`** (2h) — side-by-side panels, OOS window, costs.
       → `::test_output_states_oos_window_and_costs`
-- [ ] **E4. `qf optimize risk`** (1h) — fixed weights, full panel.
+- [ ] **E4. `sobres optimize risk`** (1h) — fixed weights, full panel.
       → `::test_weights_must_match_ticker_count_and_sum_to_one`
 
 ## Wave F — validation and release
@@ -101,14 +101,14 @@ Depends on 0001. Estimates are focused hours.
       → `tests/test_textbook_cases.py`
 - [ ] **F3. Docs: "Why your backtest looks too good"** (2h)
       Plain-language page on estimation error, in-sample vs. walk-forward, and how
-      to read the gap. Linked from `qf optimize backtest` output.
+      to read the gap. Linked from `sobres optimize backtest` output.
 - [ ] **F4. README + `v1.0.0`** (2h) — worked example with real output; tag; PyPI.
 
 **Total: ~48h.** Critical path: B2 → B3 → C2 → C3 → C7 → D1 → E3.
 
 ## Definition of done
 
-- [ ] All four `qf optimize` subcommands work end to end on live data
+- [ ] All four `sobres optimize` subcommands work end to end on live data
 - [ ] The no-lookahead test passes (D1)
 - [ ] Weights match the R reference within `1e-4` (F1)
 - [ ] Max-Sharpe matches the closed-form tangency portfolio within `1e-6` (C3)

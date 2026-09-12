@@ -5,7 +5,7 @@
 ### Requirement: Real vs. nominal is always explicit
 
 #### Scenario: Mode selection
-- **WHEN** any `qf plan` command runs
+- **WHEN** any `sobres plan` command runs
 - **THEN** `--real` or `--nominal` SHALL determine whether returns and targets are
   inflation-adjusted
 - **AND** the default SHALL be `--real`, because a retirement target in nominal
@@ -49,7 +49,7 @@ return, given the other three.
 ### Requirement: Retirement / FIRE planning
 
 #### Scenario: FI number
-- **WHEN** `qf plan retire --expenses 90000` runs
+- **WHEN** `sobres plan retire --expenses 90000` runs
 - **THEN** the FI number SHALL be `annual_expenses / withdrawal_rate`, defaulting to
   a `0.04` withdrawal rate
 - **AND** the output SHALL state the rate used and name its origin
@@ -71,19 +71,19 @@ return, given the other three.
 ### Requirement: Named goal specializations
 
 #### Scenario: House
-- **WHEN** `qf plan house --price 950000 --down-pct 0.20 --by 2029-06-01` runs
+- **WHEN** `sobres plan house --price 950000 --down-pct 0.20 --by 2029-06-01` runs
 - **THEN** the down-payment target, required monthly saving, and whether the supplied
   `--monthly` meets it SHALL be reported
 - **AND** if `--price-growth` is supplied, the target SHALL grow with it, because a
   house price rising faster than savings is the actual risk
 
 #### Scenario: Car
-- **WHEN** `qf plan car --price 45000 --by 2027-01-01` runs
+- **WHEN** `sobres plan car --price 45000 --by 2027-01-01` runs
 - **THEN** the required monthly saving SHALL be reported, with `--depreciation`
   optionally reporting expected resale value at a later date
 
 #### Scenario: Education
-- **WHEN** `qf plan education --annual-cost 35000 --years 4 --starting 2038` runs
+- **WHEN** `sobres plan education --annual-cost 35000 --years 4 --starting 2038` runs
 - **THEN** the total inflated cost and required monthly saving SHALL be reported
 - **AND** education-cost inflation SHALL default to `5%`, separately from CPI, with
   the assumption stated
@@ -91,7 +91,7 @@ return, given the other three.
 ### Requirement: Monte Carlo and bootstrap simulation
 
 #### Scenario: Simulation is run by default
-- **WHEN** any `qf plan` command runs
+- **WHEN** any `sobres plan` command runs
 - **THEN** a simulation SHALL run and a success probability SHALL be reported
 - **AND** `--simulate 0` SHALL disable it for a purely deterministic answer
 
@@ -118,7 +118,7 @@ return, given the other three.
   be reproduced
 
 #### Scenario: Not advice
-- **WHEN** any `qf plan` command emits table output
+- **WHEN** any `sobres plan` command emits table output
 - **THEN** the not-investment-advice footer SHALL be present
 - **AND** the output SHALL state that taxes are not modeled and inputs are assumed
   after-tax

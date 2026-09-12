@@ -217,26 +217,26 @@ The system SHALL evaluate an optimization strategy out-of-sample.
 - **THEN** the backtest SHALL start at the first date that does have it, and report
   the actual start on stderr
 
-### Requirement: `qf optimize` command group
+### Requirement: `sobres optimize` command group
 
 #### Scenario: Markowitz
-- **WHEN** `qf optimize markowitz --tickers AAPL MSFT --start 2015-01-01` runs
+- **WHEN** `sobres optimize markowitz --tickers AAPL MSFT --start 2015-01-01` runs
 - **THEN** a weights table SHALL print with the portfolio's expected return,
   volatility, and Sharpe
 - **AND** the estimators used SHALL be named in the output header
 
 #### Scenario: Frontier
-- **WHEN** `qf optimize frontier --tickers ... --points 50 --format csv` runs
+- **WHEN** `sobres optimize frontier --tickers ... --points 50 --format csv` runs
 - **THEN** CSV with one row per frontier point SHALL print, columns
   `ret, vol, sharpe, <one per ticker>`
 
 #### Scenario: Backtest
-- **WHEN** `qf optimize backtest ... --rebalance quarterly` runs
+- **WHEN** `sobres optimize backtest ... --rebalance quarterly` runs
 - **THEN** the strategy and benchmark panels SHALL print side by side
 - **AND** the output SHALL state the out-of-sample window and total costs paid
 
 #### Scenario: Risk panel of a given portfolio
-- **WHEN** `qf optimize risk --tickers AAPL MSFT --weights 0.6 0.4` runs
+- **WHEN** `sobres optimize risk --tickers AAPL MSFT --weights 0.6 0.4` runs
 - **THEN** the full risk panel for that fixed portfolio SHALL print
 
 #### Scenario: Weights supplied must be valid

@@ -3,7 +3,7 @@
 ## Layering
 
 ```
-qf data prices AAPL
+sobres data prices AAPL
       │
       ▼
 cli/commands/data.py ──► data/yfinance_provider.py ──► data/cache.py
@@ -53,7 +53,7 @@ every command and no command formats its own output.
 
 ## Onboarding: settings and checks are registries
 
-The user's path is `pip install` → `qf init` → `qf doctor`, and the design
+The user's path is `pip install` → `sobres init` → `sobres doctor`, and the design
 problem is keeping it that short as ten milestones add keys, providers, and
 runtime dependencies. The answer is the same one the command registry gives:
 declare once, derive everywhere.
@@ -70,8 +70,8 @@ class FredApiKey:
     def validate_live(self, value: str) -> CheckResult: ...   # one cheap request
 ```
 
-From that one declaration: `qf init` prompts (no echo, masked on re-run, live
-verification offered), `qf doctor` checks presence and validity, `qf config
+From that one declaration: `sobres init` prompts (no echo, masked on re-run, live
+verification offered), `sobres doctor` checks presence and validity, `sobres config
 set|show` accepts it, and 0004 renders a settings field. A milestone that adds
 a key adds a declaration, and gets all four for free — and a test asserts that
 every environment variable the code reads is a declared setting, so the
@@ -80,16 +80,16 @@ shortcut of reading `os.environ` directly fails the build.
 Doctor is the same shape: a `Check` registry with `run` and an optional
 idempotent `fix`. 0003 registers the migration check, 0004 the server checks,
 0010 the FX provider check. Every line doctor prints carries its next step, on
-the principle that a diagnostic without a fix is a complaint. `qf deploy check`
+the principle that a diagnostic without a fix is a complaint. `sobres deploy check`
 and the container `HEALTHCHECK` (0005) call doctor rather than re-implementing
 health, so there is one definition of "this install works".
 
-`qf init` ends by running doctor and printing one runnable first command
+`sobres init` ends by running doctor and printing one runnable first command
 tailored to what was configured — the last step of onboarding is the first step
 of use.
 
 "GUI" here means a guided terminal wizard built on Rich prompts. 0004's
-settings page is the browser form of the same registry; a `qf init --web` that
+settings page is the browser form of the same registry; a `sobres init --web` that
 opens it is a natural addition there, not here.
 
 ## Storage: a port, not a database
@@ -108,8 +108,8 @@ Note what the port speaks: observations and date ranges, not `SELECT`. A port
 phrased in SQL is a SQL port, and swapping it is then a rewrite. Phrased in the
 domain, a DuckDB or Postgres adapter is a new file and a fixture-list entry.
 
-**`QUANTFOLIO_DB_URL` selects the adapter**, defaulting to
-`sqlite:///<user-data-dir>/quantfolio.db`. Nothing above the adapter knows which
+**`SOBRES_DB_URL` selects the adapter**, defaulting to
+`sqlite:///<user-data-dir>/sobres.db`. Nothing above the adapter knows which
 backend is live.
 
 ### The library underneath
@@ -301,7 +301,7 @@ already on disk.
 One base, narrow leaves, each mapped to an exit code:
 
 ```
-QuantfolioError                 → 1
+SobresError                 → 1
 ├── UsageError                  → 2
 ├── ConfigurationError          → 3   (missing key, bad config file)
 ├── ProviderError               → 4   (network, upstream shape change)
@@ -323,7 +323,7 @@ CSV when piped. Rich's box-drawing in a pipe is the kind of small thing that mak
 a tool feel unusable in a script.
 
 Everything that is not the result — progress, warnings, the disclaimer — goes to
-stderr or is suppressed in machine formats. `qf data prices AAPL --format json | jq`
+stderr or is suppressed in machine formats. `sobres data prices AAPL --format json | jq`
 must never need a `grep -v`.
 
 ## Testing

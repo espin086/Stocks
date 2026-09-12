@@ -36,8 +36,8 @@ All complete. Recorded so the change archives with its own checklist.
 - [x] **C5. Packaging tests** — `tests/test_packaging.py`: version format,
       installed metadata parity, changelog section, both entry points.
 - [x] **C6. `docs/RELEASING.md`** — the one-time setup and the failure playbook.
-- [x] **C7. Distribution rename** to `quantfolio-cli`; `quantfolio` on PyPI is
-      held by an unrelated 2019 package.
+- [x] **C7. Distribution name** is `sobres`, unclaimed on PyPI as of 2026-09-12.
+      An earlier `quantfolio` / `quantfolio-cli` naming is superseded by change 0011.
 
 ## Definition of done
 
@@ -45,6 +45,10 @@ All complete. Recorded so the change archives with its own checklist.
 - [x] Coverage at 100%, CI gate set at 90%
 - [x] `check_release.py` verified against the live index in every mode
 - [x] Every workflow parses as valid YAML
-- [ ] **Owner action:** Trusted Publishing configured, `pypi` / `testpypi`
-      environments created, `RELEASE_ENABLED` set, `main` protected
-      (see `docs/RELEASING.md`)
+- [ ] **Owner action:** `pypi` / `testpypi` environments created and wired to the
+      organization secrets `PYPI_PROD` and `PYPI_TEST`, `RELEASE_ENABLED` set,
+      `main` protected (see `docs/RELEASING.md`)
+- [ ] **B5. Token-auth upload** — `release.yml` passes `secrets.PYPI_PROD` /
+      `secrets.PYPI_TEST` as the upload password and drops the `id-token: write`
+      permission and the attestation step. → test: a TestPyPI rehearsal uploads
+      successfully and the run log contains no token fragment.
