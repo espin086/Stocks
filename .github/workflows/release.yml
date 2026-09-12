@@ -93,9 +93,9 @@ jobs:
           EXPECTED: ${{ needs.decide.outputs.version }}
         run: |
           ls -1 dist/
-          test -f "dist/quantfolio_cli-${EXPECTED}-py3-none-any.whl" \
+          test -f "dist/sobres-${EXPECTED}-py3-none-any.whl" \
             || { echo "::error::No wheel for expected version ${EXPECTED}"; exit 1; }
-          test -f "dist/quantfolio_cli-${EXPECTED}.tar.gz" \
+          test -f "dist/sobres-${EXPECTED}.tar.gz" \
             || { echo "::error::No sdist for expected version ${EXPECTED}"; exit 1; }
 
       - uses: actions/upload-artifact@v7
@@ -113,7 +113,7 @@ jobs:
     # in repo settings to turn every publish into an approval gate.
     environment:
       name: ${{ needs.decide.outputs.target }}
-      url: ${{ needs.decide.outputs.target == 'pypi' && format('https://pypi.org/project/quantfolio-cli/{0}/', needs.decide.outputs.version) || format('https://test.pypi.org/project/quantfolio-cli/{0}/', needs.decide.outputs.version) }}
+      url: ${{ needs.decide.outputs.target == 'pypi' && format('https://pypi.org/project/sobres/{0}/', needs.decide.outputs.version) || format('https://test.pypi.org/project/sobres/{0}/', needs.decide.outputs.version) }}
     permissions:
       # Trusted Publishing (OIDC). No API token is stored anywhere in this repo.
       id-token: write
@@ -177,10 +177,10 @@ jobs:
       - name: No release for this push
         run: |
           echo "Version ${{ needs.decide.outputs.version }} is already on the index."
-          echo "Bump the version in src/quantfolio/__about__.py to cut a release."
+          echo "Bump the version in src/sobres/__about__.py to cut a release."
           {
             echo "### No release"
             echo ""
             echo "Version \`${{ needs.decide.outputs.version }}\` already exists on the index."
-            echo "Bump \`src/quantfolio/__about__.py\` and add a \`CHANGELOG.md\` entry to publish."
+            echo "Bump \`src/sobres/__about__.py\` and add a \`CHANGELOG.md\` entry to publish."
           } >> "$GITHUB_STEP_SUMMARY"

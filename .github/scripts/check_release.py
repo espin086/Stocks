@@ -31,7 +31,7 @@ import urllib.request
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
-ABOUT = REPO_ROOT / "src" / "quantfolio" / "__about__.py"
+ABOUT = REPO_ROOT / "src" / "sobres" / "__about__.py"
 PYPROJECT = REPO_ROOT / "pyproject.toml"
 CHANGELOG = REPO_ROOT / "CHANGELOG.md"
 

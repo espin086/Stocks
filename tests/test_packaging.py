@@ -15,10 +15,10 @@ from pathlib import Path
 
 import pytest
 
-from quantfolio import __version__
+from sobres import __version__
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-DIST_NAME = "quantfolio-cli"
+DIST_NAME = "sobres"
 
 # PEP 440, restricted to the subset this project uses. Must stay in step with
 # VERSION_RE in .github/scripts/check_release.py.
@@ -45,13 +45,18 @@ def test_changelog_documents_the_current_version() -> None:
     )
 
 
-@pytest.mark.parametrize("script", ["qf", "quantfolio"])
-def test_console_script_is_registered(script: str) -> None:
+def test_console_script_is_registered() -> None:
     scripts = entry_points(group="console_scripts")
-    assert script in scripts.names
+    assert "sobres" in scripts.names
 
 
-@pytest.mark.parametrize("script", ["qf", "quantfolio"])
+def test_exactly_one_console_script_is_declared() -> None:
+    """One name across every surface: no second alias entry point."""
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
+    assert list(pyproject["project"]["scripts"]) == ["sobres"]
+
+
+@pytest.mark.parametrize("script", ["sobres"])
 def test_console_script_runs(script: str) -> None:
     """The entry point resolves and executes as an installed command would."""
     module, _, attr = scripts_target(script).partition(":")

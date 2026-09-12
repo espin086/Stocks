@@ -26,7 +26,7 @@ push to main
 
 Three things in one PR:
 
-1. Bump `__version__` in `src/quantfolio/__about__.py`.
+1. Bump `__version__` in `src/sobres/__about__.py`.
 2. Add a `## [<version>]` section to `CHANGELOG.md`.
 3. Merge to `main`.
 
@@ -55,9 +55,9 @@ publisher**:
 
 | Field | Value |
 |---|---|
-| PyPI project name | `quantfolio-cli` |
-| Owner | `espin086` |
-| Repository name | `Stocks` |
+| PyPI project name | `sobres` |
+| Owner | `AI-Solutions-Lab-LLC` |
+| Repository name | `sobres` |
 | Workflow name | `release.yml` |
 | Environment name | `pypi` |
 
@@ -109,8 +109,8 @@ touching real PyPI. Verify with:
 
 ```bash
 pip install --index-url https://test.pypi.org/simple/ \
-            --extra-index-url https://pypi.org/simple/ quantfolio-cli
-qf --version
+            --extra-index-url https://pypi.org/simple/ sobres
+sobres --version
 ```
 
 ## Versioning

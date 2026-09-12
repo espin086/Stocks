@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "quantfolio-cli"
+name = "sobres"
 dynamic = ["version"]
 description = "One-stop CLI for equity analysis: market data, portfolio optimization, factor models, econometrics, and goal planning."
 readme = "README.md"
@@ -38,9 +38,9 @@ dependencies = [
 data = ["yfinance>=0.2.40", "pandas-datareader>=0.10"]
 econ = ["statsmodels>=0.14"]
 opt = ["cvxpy>=1.5"]
-all = ["quantfolio-cli[data,econ,opt]"]
+all = ["sobres[data,econ,opt]"]
 dev = [
-  "quantfolio-cli[all]",
+  "sobres[all]",
   "pytest>=8.2",
   "pytest-cov>=5.0",
   "ruff>=0.5",
@@ -50,20 +50,19 @@ dev = [
 ]
 
 [project.scripts]
-qf = "quantfolio.cli.main:app"
-quantfolio = "quantfolio.cli.main:app"
+sobres = "sobres.cli.main:app"
 
 [project.urls]
-Homepage = "https://github.com/espin086/Stocks"
-Issues = "https://github.com/espin086/Stocks/issues"
-Changelog = "https://github.com/espin086/Stocks/blob/main/CHANGELOG.md"
-Source = "https://github.com/espin086/Stocks"
+Homepage = "https://github.com/AI-Solutions-Lab-LLC/sobres"
+Issues = "https://github.com/AI-Solutions-Lab-LLC/sobres/issues"
+Changelog = "https://github.com/AI-Solutions-Lab-LLC/sobres/blob/main/CHANGELOG.md"
+Source = "https://github.com/AI-Solutions-Lab-LLC/sobres"
 
 [tool.hatch.version]
-path = "src/quantfolio/__about__.py"
+path = "src/sobres/__about__.py"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/quantfolio"]
+packages = ["src/sobres"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -73,7 +72,7 @@ markers = [
 ]
 
 [tool.coverage.run]
-source = ["quantfolio"]
+source = ["sobres"]
 branch = true
 
 [tool.coverage.report]
@@ -90,7 +89,7 @@ line-length = 100
 target-version = "py311"
 # Spec documents contain illustrative Python snippets that are deliberately
 # abbreviated -- prose, not code to be formatted. `legacy_code/` is the
-# pre-quantfolio R/Python work, preserved as-is for reference and for the 0002
+# pre-rewrite R/Python work, preserved as-is for reference and for the 0002
 # regression fixtures; it is deliberately not held to this project's standards.
 extend-exclude = ["*.md", "legacy_code"]
 
@@ -99,7 +98,7 @@ select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
 
 [tool.mypy]
 python_version = "3.11"
-packages = ["quantfolio"]
+packages = ["sobres"]
 strict = true
 warn_unreachable = true
 
