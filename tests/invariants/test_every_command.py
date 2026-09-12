@@ -51,6 +51,10 @@ SAMPLE_ARGS: dict[str, list[str]] = {
     "db.export": ["db", "export", "--to", "{tmp}/export.sqlite"],
     "db.info": ["db", "info"],
     "db.repair": ["db", "repair"],
+    "deploy.check": ["deploy", "check", "--offline", "--host", "127.0.0.1"],
+    "deploy.compose": ["deploy", "compose"],
+    "deploy.env": ["deploy", "env"],
+    "deploy.health": ["deploy", "health", "--port", "8799"],
     "doctor": ["doctor", "--offline"],
     "init": ["init", "--non-interactive", "--offline"],
     "open": ["open", "--print-url", "--port", "8797"],
@@ -211,6 +215,14 @@ def _no_pypi(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(serve_mod, "run_server", fake_run_server)
     monkeypatch.setattr(serve_mod, "probe", lambda url, timeout=1.0: None)
     monkeypatch.setattr(serve_mod.webbrowser, "open", lambda url: False)
+    # `deploy health` asks a running server; here one answers "ready" without a socket.
+    from sobres.cli.commands import deploy as deploy_mod
+
+    class _Ready:
+        def json(self) -> dict[str, Any]:
+            return {"app": "sobres", "ready": True, "version": "test", "checks": {}}
+
+    monkeypatch.setattr(deploy_mod.httpx, "get", lambda url, timeout: _Ready())
 
 
 VOLATILE_KEYS = {

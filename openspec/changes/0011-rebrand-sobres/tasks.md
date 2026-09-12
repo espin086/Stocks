@@ -28,7 +28,7 @@
 
 ## C. Published surfaces
 
-- [ ] **C1. Docker** *(lands with 0005)* — image name `aisolutionslab/sobres`, volume examples, and
+- [x] **C1. Docker** *(lands with 0005)* — image name `aisolutionslab/sobres`, volume examples, and
       the health check calling `sobres doctor`. → test: `sobres deploy check`
       output contains no `quantfolio`.
 - [ ] **C2. Landing page** *(lands with 0006)* — base URL, install snippet, and every command example.

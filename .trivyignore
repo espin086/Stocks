@@ -1,0 +1,3 @@
+# Named exceptions for the release image scan, one per line with a reason and a
+# revisit date, mirroring the pip-audit discipline in docs/RELEASING.md.
+# CVE-XXXX-NNNNN  <package>: no fixed release as of <date>; not reachable because <why>.

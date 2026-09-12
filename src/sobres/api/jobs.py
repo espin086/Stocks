@@ -71,15 +71,39 @@ class JobRunner:
     def start(self) -> None:
         if self._thread is not None:
             return
+        self.recover_orphans("the previous process exited before this job finished")
         self._thread = threading.Thread(target=self._loop, name="sobres-jobs", daemon=True)
         self._thread.start()
 
-    def stop(self) -> None:
+    def stop(self, grace: float = 8.0) -> None:
+        """Ask a running job to stop at its next checkpoint, then record whatever is left."""
         self._stop.set()
         self._wake.set()
+        with self._lock:
+            for job in self._storage.jobs.list(limit=100, state="running"):
+                self._cancel.add(job.id)
         if self._thread is not None:
-            self._thread.join(timeout=5)
+            self._thread.join(timeout=grace)
             self._thread = None
+        self.recover_orphans("the server shut down before this job finished")
+
+    def recover_orphans(self, reason: str) -> int:
+        """Mark every job still ``running`` as failed with ``reason``; returns how many."""
+        count = 0
+        for job in self._storage.jobs.list(limit=100, state="running"):
+            final = self._storage.jobs.update(
+                job.id,
+                state="failed",
+                error={
+                    "message": reason,
+                    "hint": "submit the command again",
+                    "exit_code": 1,
+                    "error_class": "Interrupted",
+                },
+            )
+            self._publish(job_event(final, reason))
+            count += 1
+        return count
 
     def _loop(self) -> None:
         while not self._stop.is_set():

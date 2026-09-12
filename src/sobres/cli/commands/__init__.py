@@ -8,6 +8,7 @@ MODULES: tuple[str, ...] = (
     "config",
     "data",
     "db",
+    "deploy",
     "doctor",
     "init",
     "optimize",

@@ -25,6 +25,7 @@ from sobres.__about__ import __version__
 from sobres.cli.context import Context
 from sobres.cli.render import render
 from sobres.core.errors import ConfigurationError, SobresError
+from sobres.deploy import require_data_volume
 from sobres.observability import configure_logging, new_run_id
 from sobres.observability.tracing import configure_tracing, shutdown
 from sobres.registry import FORMATS, Command, build_app, validate_params
@@ -119,6 +120,8 @@ def invoke(cmd: Command, raw: dict[str, Any], typer_ctx: typer.Context) -> None:
         context = Context.build(overrides, refresh=refresh, fmt=fmt, debug=opts.debug)
         if context.config.error is not None and cmd.name != "doctor":
             raise context.config.error
+        if cmd.name not in ("doctor", "deploy.check"):
+            require_data_volume(context.config)
         level = _effective_level(opts, str(context.config.get(LOG_LEVEL.key)))
         log_file = context.config.get(LOG_FILE.key)
         configure_logging(

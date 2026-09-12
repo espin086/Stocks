@@ -319,6 +319,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/deploy/check": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preflight: doctor's checks plus image, database mount, bind, token and credentials.
+         * @description Preflight: doctor's checks plus image, database mount, bind, token and credentials.
+         */
+        post: operations["deploy_check_api_v1_deploy_check_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deploy/compose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Print a docker-compose.yml generated from the current configuration.
+         * @description Print a docker-compose.yml generated from the current configuration.
+         */
+        post: operations["deploy_compose_api_v1_deploy_compose_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deploy/env": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Print a .env template: every variable, its default and description; no secret values.
+         * @description Print a .env template: every variable, its default and description; no secret values.
+         */
+        post: operations["deploy_env_api_v1_deploy_env_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/deploy/health": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Ask the running server's health endpoint whether it is ready (exit 1 if not).
+         * @description Ask the running server's health endpoint whether it is ready (exit 1 if not).
+         */
+        post: operations["deploy_health_api_v1_deploy_health_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/doctor": {
         parameters: {
             query?: never;
@@ -1022,8 +1102,50 @@ export interface components {
         };
         /** CacheInfoParams */
         CacheInfoParams: Record<string, never>;
+        /** CheckParams */
+        CheckParams: {
+            /**
+             * Host
+             * @description Bind address the deployment will use.
+             * @default 0.0.0.0
+             */
+            host: string;
+            /**
+             * Offline
+             * @description Skip network-dependent checks.
+             * @default false
+             */
+            offline: boolean;
+            /**
+             * Port
+             * @description Port.
+             * @default 8787
+             */
+            port: number;
+            /**
+             * Strict
+             * @description Exit 1 on warnings as well as failures.
+             * @default false
+             */
+            strict: boolean;
+        };
         /** CommandsParams */
         CommandsParams: Record<string, never>;
+        /** ComposeParams */
+        ComposeParams: {
+            /**
+             * Host
+             * @description Bind address inside the container.
+             * @default 0.0.0.0
+             */
+            host: string;
+            /**
+             * Port
+             * @description Published port.
+             * @default 8787
+             */
+            port: number;
+        };
         /** ConfigPathParams */
         ConfigPathParams: Record<string, never>;
         /** ConfigSetParams */
@@ -1089,6 +1211,8 @@ export interface components {
              */
             strict: boolean;
         };
+        /** EnvParams */
+        EnvParams: Record<string, never>;
         /** FactorsParams */
         FactorsParams: {
             /**
@@ -1229,6 +1353,21 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** HealthParams */
+        HealthParams: {
+            /**
+             * Port
+             * @description Server port.
+             * @default 8787
+             */
+            port: number;
+            /**
+             * Timeout
+             * @description Seconds to wait for an answer.
+             * @default 5
+             */
+            timeout: number;
         };
         /** InitParams */
         InitParams: {
@@ -2215,6 +2354,138 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["DbRepairParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deploy_check_api_v1_deploy_check_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deploy_compose_api_v1_deploy_compose_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ComposeParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deploy_env_api_v1_deploy_env_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EnvParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deploy_health_api_v1_deploy_health_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HealthParams"];
             };
         };
         responses: {

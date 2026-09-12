@@ -213,6 +213,15 @@ def open_view(p: OpenParams, ctx: Context) -> MessageResult:
         raise UsageError("`sobres open` is a terminal command")
     views = load_manifest()
     path = resolve_target(p.target, views)
+    if ctx.config.get("container"):
+        # There is no browser here: say where the UI is reachable from the host.
+        from sobres.deploy import host_url
+
+        reachable, note = host_url(p.port, ctx.environ)
+        ctx.note(f"sobres is at {reachable}{path}")
+        if note:
+            ctx.note(f"  ({note})")
+        return MessageResult(message=reachable + path)
     base = f"http://{DEFAULT_HOST}:{p.port}"
     url = base + path
     health = probe(base)
