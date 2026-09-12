@@ -136,6 +136,24 @@ class Context:
 
         return EcbProvider(source=self._source("ecb"), cache=self.cache, refresh=self.refresh)
 
+    def ppp_provider(self) -> Any:
+        from sobres.data.ppp_provider import OecdPppProvider, WorldBankPppProvider
+        from sobres.settings import PPP_PROVIDER
+
+        chosen = str(self.config.get(PPP_PROVIDER.key) or "worldbank")
+        if chosen == "oecd":
+            return OecdPppProvider(
+                source=self._source("oecd"), cache=self.cache, refresh=self.refresh
+            )
+        return WorldBankPppProvider(
+            source=self._source("worldbank"), cache=self.cache, refresh=self.refresh
+        )
+
+    def reer_provider(self) -> Any:
+        from sobres.data.ppp_provider import BisReerProvider
+
+        return BisReerProvider(source=self._source("bis"), cache=self.cache, refresh=self.refresh)
+
     # --------------------------------------------------------------------- I/O
     def ask_confirm(self, question: str, *, default: bool = False) -> bool:
         if self.confirm is not None:

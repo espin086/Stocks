@@ -1,0 +1,252 @@
+[
+ {
+  "page": 1,
+  "pages": 1,
+  "per_page": 100,
+  "total": 15,
+  "sourceid": "2",
+  "lastupdated": "2025-07-01"
+ },
+ [
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2024",
+   "value": null,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2023",
+   "value": 10.176,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2022",
+   "value": 10.08,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2021",
+   "value": 9.984,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2020",
+   "value": 9.888,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2019",
+   "value": 9.792,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2018",
+   "value": 9.696,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2017",
+   "value": 9.6,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2016",
+   "value": 9.504,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2015",
+   "value": 9.408,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2014",
+   "value": 9.312,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2013",
+   "value": 9.216,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2012",
+   "value": 9.12,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2011",
+   "value": 9.024,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "ME",
+    "value": "MEX"
+   },
+   "countryiso3code": "MEX",
+   "date": "2010",
+   "value": 8.928,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  }
+ ]
+]

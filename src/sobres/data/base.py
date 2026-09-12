@@ -80,6 +80,10 @@ class FxProvider(Protocol):
         self, pairs: Sequence[Any], start: date, end: date | None = None
     ) -> pd.DataFrame: ...
 
+    def rates_table(self, currencies: Sequence[str], start: date, end: date | None = None) -> Any:
+        """An ``FxRates`` table covering every pair between ``currencies`` and the base."""
+        ...
+
 
 # --------------------------------------------------------------------------- #
 # Canonical frame

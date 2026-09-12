@@ -1,0 +1,7 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T20:02:05.988732+00:00",
+  "provider": "worldbank",
+  "api": "v2/country/{ISO3}/indicator/PA.NUS.PPP?format=json",
+  "note": "synthesized in the API's response shape; see tests/fixtures/README.md"
+}

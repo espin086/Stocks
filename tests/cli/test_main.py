@@ -31,7 +31,7 @@ def test_help_lists_exactly_the_shipped_groups(cli: Callable[..., Any]) -> None:
     result = cli("--help")
     for group in ("data", "cache", "config", "optimize", "analyze"):
         assert f"\n  {group} " in result.output
-    assert "\n  fx " not in result.output  # 0010 has not shipped
+    assert "\n  fx " in result.output and "\n  ppp " in result.output  # every milestone shipped
 
 
 def test_provider_error_exits_4_without_traceback(

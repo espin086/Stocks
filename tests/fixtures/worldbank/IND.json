@@ -1,0 +1,252 @@
+[
+ {
+  "page": 1,
+  "pages": 1,
+  "per_page": 100,
+  "total": 15,
+  "sourceid": "2",
+  "lastupdated": "2025-07-01"
+ },
+ [
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2024",
+   "value": null,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2023",
+   "value": 23.32,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2022",
+   "value": 23.1,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2021",
+   "value": 22.88,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2020",
+   "value": 22.66,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2019",
+   "value": 22.44,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2018",
+   "value": 22.22,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2017",
+   "value": 22.0,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2016",
+   "value": 21.78,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2015",
+   "value": 21.56,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2014",
+   "value": 21.34,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2013",
+   "value": 21.12,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2012",
+   "value": 20.9,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2011",
+   "value": 20.68,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "IN",
+    "value": "IND"
+   },
+   "countryiso3code": "IND",
+   "date": "2010",
+   "value": 20.46,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  }
+ ]
+]

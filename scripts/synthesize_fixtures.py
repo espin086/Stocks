@@ -342,12 +342,120 @@ def write_ken_french(rng: np.random.Generator) -> None:
     )
 
 
+PPP_LEVELS = {
+    "USA": 1.0,
+    "GBR": 0.69,
+    "JPN": 97.0,
+    "CHE": 1.13,
+    "MEX": 9.6,
+    "PRT": 0.58,
+    "EMU": 0.71,
+    "DEU": 0.74,
+    "ESP": 0.62,
+    "CAN": 1.21,
+    "AUS": 1.44,
+    "BRA": 2.3,
+    "IND": 22.0,
+}
+
+
+def write_ppp(rng: np.random.Generator) -> None:
+    """0010: World Bank PA.NUS.PPP JSON, OECD SDMX-CSV, BIS REER SDMX-CSV, two more FRED series."""
+    stamp = datetime.now(UTC).isoformat()
+    wb = ROOT / "worldbank"
+    wb.mkdir(parents=True, exist_ok=True)
+    for code, level in PPP_LEVELS.items():
+        rows = []
+        for year in range(2024, 2009, -1):
+            drift = 1.0 if code == "USA" else (1 + 0.01 * (year - 2017))
+            rows.append(
+                {
+                    "indicator": {"id": "PA.NUS.PPP", "value": "PPP conversion factor, GDP"},
+                    "country": {"id": code[:2], "value": code},
+                    "countryiso3code": code,
+                    "date": str(year),
+                    "value": None if year > 2023 else round(level * drift, 4),
+                    "unit": "",
+                    "obs_status": "",
+                    "decimal": 4,
+                }
+            )
+        meta = {
+            "page": 1,
+            "pages": 1,
+            "per_page": 100,
+            "total": len(rows),
+            "lastupdated": "2025-07-01",
+        }
+        (wb / f"{code}.json").write_text(json.dumps([meta, rows], indent=1) + "\n")
+    (wb / "meta.json").write_text(
+        json.dumps(
+            {"recorded_at": None, "synthesized_at": stamp, "provider": "worldbank"}, indent=2
+        )
+        + "\n"
+    )
+    oe = ROOT / "oecd"
+    oe.mkdir(parents=True, exist_ok=True)
+    header = (
+        "STRUCTURE,STRUCTURE_ID,ACTION,REF_AREA,Reference area,FREQ,TRANSACTION,TIME_PERIOD,"
+        "OBS_VALUE,UNIT_MEASURE,LAST_UPDATE"
+    )
+    for code, level in PPP_LEVELS.items():
+        if code in ("EMU", "IND", "BRA"):
+            continue
+        lines = [header]
+        for year in range(2010, 2024):
+            drift = 1.0 if code == "USA" else (1 + 0.011 * (year - 2017))
+            lines.append(
+                f"DATAFLOW,OECD.SDD.NAD:DSD_NAMAIN10@DF_TABLE4(1.0),I,{code},{code},A,PPP_B1GQ,"
+                f"{year},{level * drift:.4f},LCU_USD,2025-06-15"
+            )
+        (oe / f"{code}.csv").write_text("\n".join(lines) + "\n")
+    (oe / "meta.json").write_text(
+        json.dumps({"recorded_at": None, "synthesized_at": stamp, "provider": "oecd"}, indent=2)
+        + "\n"
+    )
+    bis = ROOT / "bis"
+    bis.mkdir(parents=True, exist_ok=True)
+    months = pd.period_range("2015-01", "2024-12", freq="M")
+    for code in ("US", "GB", "JP", "XM", "MX"):
+        walk = 100 * np.exp(np.cumsum(rng.normal(0, 0.01, len(months))))
+        walk = walk / walk[months.get_loc(pd.Period("2020-06", freq="M"))] * 100
+        lines = ["KEY,FREQ,EER_TYPE,EER_BASKET,REF_AREA,TIME_PERIOD,OBS_VALUE,OBS_STATUS"]
+        for m, v in zip(months, walk, strict=True):
+            lines.append(f"M.R.B.{code},M,R,B,{code},{m},{v:.2f},A")
+        (bis / f"{code}.csv").write_text("\n".join(lines) + "\n")
+    (bis / "meta.json").write_text(
+        json.dumps({"recorded_at": None, "synthesized_at": stamp, "provider": "bis"}, indent=2)
+        + "\n"
+    )
+    fred = ROOT / "fred"
+    monthly = pd.date_range(START, END, freq="MS")
+    extra = {
+        "IR3TIB01GBM156N": np.clip(0.5 + np.cumsum(rng.normal(0, 0.05, len(monthly))), 0.05, None),
+        "GBRCPIALLMINMEI": 100 + np.cumsum(np.abs(rng.normal(0.25, 0.15, len(monthly)))),
+    }
+    for name, values in extra.items():
+        rows = [
+            {
+                "realtime_start": "2026-09-12",
+                "realtime_end": "2026-09-12",
+                "date": d.date().isoformat(),
+                "value": f"{v:.2f}",
+            }
+            for d, v in zip(monthly, values, strict=True)
+        ]
+        payload = {"file_type": "json", "count": len(rows), "observations": rows}
+        (fred / f"{name}.json").write_text(json.dumps(payload, indent=1) + "\n")
+
+
 def main() -> None:
     rng = np.random.default_rng(SEED)
     write_yfinance(rng)
     write_fred(rng)
     write_ecb(rng)
     write_ken_french(rng)
+    write_ppp(rng)
     print(f"fixtures written under {ROOT}")
 
 

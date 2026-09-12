@@ -59,6 +59,10 @@ EXPECTED_COMMANDS = [
     "econ.forecast",
     "econ.regress",
     "econ.volatility",
+    "fx.attribution",
+    "fx.convert",
+    "fx.hedge",
+    "fx.rates",
     "init",
     "open",
     "optimize.backtest",
@@ -74,6 +78,10 @@ EXPECTED_COMMANDS = [
     "portfolio.list",
     "portfolio.save",
     "portfolio.show",
+    "ppp.adjust_goal",
+    "ppp.compare",
+    "ppp.reer",
+    "ppp.relative",
     "run.delete",
     "run.diff",
     "run.list",
@@ -99,7 +107,7 @@ def _click_commands(app: typer.Typer) -> dict[str, Any]:
 
     def walk(cmd: Any, prefix: str) -> None:
         for name, sub in getattr(cmd, "commands", {}).items():
-            full = f"{prefix}{name}"
+            full = f"{prefix}{name.replace('-', '_')}"  # click names are the registry's, hyphenated
             if hasattr(sub, "commands"):
                 if getattr(sub, "invoke_without_command", False) and sub.params:
                     found[full] = sub  # a command that is also a group runs as its default

@@ -1,0 +1,252 @@
+[
+ {
+  "page": 1,
+  "pages": 1,
+  "per_page": 100,
+  "total": 15,
+  "sourceid": "2",
+  "lastupdated": "2025-07-01"
+ },
+ [
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2024",
+   "value": null,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2023",
+   "value": 2.438,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2022",
+   "value": 2.415,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2021",
+   "value": 2.392,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2020",
+   "value": 2.369,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2019",
+   "value": 2.346,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2018",
+   "value": 2.323,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2017",
+   "value": 2.3,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2016",
+   "value": 2.277,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2015",
+   "value": 2.254,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2014",
+   "value": 2.231,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2013",
+   "value": 2.208,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2012",
+   "value": 2.185,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2011",
+   "value": 2.162,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "BR",
+    "value": "BRA"
+   },
+   "countryiso3code": "BRA",
+   "date": "2010",
+   "value": 2.139,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  }
+ ]
+]

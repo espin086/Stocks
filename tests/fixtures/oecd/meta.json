@@ -1,0 +1,7 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T20:02:05.988732+00:00",
+  "provider": "oecd",
+  "api": "sdmx.oecd.org DF_TABLE4 PPP_B1GQ csvfilewithlabels",
+  "note": "synthesized in the SDMX-CSV shape; see tests/fixtures/README.md"
+}

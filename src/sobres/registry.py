@@ -151,6 +151,8 @@ GROUP_HELP: dict[str, str] = {
     "analyze": "Single-stock dashboards and factor-model regressions.",
     "plan": "Retirement, house, car, education and generic goals, with simulation.",
     "econ": "Stationarity diagnostics, ARIMA and GARCH forecasts, robust regression.",
+    "fx": "Exchange rates, conversion, currency attribution and hedging. Never a forecast.",
+    "ppp": "Purchasing power parity: valuation gaps and goal restatement, never a forecast.",
 }
 
 
