@@ -65,7 +65,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | ✅ Done |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | ✅ Done |
 | [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | ✅ Done |
-| [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
+| [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | ✅ Done |
 | [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
 | [0011](openspec/changes/0011-rebrand-sobres/) | Rebrand | One name everywhere: `sobres` | 🔧 In progress |
 
@@ -172,6 +172,23 @@ Every answer comes with a simulated success probability and the 10th to 90th
 percentile outcomes; `--method bootstrap --history SPY` resamples real return
 blocks so bad-early-years paths appear. The seed is printed. Taxes are not
 modeled and the output says so.
+
+## Quickstart: econometrics
+
+```bash
+pip install "sobres[econ]"                      # statsmodels + arch
+sobres econ diagnose DGS10                      # ADF, KPSS, ACF/PACF through lag 20
+sobres econ forecast CPIAUCSL --horizon 12      # ARIMA with 80% and 95% intervals, order shown
+sobres econ volatility SPY --model garch --horizon 30
+sobres econ regress --y AAPL --x SPY DGS10 --robust hac
+```
+
+Bare symbols with a digit or longer than five characters are FRED series,
+shorter ones are tickers; `fred:` and `ticker:` prefixes override. A
+non-stationary series is differenced to stationarity with `d` reported, the
+chosen ARIMA order comes with its criterion and the two runners-up, residuals
+get a Ljung-Box test, and no forecast is ever printed without its intervals.
+`--covariance garch` is available to the optimizer.
 
 ## Quickstart: saved state
 

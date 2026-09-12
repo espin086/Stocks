@@ -23,9 +23,9 @@ from sobres.core.conventions import periods_per_year
 from sobres.core.errors import InsufficientDataError, UsageError
 
 ReturnMethod = Literal["mean_historical", "ewma", "capm"]
-CovMethod = Literal["sample", "ledoit_wolf", "ewma", "semicovariance"]
+CovMethod = Literal["sample", "ledoit_wolf", "ewma", "semicovariance", "garch"]
 RETURN_METHODS: tuple[str, ...] = ("mean_historical", "ewma", "capm")
-COV_METHODS: tuple[str, ...] = ("sample", "ledoit_wolf", "ewma", "semicovariance")
+COV_METHODS: tuple[str, ...] = ("sample", "ledoit_wolf", "ewma", "semicovariance", "garch")
 DEFAULT_COV: CovMethod = "ledoit_wolf"
 EWMA_SPAN = 60
 PSD_TOLERANCE = 1e-10
@@ -158,6 +158,11 @@ def covariance(
         raw = _ewma_cov(x, span)
     elif method == "semicovariance":
         raw = _semicov(x, target)
+    elif method == "garch":
+        # 0009: GARCH(1,1) conditional variances with constant correlation, already annualized.
+        from sobres.core.timeseries import garch_covariance
+
+        raw = garch_covariance(clean, frequency) / periods
     else:
         raise ValueError(f"method must be one of {COV_METHODS}, got {method!r}")
     sigma = pd.DataFrame(raw * periods, index=clean.columns, columns=clean.columns)
