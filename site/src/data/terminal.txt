@@ -1,0 +1,23 @@
+objective: max_sharpe
+estimators: mean_historical expected returns, ledoit_wolf covariance, shrinkage 0.009
+expected return 15.7905%, volatility 12.3531%, sharpe 1.28 (risk-free 0.0000%)
+source: yfinance (adj_close)
+prices are total return
+currency: USD
+window: 2020-01-03 → 2024-12-31
+cache: hit
+risk-free rate 0.0000% (0.0 fallback: no FRED key configured)
+survivorship: a ticker list chosen today reflects survivors, so results over past windows are biased upward; no free source provides point-in-time constituents
+in-sample: estimated on the same data it is evaluated on; see `sobres optimize backtest`
+seed: 0
+┏━━━━━━━┳━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ticker ┃ weight ┃ risk_contribution┃
+┡━━━━━━━╇━━━━━━━━╇━━━━━━━━━━━━━━━━━━┩
+│AAPL   │ 0.1976 │            0.2085│
+│MSFT   │ 0.3672 │            0.5443│
+│NVDA   │ 0.1001 │            0.1327│
+│JNJ    │ 0.2655 │            0.1139│
+│XOM    │ 0.0000 │            0.0000│
+│GLD    │ 0.0696 │            0.0006│
+└───────┴────────┴──────────────────┘
+For research and education only. Not investment advice.

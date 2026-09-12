@@ -1,0 +1,61 @@
+name: Landing page
+
+# Builds site/ on every change and deploys it to GitHub Pages from main. A
+# failed build or a failed Lighthouse audit deploys nothing: the previous
+# version stays live.
+on:
+  pull_request:
+    paths: [site/**, frontend/src/theme/**, src/sobres/__about__.py, .github/workflows/pages.yml]
+  push:
+    branches: [main]
+    paths: [site/**, frontend/src/theme/**, src/sobres/__about__.py, .github/workflows/pages.yml]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    name: Build and audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - run: npm ci
+        working-directory: site
+      - name: Build (version generated, tsc --strict, bundle budget, content rules)
+        run: npm run build
+        working-directory: site
+
+      - name: Lighthouse on a simulated mid-range mobile device
+        # Performance, Accessibility and Best Practices each at least 95, or the build fails.
+        run: node scripts/prepare-audit.mjs && npx --yes @lhci/cli@0.14.x autorun --config=lighthouserc.json
+        working-directory: site
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+  deploy:
+    name: Deploy to GitHub Pages
+    needs: build
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    # Least privilege: only this job may write Pages, and only on main.
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

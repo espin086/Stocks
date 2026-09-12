@@ -62,7 +62,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `sobres db` | ✅ Done |
 | [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | ✅ Done |
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | ✅ Done |
-| [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
+| [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | ✅ Done |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
 | [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
 | [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
@@ -214,6 +214,15 @@ are three renderings of one command registry — so "the UI has every CLI featur
 a test that fails the build, not an intention. One SQLite file holds the cache,
 saved portfolios, and run history, and is also the one thing Docker mounts. Full
 detail: [`openspec/project.md`](openspec/project.md).
+
+## Landing page
+
+<https://ai-solutions-lab-llc.github.io/sobres/> is built from `site/` and deployed
+by GitHub Actions on every push to `main` that touches it. Every figure on it is
+recorded by `python site/scripts/record_figures.py` from real `sobres` runs, the
+version and install commands are generated at build time, and the build fails on
+a bundle over 150 KB, a Lighthouse score under 95, a third-party request, or a
+stale command name.
 
 ## Development
 

@@ -12,6 +12,15 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 ## [Unreleased]
 
 ### Added
+- **Landing page (change 0006).** `site/`: a dark, static Vite + TypeScript page
+  at ai-solutions-lab-llc.github.io/sobres with an efficient frontier that draws
+  itself, a terminal replaying a recorded `sobres optimize markowitz` transcript,
+  the in-sample-versus-walk-forward Sharpe gap, and two install commands. Every
+  figure comes from `site/scripts/record_figures.py`; the version is generated
+  at build time; bundle (150 KB), Lighthouse (95), content and third-party
+  request rules are build gates; deployed to GitHub Pages from `main` with
+  `pages: write` scoped to the deploy job. Design tokens now live in
+  `frontend/src/theme/tokens.css`, shared by the app and the page.
 - **Docker distribution (change 0005).** A multi-stage image with the CLI as
   its entrypoint (`aisolutionslab/sobres`, non-root uid 1000, `/data` volume,
   `HEALTHCHECK` on doctor's checks, no Node or build tooling at runtime), the
