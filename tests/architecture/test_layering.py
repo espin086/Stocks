@@ -38,7 +38,7 @@ VENDOR_MODULES = {"yfinance", "pandas_datareader"}
 
 
 def _imports(path: Path) -> set[str]:
-    tree = ast.parse(path.read_text())
+    tree = ast.parse(path.read_text(encoding="utf-8"))
     names: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -49,7 +49,7 @@ def _imports(path: Path) -> set[str]:
 
 
 def _full_imports(path: Path) -> set[str]:
-    tree = ast.parse(path.read_text())
+    tree = ast.parse(path.read_text(encoding="utf-8"))
     names: set[str] = set()
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
@@ -71,7 +71,9 @@ def test_core_imports_no_network_database_logging_or_tracing() -> None:
         assert not imported & LOGGING_MODULES, f"{path.name} imports logging or tracing"
         assert not any(m.startswith("sobres.data") for m in _full_imports(path)), path.name
         assert not any(m.startswith("sobres.cli") for m in _full_imports(path)), path.name
-        assert "open(" not in path.read_text().replace("os.open", ""), f"{path.name} opens a file"
+        assert "open(" not in path.read_text(encoding="utf-8").replace("os.open", ""), (
+            f"{path.name} opens a file"
+        )
 
 
 def test_core_imports_no_logging_or_tracing() -> None:
@@ -117,7 +119,7 @@ def test_no_rate_arithmetic_outside_currency_module() -> None:
     for path in SRC.rglob("*.py"):
         if path.name == "currency.py":
             continue
-        for lineno, line in enumerate(path.read_text().splitlines(), start=1):
+        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             code = line.split("#", 1)[0]
             assert not RATE_MULTIPLY.search(code), (
                 f"{path.relative_to(SRC)}:{lineno} applies a rate"
@@ -132,7 +134,7 @@ def test_no_bare_periods_per_year_literal_outside_conventions() -> None:
     for path in SRC.rglob("*.py"):
         if path.name == "conventions.py":
             continue
-        for lineno, line in enumerate(path.read_text().splitlines(), start=1):
+        for lineno, line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
             code = line.split("#", 1)[0]
             if PERIODS_LITERAL.search(code) and ANNUALIZATION_HINT.search(code):
                 pytest.fail(
@@ -145,12 +147,12 @@ def test_no_typer_command_outside_the_generator() -> None:
     for path in SRC.rglob("*.py"):
         if path.name in {"registry.py"}:
             continue
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         assert not pattern.search(text), f"{path.relative_to(SRC)} adds a Typer command by hand"
 
 
 def test_test_taxonomy_directories_and_markers() -> None:
-    pyproject = tomllib.loads((REPO / "pyproject.toml").read_text())
+    pyproject = tomllib.loads((REPO / "pyproject.toml").read_text(encoding="utf-8"))
     options = pyproject["tool"]["pytest"]["ini_options"]
     assert "--strict-markers" in options["addopts"]
     markers = {m.split(":")[0] for m in options["markers"]}
@@ -172,4 +174,4 @@ def test_test_taxonomy_directories_and_markers() -> None:
 
 def test_network_tests_are_marked() -> None:
     for path in (TESTS / "network").rglob("test_*.py"):
-        assert "pytest.mark.network" in path.read_text(), path
+        assert "pytest.mark.network" in path.read_text(encoding="utf-8"), path

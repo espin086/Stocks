@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Claude Code PreToolUse hook: before any `git commit` runs from a Bash tool call, run the
-# same gate CI runs (ruff check, ruff format --check, mypy --strict). Exit 2 blocks the
+# same gate CI runs (ruff check, ruff format --check, mypy --strict, actionlint). Exit 2 blocks the
 # commit and hands the output back to the agent, so a red PR is caught before it exists.
 #
 # Reads the tool call as JSON on stdin; only acts when the command contains "git commit".
@@ -24,6 +24,9 @@ run() {
 run "ruff check" ruff check .
 run "ruff format --check" ruff format --check .
 run "mypy --strict" python -m mypy
+if command -v pre-commit >/dev/null 2>&1; then
+  run "actionlint" pre-commit run actionlint --all-files
+fi
 if [ "$fail" -ne 0 ]; then
   printf '\n[commit gate] fix the findings above (ruff format . fixes formatting), then commit again.\n' >&2
   exit 2
