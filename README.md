@@ -61,7 +61,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | ✅ Done |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `sobres db` | ✅ Done |
 | [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | ✅ Done |
-| [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | 📋 Planned |
+| [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | ✅ Done |
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
 | [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
@@ -69,10 +69,12 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
 | [0011](openspec/changes/0011-rebrand-sobres/) | Rebrand | One name everywhere: `sobres` | 🔧 In progress |
 
-Once 0005 lands, the whole tool runs from one container:
+The whole tool also runs from one container — see [docs/DEPLOYING.md](docs/DEPLOYING.md):
 
 ```bash
 docker run -p 8787:8787 -v sobres:/data aisolutionslab/sobres serve --host 0.0.0.0
+sobres deploy compose > docker-compose.yml     # generated from your resolved configuration
+sobres deploy check                            # doctor's checks plus mount, bind, token, credentials
 ```
 
 ## Install

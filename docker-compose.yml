@@ -1,0 +1,23 @@
+# The reference deployment. `sobres deploy compose` generates one that matches
+# your resolved configuration; this file is the shape it follows.
+services:
+  sobres:
+    image: aisolutionslab/sobres:latest
+    command: ["serve", "--host", "0.0.0.0", "--port", "8787"]
+    ports:
+      - "8787:8787"
+    volumes:
+      - sobres-data:/data
+    environment:
+      # Secrets come from the environment or a .env file (`sobres deploy env`).
+      SOBRES_FRED_API_KEY: ${SOBRES_FRED_API_KEY:-}
+      SOBRES_LOG_LEVEL: ${SOBRES_LOG_LEVEL:-WARNING}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "sobres", "deploy", "health", "--port", "8787"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  sobres-data:

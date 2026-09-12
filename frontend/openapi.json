@@ -219,10 +219,64 @@
         "title": "CacheInfoParams",
         "type": "object"
       },
+      "CheckParams": {
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "default": "0.0.0.0",
+            "description": "Bind address the deployment will use.",
+            "title": "Host",
+            "type": "string"
+          },
+          "offline": {
+            "default": false,
+            "description": "Skip network-dependent checks.",
+            "title": "Offline",
+            "type": "boolean"
+          },
+          "port": {
+            "default": 8787,
+            "description": "Port.",
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          },
+          "strict": {
+            "default": false,
+            "description": "Exit 1 on warnings as well as failures.",
+            "title": "Strict",
+            "type": "boolean"
+          }
+        },
+        "title": "CheckParams",
+        "type": "object"
+      },
       "CommandsParams": {
         "additionalProperties": false,
         "properties": {},
         "title": "CommandsParams",
+        "type": "object"
+      },
+      "ComposeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "default": "0.0.0.0",
+            "description": "Bind address inside the container.",
+            "title": "Host",
+            "type": "string"
+          },
+          "port": {
+            "default": 8787,
+            "description": "Published port.",
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          }
+        },
+        "title": "ComposeParams",
         "type": "object"
       },
       "ConfigPathParams": {
@@ -341,6 +395,12 @@
           }
         },
         "title": "DoctorParams",
+        "type": "object"
+      },
+      "EnvParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "EnvParams",
         "type": "object"
       },
       "FactorsParams": {
@@ -612,6 +672,28 @@
           }
         },
         "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "HealthParams": {
+        "additionalProperties": false,
+        "properties": {
+          "port": {
+            "default": 8787,
+            "description": "Server port.",
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          },
+          "timeout": {
+            "default": 5.0,
+            "description": "Seconds to wait for an answer.",
+            "exclusiveMinimum": 0.0,
+            "title": "Timeout",
+            "type": "number"
+          }
+        },
+        "title": "HealthParams",
         "type": "object"
       },
       "InitParams": {
@@ -2139,6 +2221,166 @@
         "summary": "Recover what can be read from a damaged database into a new file; the original is untouched.",
         "tags": [
           "db"
+        ]
+      }
+    },
+    "/api/v1/deploy/check": {
+      "post": {
+        "description": "Preflight: doctor's checks plus image, database mount, bind, token and credentials.",
+        "operationId": "deploy_check_api_v1_deploy_check_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preflight: doctor's checks plus image, database mount, bind, token and credentials.",
+        "tags": [
+          "deploy"
+        ]
+      }
+    },
+    "/api/v1/deploy/compose": {
+      "post": {
+        "description": "Print a docker-compose.yml generated from the current configuration.",
+        "operationId": "deploy_compose_api_v1_deploy_compose_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComposeParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Print a docker-compose.yml generated from the current configuration.",
+        "tags": [
+          "deploy"
+        ]
+      }
+    },
+    "/api/v1/deploy/env": {
+      "post": {
+        "description": "Print a .env template: every variable, its default and description; no secret values.",
+        "operationId": "deploy_env_api_v1_deploy_env_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnvParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Print a .env template: every variable, its default and description; no secret values.",
+        "tags": [
+          "deploy"
+        ]
+      }
+    },
+    "/api/v1/deploy/health": {
+      "post": {
+        "description": "Ask the running server's health endpoint whether it is ready (exit 1 if not).",
+        "operationId": "deploy_health_api_v1_deploy_health_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HealthParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ask the running server's health endpoint whether it is ready (exit 1 if not).",
+        "tags": [
+          "deploy"
         ]
       }
     },

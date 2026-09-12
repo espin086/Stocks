@@ -147,6 +147,7 @@ GROUP_HELP: dict[str, str] = {
     "run": "Browse, inspect and compare recorded analysis runs.",
     "db": "Inspect, back up and repair the database.",
     "token": "Manage the deployment token.",
+    "deploy": "Generate and check the container deployment.",
 }
 
 

@@ -521,3 +521,12 @@ def config_path_for(ctx: Any) -> Path:
 
 def setting_for(key: str) -> Setting:
     return get_setting(key)
+
+
+# The deployment checks (0005) live beside the deployment knowledge; importing
+# them here is what registers them, so `sobres doctor` in the container reports
+# the data mount and the user it runs as.
+from sobres import deploy as _deploy  # noqa: E402
+
+__all__ = ["Check", "CheckReport", "CheckResult", "all_checks", "declare_check", "run_checks"]
+_ = _deploy

@@ -209,6 +209,68 @@ jobs:
           path: dist/
           if-no-files-found: error
 
+  docker:
+    name: Container image (quickstart, size budget)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: docker/setup-buildx-action@v3
+      - name: Build the image from this checkout
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: sobres:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: The CLI is the entrypoint, as a non-root user
+        run: |
+          docker run --rm sobres:ci --help | grep -q "Usage: sobres"
+          docker run --rm sobres:ci --version
+          test "$(docker run --rm --entrypoint id sobres:ci -u)" = "1000"
+          test "$(docker run --rm --entrypoint id sobres:ci -g)" = "1000"
+
+      - name: A missing data volume fails loudly
+        run: |
+          mkdir -p /tmp/ro && chmod 555 /tmp/ro
+          set +e
+          out=$(docker run --rm -v /tmp/ro:/data:ro sobres:ci db info 2>&1)
+          code=$?
+          set -e
+          echo "$out"
+          test "$code" -ne 0
+          echo "$out" | grep -q "/data"
+
+      - name: The documented quickstart, end to end
+        run: |
+          docker volume create sobres-ci
+          docker run -d --name sobres-ci -p 8787:8787 -v sobres-ci:/data sobres:ci serve --host 0.0.0.0
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8787/api/v1/health > /tmp/health.json; then break; fi
+            sleep 1
+          done
+          cat /tmp/health.json
+          python3 -c "import json; d=json.load(open('/tmp/health.json')); assert d['app']=='sobres' and d['ready'], d"
+          curl -fsS http://127.0.0.1:8787/ | grep -qi "<div id=\"root\""
+          docker exec sobres-ci sobres deploy health --port 8787
+          docker logs sobres-ci 2>&1 | grep -q "token"
+          # A one-off command shares the same volume, then the container is replaced and data survives.
+          docker run --rm -v sobres-ci:/data sobres:ci portfolio save core --tickers AAPL MSFT --weights 0.6 0.4
+          docker stop -t 10 sobres-ci && docker rm sobres-ci
+          docker run --rm -v sobres-ci:/data sobres:ci portfolio list --format json | grep -q '"core"'
+          docker run --rm -v sobres-ci:/data sobres:ci doctor --offline
+
+      - name: The compressed image is under the 500 MB budget
+        run: |
+          size=$(docker save sobres:ci | gzip | wc -c)
+          echo "compressed image: $((size / 1024 / 1024)) MB"
+          test "$size" -lt $((500 * 1024 * 1024))
+
+      - name: The runtime stage carries no Node or build toolchain
+        run: |
+          ! docker run --rm --entrypoint sh sobres:ci -c "command -v node || command -v npm || command -v gcc"
+
   security:
     name: Dependency audit
     runs-on: ubuntu-latest
@@ -241,7 +303,7 @@ jobs:
   all-green:
     name: All checks passed
     if: always()
-    needs: [lint, typecheck, test, frontend, build, security]
+    needs: [lint, typecheck, test, frontend, build, docker, security]
     runs-on: ubuntu-latest
     steps:
       # `if: always()` means this job runs even when a dependency failed, so it

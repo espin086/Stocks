@@ -36,6 +36,8 @@ from sobres.core.errors import (
     UsageError,
 )
 from sobres.data.storage.base import TERMINAL_JOB_STATES, OpenOptions, Storage, open_storage
+from sobres.deploy import require_data_volume
+from sobres.doctor import run_checks
 from sobres.observability import get_logger, new_run_id, run_id, span
 from sobres.observability.tracing import current_trace_ids
 from sobres.registry import Command, all_commands, command_schema, validate_params
@@ -43,6 +45,7 @@ from sobres.settings import all_settings, get_setting
 
 STATIC_DIR = Path(__file__).resolve().parent / "static"
 API_PREFIX = "/api/v1"
+READINESS_CHECKS = ("config-file", "db-reachable", "db-schema", "disk-space", "data-volume")
 PUBLIC_PATHS = {f"{API_PREFIX}/health", f"{API_PREFIX}/auth/login", f"{API_PREFIX}/auth/logout"}
 STATUS_FOR: dict[type[SobresError], int] = {
     UsageError: 400,
@@ -100,6 +103,7 @@ def create_app(
     config = resolve(None, env, path=config_path)
     if config.error is not None:
         raise config.error
+    require_data_volume(config)
     storage = open_storage(config.db_url, OpenOptions())
     runner = JobRunner(storage, config, env, sources=sources)
     state = AppState(
@@ -214,10 +218,15 @@ def create_app(
     # ------------------------------------------------------------ core routes
     @app.get(f"{API_PREFIX}/health", tags=["meta"])
     def health() -> dict[str, Any]:
+        # Readiness is doctor's own checks (the fast, offline ones), not a second notion of health.
+        reports = run_checks(state.context(), offline=True, only=READINESS_CHECKS)
+        checks = {r.name: r.status for r in reports}
         return {
             "app": "sobres",
             "version": __version__,
             "ok": True,
+            "ready": not any(s == "fail" for s in checks.values()),
+            "checks": checks,
             "token_required": state.require_token,
         }
 

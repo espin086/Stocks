@@ -144,7 +144,8 @@ def init(p: InitParams, ctx: Context) -> InitReport:
     values: dict[str, Any] = dict(existing)
     explicit = _parse_set(p.set_values)
     changed: list[str] = []
-    interactive = ctx.interactive and not p.non_interactive
+    # There is no terminal to prompt on inside the container image.
+    interactive = ctx.interactive and not p.non_interactive and not ctx.config.get("container")
     for setting in all_settings():
         if setting.key in explicit:
             setting.coerce(explicit[setting.key])

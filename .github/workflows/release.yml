@@ -142,6 +142,85 @@ jobs:
           # consumer can verify which workflow in which repo built the artifact.
           attestations: true
 
+  # ---------------------------------------------------------------------------
+  # The container image: same commit, same version gate, the exact wheel that
+  # went to PyPI. Disarmed until DOCKER_RELEASE_ENABLED=true, like PyPI.
+  # ---------------------------------------------------------------------------
+  docker:
+    name: Publish the container image
+    needs: [decide, build, publish]
+    if: needs.decide.outputs.publish == 'true' && needs.decide.outputs.target == 'pypi' && vars.DOCKER_RELEASE_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      IMAGE: aisolutionslab/sobres
+      VERSION: ${{ needs.decide.outputs.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: release-dist
+          path: dist/
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build for the native architecture and assert the version
+        # Version parity before any push: the image must report the wheel's version.
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          build-args: WHEEL_SOURCE=prebuilt
+          load: true
+          tags: ${{ env.IMAGE }}:candidate
+      - run: |
+          reported=$(docker run --rm "${IMAGE}:candidate" --version | tr -d '\r' | awk '{print $NF}')
+          test "$reported" = "$VERSION" || { echo "::error::image reports ${reported}, wheel is ${VERSION}"; exit 1; }
+          size=$(docker save "${IMAGE}:candidate" | gzip | wc -c)
+          echo "compressed image: $((size / 1024 / 1024)) MB"
+          test "$size" -lt $((500 * 1024 * 1024))
+
+      - name: Scan the candidate (fixable high/critical, and any secret, fails the run)
+        # Same discipline as pip-audit: an unfixable advisory gets a named
+        # exception in .trivyignore with a written reason, never a disabled scan.
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ env.IMAGE }}:candidate
+          scanners: vuln,secret
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          trivyignores: .trivyignore
+
+      - name: Never overwrite an existing version tag
+        run: |
+          if docker manifest inspect "${IMAGE}:${VERSION}" > /dev/null 2>&1; then
+            echo "::error::${IMAGE}:${VERSION} already exists on Docker Hub"; exit 1
+          fi
+
+      - uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tags — exact version, minor series, latest
+        id: tags
+        run: |
+          minor="${VERSION%.*}"
+          echo "list=${IMAGE}:${VERSION},${IMAGE}:${minor},${IMAGE}:latest" >> "$GITHUB_OUTPUT"
+
+      - name: Build once for amd64 and arm64 and push every tag
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          build-args: WHEEL_SOURCE=prebuilt
+          platforms: linux/amd64,linux/arm64
+          push: true
+          tags: ${{ steps.tags.outputs.list }}
+          # BuildKit build attestations (not an OIDC-signed identity) and an SBOM on the manifest.
+          provenance: mode=max
+          sbom: true
+
   github-release:
     name: Tag and create GitHub release
     needs: [decide, publish]
