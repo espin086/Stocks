@@ -163,6 +163,81 @@ Docker deployment in 0005 a single mounted volume.
   `qf db repair` command, and SHALL NOT silently recreate it — the same file
   holds user-authored state from 0003 onward, so discarding it is data loss
 
+### Requirement: Data quality is checked on ingest
+
+Every observation passes validation before it is cached, so a bad row is caught
+at the boundary rather than discovered as an impossible Sharpe ratio.
+
+#### Scenario: Structural validation
+- **WHEN** a provider returns a frame
+- **THEN** `validate_price_frame` SHALL reject a duplicated date, a
+  non-monotonic index, a non-positive price, or a non-finite value that is not
+  `NaN`
+- **AND** the rejection SHALL name the symbol, date, and rule
+
+#### Scenario: Implausible moves are flagged
+- **WHEN** a single-day return exceeds a configurable threshold, defaulting to
+  50%
+- **THEN** the observation SHALL be kept, and a WARNING SHALL be logged naming
+  the symbol, date, and move
+- **AND** the frame's `attrs["flags"]` SHALL record it, so downstream reporting
+  can surface it beside any result that used it
+
+#### Scenario: Adjustment consistency
+- **WHEN** adjusted and unadjusted closes are both available
+- **THEN** the adjustment factor SHALL be monotone non-increasing going back in
+  time for a series with only splits and dividends
+- **AND** a violation SHALL be flagged, since it indicates a provider data error
+
+### Requirement: Corporate actions and history
+
+#### Scenario: Adjusted close is total return
+- **WHEN** `field="adj_close"` is used
+- **THEN** the series SHALL reflect splits and cash dividends, so differencing
+  it yields total return
+- **AND** the output SHALL state "total return" where adjusted data was used
+  and "price return" where it was not
+
+#### Scenario: Delisted and renamed tickers
+- **WHEN** a ticker no longer trades
+- **THEN** the provider SHALL return its history up to the last quote rather
+  than an empty frame, where the source retains it
+- **AND** the frame's `attrs` SHALL record the last quote date and, if known,
+  the reason
+
+#### Scenario: Survivorship is stated, not hidden
+- **WHEN** any backtest or optimization runs on a user-supplied ticker list
+- **THEN** the output SHALL note that a list chosen today reflects survivors,
+  and results over past windows are biased upward for that reason
+- **AND** the tool SHALL NOT claim to correct for it, since no free source
+  provides point-in-time constituents
+
+### Requirement: Missing data has a policy, never a default
+
+#### Scenario: Gaps are classified
+- **WHEN** a date is missing from a series
+- **THEN** the data layer SHALL classify it as: market closed, instrument not
+  yet listed, instrument delisted, or provider gap
+- **AND** only a provider gap SHALL be eligible for filling
+
+#### Scenario: Filling is explicit
+- **WHEN** a caller wants provider gaps filled
+- **THEN** it SHALL choose `drop`, `ffill`, or `raise` via a parameter with no
+  default, per the rule in `portfolio-optimization`
+- **AND** the count of filled observations SHALL be reported in `attrs`
+
+#### Scenario: Alignment reports what it dropped
+- **WHEN** `align_frames(how="inner")` removes dates
+- **THEN** the count and the reason per source SHALL be recorded in the result's
+  `attrs`, and reported at INFO
+
+#### Scenario: Too little data is an error, not a shorter answer
+- **WHEN** after alignment fewer observations remain than the calling method's
+  declared minimum
+- **THEN** `InsufficientDataError` SHALL be raised naming the count, the
+  minimum, and which source constrained the window
+- **AND** the computation SHALL NOT proceed on a silently shortened window
+
 ### Requirement: Offline test suite
 
 The full test suite SHALL pass with no network access.

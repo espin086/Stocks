@@ -44,6 +44,16 @@ the codebase is small enough that the rule is free to follow.
 - **New capability `observability`** — structured logging on by default and
   OpenTelemetry tracing behind an optional extra, instrumenting the adapters and
   the I/O layer while `core/` stays pure.
+- **New capability `command-registry`** — every command declared once with a
+  pydantic parameter model and a typed result; the Typer CLI is generated from
+  it. 0004 later derives the HTTP API and UI forms from the same declarations,
+  which is why it lands here and not there.
+- **New capability `testing`** — the test taxonomy, what each kind may depend
+  on, and the architecture and invariant suites that every later "a test SHALL
+  assert" refers to.
+- **Data quality** (in `market-data`) — validation on ingest, corporate-action
+  consistency, a missing-data policy with no default, and survivorship stated
+  in output rather than hidden.
 - **New capability `currency`** — every monetary series declares its currency, an
   `FxProvider` with keyless ECB rates, typed `CurrencyPair` so rate direction
   cannot be got wrong, and one explicit conversion operation. The FX and PPP
@@ -90,4 +100,7 @@ the codebase is small enough that the rule is free to follow.
 | Instrumentation changes behavior or output | A test asserts stdout is byte-identical across log levels and with tracing on and off |
 | A rate is applied in the wrong direction | Direction is carried by `CurrencyPair(base, quote)`, call sites never touch a raw rate, and round-trip conversion is a test |
 | A listing quoted in a sub-unit (GBp, ZAc) is read as the major unit | The data layer normalizes to the major unit and a test covers a real pence-quoted listing — a silent hundred-fold error otherwise |
+| Hand-written commands in 0001 have to be rewritten when 0004 needs API and UI surfaces | The registry lands here; 0004 adds consumers of existing declarations rather than restructuring them |
+| "A test SHALL assert" in later specs never becomes a test | The `testing` spec defines the suites and a scenario-coverage test that fails on an unreferenced scenario once a change is marked implemented |
+| Bad provider rows produce plausible-looking wrong results | Validation on ingest; implausible moves flagged in `attrs` and surfaced beside results; missing-data handling requires an explicit policy |
 | Currency support slows or complicates the single-currency path | No rate is fetched when every input shares a currency, and results are asserted identical to a build without conversion |

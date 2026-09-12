@@ -27,7 +27,7 @@ Do not implement a behavior that has no scenario. Add the scenario first.
 ## The one architectural rule
 
 ```
-registry.py  One declaration per command (0004). CLI, API and UI derive from it.
+registry.py  One declaration per command (0001). CLI, API (0004) and UI derive from it.
 cli/    Typer adapters — argv → data → core → render.    NO business logic.
 api/    FastAPI adapters (0004).                          NO business logic.
         ^ logs and spans are emitted at this layer
@@ -46,9 +46,24 @@ If you find yourself computing something in `cli/` or `api/`, it belongs in
 `core/`. If you find yourself calling a provider or opening a connection from
 `core/`, pass the frame in instead.
 
-From 0004 on, never add a command to only one surface. Declare it in
-`registry.py`; the CLI, the HTTP route, and the UI form come from that. A parity
-test fails the build if a registered command lacks a route or a view.
+**Never write a Typer command by hand.** Every command is a registry
+declaration — a pydantic parameter model, a typed result, a handler — and the
+CLI is generated from it. From 0004 the HTTP route and the UI form come from
+the same declaration, and a parity test fails the build if one is missing.
+Cross-field rules (weights match tickers, `--portfolio` excludes `--tickers`)
+are model validators, never handler code.
+
+**Tests are organized by what they prove** — `tests/core/` (known answers),
+`tests/data/` (recorded fixtures, conformance), `tests/cli/`,
+`tests/architecture/` (import and literal rules), `tests/invariants/` (every
+registered command), `tests/network/` (marked). A math test never asserts
+against a value the function itself produced. Architecture rules in this file
+are enforced by `tests/architecture/`, not by review.
+
+**Missing data has no default.** Callers choose `drop`, `ffill`, or `raise`.
+Only provider gaps are fillable; market closures, pre-listing, and delisting
+are not. Alignment records what it dropped. Survivorship bias is stated in
+output, never silently accepted or claimed to be corrected.
 
 ## Storage is a port, not a database
 

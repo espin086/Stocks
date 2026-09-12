@@ -54,10 +54,10 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | # | Milestone | Ships | State |
 |---|---|---|---|
 | [0000](openspec/changes/0000-release-engineering/) | Release engineering | CI gate, version-gated PyPI publishing | ✅ Done |
-| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | Provider layer, SQLite cache, CLI shell, `qf data` | 📋 Planned |
+| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | Command registry, storage port, providers, currency, observability, `qf data` | 📋 Planned |
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `qf db` | 📋 Planned |
-| [0004](openspec/changes/0004-web-ui/) | Web UI | Command registry, FastAPI + React SPA, `qf serve` | 📋 Planned |
+| [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `qf serve` | 📋 Planned |
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `qf deploy` | 📋 Planned |
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |

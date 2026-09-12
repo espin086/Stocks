@@ -13,7 +13,7 @@ or notebook can sit on top later without moving any logic.
 
 ```
               ┌──────────────────────────────────────────────┐
-              │            registry.py  (0004)               │  one declaration
+              │            registry.py  (0001)               │  one declaration
               │   every command: params, types, defaults      │  per capability
               └───────┬──────────────────┬───────────────────┘
                       │                  │
@@ -37,9 +37,10 @@ or notebook can sit on top later without moving any logic.
 - `data/**` — every byte that crosses the network. Returns plain `pandas` objects
   with a documented shape. Caches to disk. Knows nothing about optimization.
 - `cli/**`, `api/**`, `frontend/**` — parse, call `core`, format. Three renderings
-  of one set of capabilities, all generated from `registry.py` (0004) so a
-  parameter added in one place appears in all three. A parity test fails the build
-  if any registered command lacks an API route or a UI view.
+  of one set of capabilities, all generated from `registry.py` — declared in 0001,
+  consumed by the API and UI from 0004 — so a parameter added in one place
+  appears in all three. A parity test fails the build if any registered command
+  lacks an API route or a UI view.
 
 This rule is what makes the tool testable: the math is tested against fixtures with
 no network, and the providers are tested against recorded payloads. It is also what
@@ -61,7 +62,7 @@ src/quantfolio/
 │   ├── goals.py            # retirement / house / car / education solvers
 │   ├── simulate.py         # Monte Carlo + bootstrap engines
 │   └── backtest.py         # walk-forward rebalancing evaluation
-├── registry.py             # 0004: every command declared once
+├── registry.py             # 0001: every command declared once; CLI generated from it
 ├── observability/          # logging + tracing setup, redaction
 ├── data/
 │   ├── base.py             # PriceProvider / FactorProvider / MacroProvider protocols
@@ -216,10 +217,10 @@ Each is one OpenSpec change under `openspec/changes/`.
 | # | Change | Ships |
 |---|---|---|
 | 0000 | `release-engineering` | CI gate, version-gated PyPI publishing |
-| 0001 | `foundation-data-and-cli` | Provider layer, storage port + SQLite adapter, cache, logging + tracing, CLI shell, `qf data *` |
+| 0001 | `foundation-data-and-cli` | Command registry, storage port + SQLite adapter, providers, data quality, currency model, logging + tracing, test scaffolding, `qf data *` |
 | 0002 | `portfolio-optimization` | **v1.0.0** — returns/risk, MVO, frontier, backtest |
 | 0003 | `local-persistence` | Schema + migrations, saved portfolios/goals/runs, `qf db` |
-| 0004 | `web-ui` | Command registry, FastAPI, React SPA, jobs + SSE, `qf serve` |
+| 0004 | `web-ui` | API and UI derived from the registry, React SPA, jobs + SSE, `qf serve` |
 | 0005 | `docker-distribution` | One image on Docker Hub, CLI entrypoint, `qf deploy` |
 | 0006 | `landing-page` | Animated dark GitHub Pages site |
 | 0007 | `equity-factor-analysis` | Single-stock analysis, CAPM, Fama-French 3/5 + momentum |

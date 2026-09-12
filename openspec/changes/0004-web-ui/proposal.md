@@ -3,6 +3,7 @@ change: 0004-web-ui
 milestone: v1.2
 depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization, 0003-local-persistence]
 status: proposed
+planning_depth: proposal + 2 spec deltas + design (tasks written when 0003 lands)
 ---
 
 # 0004 — Web UI
@@ -37,11 +38,13 @@ show, and "watch the frontier solve" is the demo.
   over `core` and `data` exactly like `cli/`, holding no business logic.
 - **New capability `web-ui`** — React + TypeScript SPA under `frontend/`, built to
   static assets and served by the same process.
-- **New capability surface: a command registry.** Every command is declared once
-  in `quantfolio/registry.py` — name, parameters, types, defaults, help. The CLI,
-  the HTTP API, and the UI's forms are all generated from it. This is what makes
-  "the UI has all the features of the CLI" a tested invariant rather than an
-  intention.
+- **Two new consumers of the command registry.** 0001 declares every command
+  once and generates the CLI from it; this change generates the HTTP API and the
+  UI's forms from the same declarations. This is what makes "the UI has all the
+  features of the CLI" a tested invariant rather than an intention — and why the
+  registry landed in 0001 rather than here: adding consumers to declarations is
+  a generator each; retrofitting declarations onto hand-written commands would
+  have been a rewrite of every one.
 - **Job execution** — optimizations and backtests run as jobs persisted through
   0003's repositories, with progress streamed over SSE. Trace context and run id
   are persisted with the job, so work that outlives its request stays traceable.

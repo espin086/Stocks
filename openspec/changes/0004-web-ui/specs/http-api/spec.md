@@ -2,15 +2,22 @@
 
 ## ADDED Requirements
 
-### Requirement: Single command registry
+### Requirement: The API and UI are derived from 0001's registry
 
-Every capability SHALL be declared once and consumed by all three surfaces.
+0001 declares every command once and generates the CLI. This change adds two
+consumers of those declarations and changes nothing about how a command is
+declared.
 
-#### Scenario: One declaration
-- **WHEN** a command is added to `quantfolio/registry.py` with its parameters,
-  types, defaults, and help text
-- **THEN** a CLI subcommand, an HTTP route, and an OpenAPI schema entry SHALL all
-  exist for it without further code
+#### Scenario: One declaration, three surfaces
+- **WHEN** a command exists in `quantfolio/registry.py` per 0001
+- **THEN** an HTTP route, an OpenAPI schema entry, and a UI form SHALL all exist
+  for it without further code
+
+#### Scenario: One route shape
+- **WHEN** a command is exposed over HTTP
+- **THEN** it SHALL be `POST /api/v1/<group>/<name>` with the parameter model as
+  the request body, so the CLI and the API share one validation path and one
+  set of error messages
 
 #### Scenario: Parity is tested, not trusted
 - **WHEN** the test suite runs

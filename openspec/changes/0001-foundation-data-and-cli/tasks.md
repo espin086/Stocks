@@ -17,6 +17,20 @@ Estimates are focused hours. Each task names the test that proves it.
       per-column precision rules.
       → `tests/test_render.py::test_json_is_sole_stdout_document`,
         `::test_non_tty_defaults_to_csv`
+- [ ] **A3b. Command registry** (3h)
+      `registry.py`: `Command`, `register`, shared parameter types (`TickerList`,
+      `Frequency`, `Weights`, `Currency`), the Typer generator, `qf commands`.
+      → `tests/cli/test_registry.py::test_typer_app_has_one_subcommand_per_registration`,
+        `::test_defaults_come_only_from_param_model`,
+        `::test_cross_field_validator_rejects_weight_count_mismatch`,
+        `::test_registration_count_matches_explicit_list`
+- [ ] **A3c. Test scaffolding** (2h)
+      `tests/architecture/` import scanners and literal checks;
+      `tests/invariants/` iterating the registry; `scripts/record_fixtures.py`
+      skeleton; scenario-coverage test (advisory until a change is marked
+      implemented).
+      → `tests/architecture/test_layering.py`,
+        `tests/invariants/test_every_command.py`
 - [ ] **A4. Structured logging** (3h)
       `observability/logging.py`: structlog wired to stderr, human renderer on a
       TTY and JSON otherwise, run-id binding, third-party loggers routed and
@@ -70,11 +84,21 @@ Estimates are focused hours. Each task names the test that proves it.
         `::test_timestamps_round_trip_as_utc_aware`,
         `::test_no_backend_specific_sql_outside_adapters`
 
-- [ ] **B1. Protocols and canonical frame** (2h)
-      `data/base.py`: the three protocols, `PriceField`, and
-      `validate_price_frame()` enforcing the canonical shape.
+- [ ] **B1. Protocols and canonical frame** (2.5h)
+      `data/base.py`: the four protocols, `PriceField`, and
+      `validate_price_frame()` enforcing the canonical shape plus the data-quality
+      rules: non-positive price, non-finite value, implausible move flagged in
+      `attrs`, adjustment-factor monotonicity.
       → `tests/data/test_base.py::test_validate_rejects_tz_aware_index` (+ duplicate
-        index, non-float dtype, descending index)
+        index, non-float dtype, descending index, non-positive price)
+      → `::test_implausible_move_kept_and_flagged`,
+        `::test_adjustment_factor_violation_flagged`
+- [ ] **B1b. Missing-data policy** (1.5h)
+      Gap classification (closed / not listed / delisted / provider gap); fill
+      policy with no default; alignment records what it dropped.
+      → `tests/data/test_gaps.py::test_only_provider_gaps_are_fillable`,
+        `::test_fill_policy_has_no_default`,
+        `::test_alignment_records_dropped_counts_per_source`
 - [ ] **B2. Cache over the storage port** (3h)
       `data/cache.py`: observation upsert keyed
       `(provider, dataset, symbol, date)`, `fetch_log` ranges, per-dataset TTL,
@@ -129,7 +153,8 @@ Estimates are focused hours. Each task names the test that proves it.
       message + exit code, with the run id in the message.
       → `tests/cli/test_main.py::test_version`, `::test_bare_shows_help_exit_0`,
         `::test_provider_error_exits_4_without_traceback`
-- [ ] **C2. `qf data` group** (2h) — `prices`, `macro`, `factors`.
+- [ ] **C2. `qf data` group** (2h) — `prices`, `macro`, `factors`, `fx`, each a
+      registry declaration; no hand-written Typer command.
       → `tests/cli/test_data_commands.py` (one test per subcommand × 3 formats)
 - [ ] **C3. `qf cache` group** (1h) — `info`, `clear` (with confirm + `--yes`).
       Cache-only; the wider `qf db` group arrives with 0003.
@@ -156,8 +181,8 @@ Estimates are focused hours. Each task names the test that proves it.
       per the placement rule in `design.md`.
       → `tests/test_architecture.py::test_core_imports_no_logging_or_tracing`
 
-**Total: ~51h** (was ~27h; the storage port and observability added ~19h, the
-currency model ~5h). Wave B is the critical path; B6 and B0b are the tasks with
+**Total: ~58h** (was ~27h; the storage port and observability added ~19h, the
+currency model ~5h, the registry, test scaffolding, and data quality ~7h). Wave B is the critical path; B6 and B0b are the tasks with
 real unknowns.
 
 ## Definition of done
@@ -170,6 +195,8 @@ real unknowns.
 - [ ] stdout is byte-identical across log levels and with tracing on and off
 - [ ] No call site outside `data/currency.py` multiplies or divides by a rate
 - [ ] A single-currency run fetches no rates and matches a no-conversion build
+- [ ] No Typer command exists that is not a registry declaration
+- [ ] `tests/architecture/` and `tests/invariants/` run against every registered command
 - [ ] `pytest -m "not network"` passes with networking disabled
 - [ ] `mypy --strict` clean
 - [ ] Every scenario in both spec deltas has a test that references it

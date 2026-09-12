@@ -19,6 +19,38 @@ cli/render.py  (table | json | csv)          adapters/sqlite.py  ← only place
 `core/` is untouched by this change — it has nothing to compute yet. That is the
 point: the boundaries exist before there is pressure to cross them.
 
+## The command registry, and why it starts here
+
+Every command is one declaration:
+
+```python
+@register("data.prices")
+class Prices(Command):
+    """Fetch and cache price history."""
+    class Params(BaseModel):
+        tickers: TickerList
+        start: date
+        end: date | None = None
+        field: PriceField = "adj_close"
+    result = PriceTable
+    def run(self, p: Params, ctx: Context) -> PriceTable: ...
+```
+
+The Typer app is generated from `Params` — options, types, defaults, and help
+all come from the model's fields. No command is added to Typer by hand.
+
+This could have waited for 0004, where the API and UI need it. It does not wait,
+because the cost curve is asymmetric: adding a second and third consumer to
+existing declarations is a generator each; retrofitting declarations onto a
+year of hand-written commands is a rewrite of every one. 0001 pays a few hours
+for the generator and 0004 inherits every command for free.
+
+Two things fall out immediately even with one surface. Cross-field validation —
+weights matching tickers, `--portfolio` excluding `--tickers` — lives in the
+model as a validator, so it is written once and cannot drift between commands.
+And results are typed, carrying their own provenance, so one renderer handles
+every command and no command formats its own output.
+
 ## Storage: a port, not a database
 
 Two protocols and a registry:
@@ -279,6 +311,8 @@ must never need a `grep -v`.
 | Instrument adapters | Instrument `core/` | Preserves purity, and adapter-observed timings are what a trace reader wants |
 | OTel API with optional SDK | Always-on tracing, or none | Zero dependency and zero overhead by default, same call sites either way |
 | structlog | stdlib `logging` alone | Typed key/value context and bound scopes; still routes third-party stdlib records through one handler |
+| Registry in 0001 | Registry in 0004 when the API needs it | Adding consumers to declarations is a generator each; retrofitting declarations onto hand-written commands is a rewrite of every one |
+| pydantic parameter models | Typer-native annotations | One validation path serves CLI, API, and UI; cross-field rules live in one validator |
 | `CurrencyPair` type carrying direction | A string like `"EURUSD"` plus a convention | Conventions are remembered wrongly; a type is checked |
 | `convert()` as the only rate application | Exposing rates for call sites to apply | Removes the inversion bug by removing the opportunity |
 | Currency model in 0001, analytics in 0010 | All of it in 0010 | Returns computed without a currency concept have to be recomputed with one; that is every risk function by 0002 |

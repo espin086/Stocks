@@ -1,18 +1,20 @@
 # Roadmap
 
-Each milestone is an OpenSpec change under `openspec/changes/`. The proposal and
-spec delta for all five are written; `design.md` and `tasks.md` are written in full
-for 0001 and 0002, and are deliberately deferred for 0003–0005 until the change
-before them lands — planning that far ahead in implementation detail goes stale
-before it is used.
+Each milestone is an OpenSpec change under `openspec/changes/`. Proposals and
+spec deltas exist for all eleven. `design.md` and `tasks.md` are complete for
+0001 and 0002; 0004 has a `design.md` because its central decision — deriving the
+API and UI from the registry — constrains how 0001 declares commands and had to be
+settled before 0001 is built. Design and tasks for the rest are deliberately
+deferred until the change before them lands; implementation detail planned that
+far ahead goes stale before it is used.
 
 | # | Milestone | Depends on | Est. | Planning depth |
 |---|---|---|---|---|
 | 0000 | Release engineering: CI gate + PyPI pipeline | — | done | proposal + spec + tasks |
-| 0001 | Foundation: storage port, data layer, currency, observability, CLI shell | 0000 | ~51h | proposal + 5 specs + design + tasks |
+| 0001 | Foundation: registry, storage port, data layer + quality, currency, observability, testing | 0000 | ~58h | proposal + 7 specs + design + tasks |
 | 0002 | **Portfolio optimization → v1.0.0** | 0001 | ~48h | proposal + spec + design + tasks |
 | 0003 | Local persistence (SQLite) → v1.1 | 0002 | ~25h est. | proposal + spec |
-| 0004 | Web UI (FastAPI + React) → v1.2 | 0003 | ~70h est. | proposal + specs |
+| 0004 | Web UI (FastAPI + React) → v1.2 | 0003 | ~70h est. | proposal + 2 specs + design |
 | 0005 | Docker distribution → v1.2 | 0004 | ~25h est. | proposal + spec |
 | 0006 | Landing page (GitHub Pages) → v1.2 | 0005 | ~30h est. | proposal + spec |
 | 0007 | Equity & factor analysis → v1.3 | 0002 | ~35h est. | proposal + spec |
@@ -20,7 +22,7 @@ before it is used.
 | 0009 | Econometrics & forecasting → v1.5 | 0007 | ~40h est. | proposal + spec |
 | 0010 | Exchange rates & PPP → v1.6 | 0002, 0008 | ~35h est. | proposal + 2 specs |
 
-**v1.0.0 = 0001 + 0002 (~99h).** **v1.2, the deployable product = 0003–0006
+**v1.0.0 = 0001 + 0002 (~106h).** **v1.2, the deployable product = 0003–0006
 (~150h more).**
 
 ## Sequencing rationale
