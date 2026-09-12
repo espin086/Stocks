@@ -70,10 +70,13 @@ Source = "https://github.com/AI-Solutions-Lab-LLC/sobres"
 [tool.hatch.version]
 path = "src/sobres/__about__.py"
 
+[tool.hatch.build]
+# The built SPA (gitignored) ships in the sdist and the wheel so `pip install sobres[web]`
+# needs no Node. `python -m build` builds the wheel from the sdist, so both must carry it.
+artifacts = ["src/sobres/api/static/**"]
+
 [tool.hatch.build.targets.wheel]
 packages = ["src/sobres"]
-# The built SPA ships in the wheel so `pip install sobres[web]` needs no Node.
-artifacts = ["src/sobres/api/static/**"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
