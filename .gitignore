@@ -24,3 +24,10 @@ src/sobres/api/static/
 requirements-audit.txt
 actionlint
 actionlint.tar.gz
+
+# The landing page build (0006): generated at build time, never committed.
+site/node_modules/
+site/dist/
+site/src/generated.json
+site/lhci-root/
+site/.lighthouseci/

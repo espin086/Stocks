@@ -31,7 +31,7 @@
 - [x] **C1. Docker** *(lands with 0005)* — image name `aisolutionslab/sobres`, volume examples, and
       the health check calling `sobres doctor`. → test: `sobres deploy check`
       output contains no `quantfolio`.
-- [ ] **C2. Landing page** *(lands with 0006)* — base URL, install snippet, and every command example.
+- [x] **C2. Landing page** *(lands with 0006)* — base URL, install snippet, and every command example.
       → test: the site build fails on the string `qf `.
 - [x] **C3. Docs and README** — install line, quickstart, every command example,
       `docs/RELEASING.md`. → test: the repository-wide grep test from A3 covers

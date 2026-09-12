@@ -40,7 +40,7 @@ def _tokens(block: str) -> dict[str, str]:
 
 
 def _theme_blocks() -> tuple[dict[str, str], dict[str, str]]:
-    css = _read("src/index.css")
+    css = _read("src/theme/tokens.css")  # shared with site/ (0006)
     light = re.search(r":root \{(.*?)\}", css, re.S)
     dark = re.search(r"\.dark \{(.*?)\}", css, re.S)
     assert light and dark

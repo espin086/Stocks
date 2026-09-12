@@ -1,0 +1,38 @@
+{
+ "recorded_at": "2026-09-12T19:10:46.756956+00:00",
+ "tickers": [
+  "AAPL",
+  "MSFT",
+  "NVDA",
+  "JNJ",
+  "XOM",
+  "GLD"
+ ],
+ "frontier_window": [
+  "2020-01-01",
+  "2024-12-31"
+ ],
+ "backtest_window": [
+  "2021-01-01",
+  "2024-12-31"
+ ],
+ "backtest": {
+  "lookback": "1y",
+  "rebalance": "quarterly",
+  "cost_bps": 10
+ },
+ "estimators": {
+  "expected_return": "mean_historical",
+  "covariance": "ledoit_wolf",
+  "shrinkage": 0.009020731975258309,
+  "psd_repair": null
+ },
+ "commands": {
+  "frontier": "sobres optimize frontier --tickers AAPL MSFT NVDA JNJ XOM GLD --start 2020-01-01 --end 2024-12-31 --fill drop",
+  "backtest": "sobres optimize backtest --tickers AAPL MSFT NVDA JNJ XOM GLD --start 2021-01-01 --end 2024-12-31 --fill drop --lookback 1y --rebalance quarterly --cost-bps 10",
+  "markowitz": "sobres optimize markowitz --tickers AAPL MSFT NVDA JNJ XOM GLD --fill drop --start 2020-01-01 --end 2024-12-31"
+ },
+ "data_source": "the repository's recorded fixtures",
+ "synthetic": true,
+ "note": "the fixtures are synthesized random walks in the providers' payload shapes, not market data; rerun with --live after recording live fixtures"
+}

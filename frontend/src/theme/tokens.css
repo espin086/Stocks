@@ -1,0 +1,39 @@
+/* Shared design tokens: the app (frontend/) and the landing page (site/) both import this file,
+   so the two look like one product. `:root` is the light theme, `.dark` the dark one. */
+/* Design tokens: every surface, including charts, reads these. Both themes are complete. */
+:root {
+  --bg: #f6f7f9;
+  --bg-elev: #ffffff;
+  --fg: #101418;
+  --fg-muted: #4b5563;
+  --border: #d6dbe1;
+  --accent: #0b6bcb;
+  --accent-fg: #ffffff;
+  --ok: #1a7f37;
+  --warn: #b7791f;
+  --fail: #c0392b;
+  --series-1: #0b6bcb;
+  --series-2: #d97706;
+  --series-3: #059669;
+  --series-4: #7c3aed;
+  --series-5: #dc2626;
+  --series-6: #0891b2;
+}
+.dark {
+  --bg: #0b0f14;
+  --bg-elev: #131a22;
+  --fg: #e6edf3;
+  --fg-muted: #9aa7b4;
+  --border: #263241;
+  --accent: #7cc4ff;
+  --accent-fg: #0b0f14;
+  --ok: #4ade80;
+  --warn: #fbbf24;
+  --fail: #f87171;
+  --series-1: #7cc4ff;
+  --series-2: #fbbf24;
+  --series-3: #4ade80;
+  --series-4: #c084fc;
+  --series-5: #f87171;
+  --series-6: #22d3ee;
+}
