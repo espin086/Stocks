@@ -24,7 +24,7 @@ def _env_reads() -> dict[str, set[str]]:
     """Every ``os.environ[...]``/``os.getenv(...)`` literal in the source tree, by file."""
     found: dict[str, set[str]] = {}
     for path in SRC.rglob("*.py"):
-        tree = ast.parse(path.read_text())
+        tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
             literal: str | None = None
             if (
@@ -64,7 +64,7 @@ def test_every_env_var_read_is_a_declared_setting() -> None:
 def test_no_module_touches_os_environ_outside_the_resolution_chain() -> None:
     pattern = re.compile(r"os\.environ|os\.getenv")
     for path in SRC.rglob("*.py"):
-        if pattern.search(path.read_text()):
+        if pattern.search(path.read_text(encoding="utf-8")):
             assert path.name in ALLOWED_ENV_READERS, f"{path} touches os.environ"
 
 

@@ -17,7 +17,7 @@ FIXTURE = Path(__file__).resolve().parents[1] / "fixtures" / "r_reference" / "al
 
 
 def test_weights_match_within_1e_4() -> None:
-    ref = json.loads(FIXTURE.read_text())
+    ref = json.loads(FIXTURE.read_text(encoding="utf-8"))
     vehicles = ref["vehicles"]
     returns = [r / 100 for r in ref["returns_pct"]]
     result = linear_allocation(vehicles, returns, legacy_constraints(ref["risk"]))

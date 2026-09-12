@@ -26,16 +26,16 @@ from tests.ui.test_frontend_source import contrast
 
 REPO = Path(__file__).resolve().parents[2]
 SITE = REPO / "site"
-INDEX = (SITE / "index.html").read_text()
-MAIN = (SITE / "src" / "main.ts").read_text()
-FIGURES = (SITE / "src" / "figures.ts").read_text()
-MOTION = (SITE / "src" / "motion.ts").read_text()
-STYLE = (SITE / "src" / "style.css").read_text()
-PAGES = (REPO / ".github" / "workflows" / "pages.yml").read_text()
+INDEX = (SITE / "index.html").read_text(encoding="utf-8")
+MAIN = (SITE / "src" / "main.ts").read_text(encoding="utf-8")
+FIGURES = (SITE / "src" / "figures.ts").read_text(encoding="utf-8")
+MOTION = (SITE / "src" / "motion.ts").read_text(encoding="utf-8")
+STYLE = (SITE / "src" / "style.css").read_text(encoding="utf-8")
+PAGES = (REPO / ".github" / "workflows" / "pages.yml").read_text(encoding="utf-8")
 
 
 def _pkg() -> dict[str, dict[str, str]]:
-    return json.loads((SITE / "package.json").read_text())
+    return json.loads((SITE / "package.json").read_text(encoding="utf-8"))
 
 
 def test_chosen_libraries_and_a_static_build() -> None:
@@ -43,9 +43,9 @@ def test_chosen_libraries_and_a_static_build() -> None:
     deps = {**pkg["dependencies"], **pkg["devDependencies"]}
     for lib in ("vite", "typescript", "tailwindcss", "gsap", "lenis", "echarts"):
         assert lib in deps, lib
-    ts = json.loads((SITE / "tsconfig.json").read_text())
+    ts = json.loads((SITE / "tsconfig.json").read_text(encoding="utf-8"))
     assert ts["compilerOptions"]["strict"] is True
-    vite = (SITE / "vite.config.ts").read_text()
+    vite = (SITE / "vite.config.ts").read_text(encoding="utf-8")
     assert 'base: "/sobres/"' in vite and 'outDir: "dist"' in vite
     assert "server" not in pkg["dependencies"]  # nothing runs at request time
 
@@ -64,7 +64,9 @@ def test_published_automatically_with_least_privilege_and_no_broken_deploys() ->
 
 def test_shares_the_apps_design_tokens_and_is_dark_by_design() -> None:
     assert '@import "../../frontend/src/theme/tokens.css";' in STYLE
-    assert '@import "./theme/tokens.css";' in (REPO / "frontend" / "src" / "index.css").read_text()
+    assert '@import "./theme/tokens.css";' in (REPO / "frontend" / "src" / "index.css").read_text(
+        encoding="utf-8"
+    )
     assert '<html lang="en" class="dark">' in INDEX
     assert '<meta name="color-scheme" content="dark" />' in INDEX
     assert "prefers-color-scheme" not in STYLE and "prefers-color-scheme" not in MAIN
@@ -75,7 +77,7 @@ def test_shares_the_apps_design_tokens_and_is_dark_by_design() -> None:
 
 
 def test_contrast_of_the_dark_tokens_meets_aa() -> None:
-    css = (REPO / "frontend" / "src" / "theme" / "tokens.css").read_text()
+    css = (REPO / "frontend" / "src" / "theme" / "tokens.css").read_text(encoding="utf-8")
     dark = dict(re.findall(r"--([a-z0-9-]+):\s*(#[0-9a-fA-F]{6});", css.split(".dark {", 1)[1]))
     for fg, bg in (("fg", "bg"), ("fg-muted", "bg-elev"), ("accent", "bg"), ("ok", "bg-elev")):
         assert contrast(dark[fg], dark[bg]) >= 4.5, (fg, bg)
@@ -83,10 +85,10 @@ def test_contrast_of_the_dark_tokens_meets_aa() -> None:
 
 def test_animation_shows_the_product_from_recorded_data() -> None:
     data = SITE / "src" / "data"
-    meta = json.loads((data / "figures-meta.json").read_text())
-    frontier = json.loads((data / "frontier.json").read_text())
-    backtest = json.loads((data / "backtest.json").read_text())
-    transcript = (data / "terminal.txt").read_text()
+    meta = json.loads((data / "figures-meta.json").read_text(encoding="utf-8"))
+    frontier = json.loads((data / "frontier.json").read_text(encoding="utf-8"))
+    backtest = json.loads((data / "backtest.json").read_text(encoding="utf-8"))
+    transcript = (data / "terminal.txt").read_text(encoding="utf-8")
     assert "sobres optimize frontier" in meta["commands"]["frontier"]
     assert sum(1 for r in frontier["rows"] if r["max_sharpe"]) == 1  # the point that lands last
     assert sum(1 for r in frontier["rows"] if r["min_variance"]) == 1
@@ -94,7 +96,7 @@ def test_animation_shows_the_product_from_recorded_data() -> None:
     assert backtest["in_sample_sharpe"] > backtest["walk_forward_sharpe"]  # the thesis, in numbers
     assert transcript.startswith("objective: max_sharpe") and "Not investment advice" in transcript
     assert "For research and education only" in transcript  # the CLI's own footer, recorded
-    script = (SITE / "scripts" / "record_figures.py").read_text()
+    script = (SITE / "scripts" / "record_figures.py").read_text(encoding="utf-8")
     assert (
         re.search(r'"optimize",\s*"frontier"', script) and 'fmt="table"' in script
     )  # regenerable, not hand-written
@@ -137,10 +139,10 @@ def test_only_shipped_capabilities_are_claimed() -> None:
 
 
 def test_install_commands_and_version_are_generated_at_build_time() -> None:
-    generate = (SITE / "scripts" / "generate.mjs").read_text()
+    generate = (SITE / "scripts" / "generate.mjs").read_text(encoding="utf-8")
     assert "__about__.py" in generate and "process.exit(1)" in generate
     assert "generated.version" in MAIN and "generated.install.docker" in MAIN
-    assert "site/src/generated.json" in (REPO / ".gitignore").read_text()
+    assert "site/src/generated.json" in (REPO / ".gitignore").read_text(encoding="utf-8")
     assert "npm run generate && tsc" in _pkg()["scripts"]["build"]
 
 
@@ -156,14 +158,14 @@ def test_numbers_are_sourced_and_the_disclaimer_is_on_the_page() -> None:
 
 
 def test_performance_gates_are_build_failures() -> None:
-    lh = json.loads((SITE / "lighthouserc.json").read_text())
+    lh = json.loads((SITE / "lighthouserc.json").read_text(encoding="utf-8"))
     for category in ("performance", "accessibility", "best-practices"):
         assert lh["ci"]["assert"]["assertions"][f"categories:{category}"] == [
             "error",
             {"minScore": 0.95},
         ]
     assert lh["ci"]["collect"]["settings"]["formFactor"] == "mobile"
-    bundle = (SITE / "scripts" / "check-bundle.mjs").read_text()
+    bundle = (SITE / "scripts" / "check-bundle.mjs").read_text(encoding="utf-8")
     assert "const BUDGET = 150 * 1024;" in bundle and "process.exit(1)" in bundle
     assert "check-bundle.mjs" in _pkg()["scripts"]["build"]
     assert "check-content.mjs" in _pkg()["scripts"]["build"]
@@ -193,7 +195,7 @@ def test_self_hosted_assets_and_no_tracking() -> None:
     for word in ("gtag", "analytics", "plausible", "hotjar", "cookie"):
         assert word not in INDEX.lower() or "no cookies" in INDEX, word
     assert "document.cookie" not in MAIN and "localStorage" not in MAIN
-    check = (SITE / "scripts" / "check-content.mjs").read_text()
+    check = (SITE / "scripts" / "check-content.mjs").read_text(encoding="utf-8")
     assert "runtime request to" in check and "loads from" in check
 
 
@@ -217,7 +219,7 @@ def test_link_previews_depict_the_product() -> None:
         assert prop in INDEX, prop
     image = SITE / "public" / "og-image.png"
     assert image.exists() and image.stat().st_size > 10_000
-    assert "og_image.py" in (SITE / "scripts" / "og_image.py").read_text() or True
-    assert (
-        "page.screenshot" in (SITE / "scripts" / "og_image.py").read_text()
+    assert "og_image.py" in (SITE / "scripts" / "og_image.py").read_text(encoding="utf-8") or True
+    assert "page.screenshot" in (SITE / "scripts" / "og_image.py").read_text(
+        encoding="utf-8"
     )  # rendered from the page itself
