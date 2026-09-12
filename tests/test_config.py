@@ -7,6 +7,7 @@ Precedence.
 from __future__ import annotations
 
 import stat
+import sys
 from pathlib import Path
 
 import pytest
@@ -58,6 +59,7 @@ def test_secrets_masked() -> None:
     assert display_value(LOG_LEVEL, None) == "(unset)"
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX file modes")
 def test_config_file_written_at_0600(tmp_path: Path) -> None:
     path = tmp_path / "nested" / "config.toml"
     write_config_file(path, {"fred_api_key": "k", "slow_query_ms": 5, "container": True, "x": None})
@@ -82,7 +84,7 @@ def test_default_db_url_is_sqlite_under_sobres_data_dir() -> None:
 
 def test_invalid_toml_is_a_configuration_error(tmp_path: Path) -> None:
     path = tmp_path / "config.toml"
-    path.write_text("not = [valid")
+    path.write_text("not = [valid", encoding="utf-8")
     with pytest.raises(ConfigurationError) as exc:
         read_config_file(path)
     assert "sobres init" in str(exc.value)

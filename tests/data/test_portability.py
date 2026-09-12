@@ -67,5 +67,5 @@ def test_no_backend_specific_sql_outside_adapters() -> None:
     for path in STORAGE_DIR.rglob("*.py"):
         if "adapters" in path.parts and path.name in {"sqlite.py"}:
             continue
-        text = path.read_text()
+        text = path.read_text(encoding="utf-8")
         assert not banned.search(text), f"{path.name} carries backend-specific SQL"

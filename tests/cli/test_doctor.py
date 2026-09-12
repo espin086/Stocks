@@ -9,6 +9,7 @@ directory; Installer is detected, not assumed.
 from __future__ import annotations
 
 import json
+import sys
 from collections.abc import Callable
 from pathlib import Path
 from typing import Any
@@ -88,13 +89,14 @@ def test_tty_rendering_groups_by_category(cli: Callable[..., Any]) -> None:
     assert " ok, " in out and " skipped" in out
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="POSIX file modes")
 def test_fix_repairs_permissions_and_migrations_but_never_secrets(
     cli: Callable[..., Any], env: dict[str, str]
 ) -> None:
     cli("config", "set", "fred_api_key", SENTINEL_KEY)
     path = Path(env["SOBRES_CONFIG_FILE"])
     path.chmod(0o644)
-    before = path.read_text()
+    before = path.read_text(encoding="utf-8")
     broken = cli("doctor", "--offline", "--format", "json")
     checks = {c["name"]: c for c in json.loads(broken.stdout)["checks"]}
     assert (
@@ -107,7 +109,7 @@ def test_fix_repairs_permissions_and_migrations_but_never_secrets(
         checks["config-file"]["status"] == "ok"
         and checks["config-file"]["fixed"] == "set mode 0600"
     )
-    assert path.read_text() == before  # the secret itself was never touched
+    assert path.read_text(encoding="utf-8") == before  # the secret itself was never touched
     assert SENTINEL_KEY not in fixed.stdout and SENTINEL_KEY not in fixed.stderr
     assert checks["setting:fred_api_key"]["message"] == "fred_api_key: present (from file)"
 
@@ -138,7 +140,7 @@ def test_legacy_directory_reports_the_move_without_moving(
 ) -> None:
     legacy = tmp_path / "old-config"
     legacy.mkdir()
-    (legacy / "config.toml").write_text("x = 1\n")
+    (legacy / "config.toml").write_text("x = 1\n", encoding="utf-8")
     monkeypatch.setattr(doc, "legacy_dirs", lambda: [legacy, tmp_path / "absent"])
     [report] = run_checks(make_context(), offline=True, only=["legacy-directories"])
     assert report.status == "warn"
@@ -297,7 +299,7 @@ def test_config_file_check_paths(make_context: Callable[..., Context], env: dict
     [report] = run_checks(ctx, only=["config-file"], fix=True)
     assert report.fixed is None
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("bad = [\n")
+    path.write_text("bad = [\n", encoding="utf-8")
     path.chmod(0o600)
     assert run_checks(make_context(), only=["config-file"])[0].status == "fail"
 
