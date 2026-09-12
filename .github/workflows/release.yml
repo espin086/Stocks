@@ -1,0 +1,183 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "Where to publish"
+        type: choice
+        options: [testpypi, pypi]
+        default: testpypi
+        required: true
+
+permissions:
+  contents: read
+
+# Never run two releases at once, and never cancel one midway -- a half-finished
+# publish is worse than a slow one.
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Decide whether this push is a release. PyPI versions are immutable, so
+  # "publish on every push to main" can only mean "publish when the version in
+  # __about__.py names a release that does not exist yet".
+  # ---------------------------------------------------------------------------
+  decide:
+    name: Should we publish?
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.check.outputs.version }}
+      publish: ${{ steps.check.outputs.publish }}
+      target: ${{ steps.check.outputs.target }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - id: check
+        name: Compare the declared version against the index
+        env:
+          TARGET: ${{ inputs.target || 'pypi' }}
+          RELEASE_ENABLED: ${{ vars.RELEASE_ENABLED }}
+        run: python .github/scripts/check_release.py >> "$GITHUB_OUTPUT"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Release decision"
+            echo ""
+            echo "| | |"
+            echo "|---|---|"
+            echo "| Version | \`${{ steps.check.outputs.version }}\` |"
+            echo "| Target | \`${{ steps.check.outputs.target }}\` |"
+            echo "| Publish | \`${{ steps.check.outputs.publish }}\` |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  # ---------------------------------------------------------------------------
+  # Re-run the full quality gate on the exact commit being released. Calling the
+  # CI workflow rather than copying its steps means the release gate cannot
+  # drift from the PR gate.
+  # ---------------------------------------------------------------------------
+  verify:
+    name: Verify
+    needs: decide
+    if: needs.decide.outputs.publish == 'true'
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  build:
+    name: Build distributions
+    needs: [decide, verify]
+    if: needs.decide.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install build twine
+      - run: python -m build
+      - run: twine check --strict dist/*
+
+      - name: Assert the built version matches the decision
+        # Guards against a build that silently produces a different version than
+        # the one whose absence from the index authorized this publish.
+        env:
+          EXPECTED: ${{ needs.decide.outputs.version }}
+        run: |
+          ls -1 dist/
+          test -f "dist/quantfolio_cli-${EXPECTED}-py3-none-any.whl" \
+            || { echo "::error::No wheel for expected version ${EXPECTED}"; exit 1; }
+          test -f "dist/quantfolio_cli-${EXPECTED}.tar.gz" \
+            || { echo "::error::No sdist for expected version ${EXPECTED}"; exit 1; }
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+          if-no-files-found: error
+
+  publish:
+    name: Publish to ${{ needs.decide.outputs.target }}
+    needs: [decide, build]
+    if: needs.decide.outputs.publish == 'true'
+    runs-on: ubuntu-latest
+    # The environment is the human control point: add required reviewers to it
+    # in repo settings to turn every publish into an approval gate.
+    environment:
+      name: ${{ needs.decide.outputs.target }}
+      url: ${{ needs.decide.outputs.target == 'pypi' && format('https://pypi.org/project/quantfolio-cli/{0}/', needs.decide.outputs.version) || format('https://test.pypi.org/project/quantfolio-cli/{0}/', needs.decide.outputs.version) }}
+    permissions:
+      # Trusted Publishing (OIDC). No API token is stored anywhere in this repo.
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+
+      - name: Publish
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          repository-url: ${{ needs.decide.outputs.target == 'testpypi' && 'https://test.pypi.org/legacy/' || '' }}
+          print-hash: true
+          # PEP 740 attestations are signed with the same OIDC identity, so a
+          # consumer can verify which workflow in which repo built the artifact.
+          attestations: true
+
+  github-release:
+    name: Tag and create GitHub release
+    needs: [decide, publish]
+    if: needs.decide.outputs.publish == 'true' && needs.decide.outputs.target == 'pypi'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-dist
+          path: dist/
+
+      - name: Create tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ needs.decide.outputs.version }}
+        run: |
+          if gh release view "v${VERSION}" >/dev/null 2>&1; then
+            echo "Release v${VERSION} already exists; attaching nothing."
+            exit 0
+          fi
+          gh release create "v${VERSION}" dist/* \
+            --title "v${VERSION}" \
+            --generate-notes \
+            --verify-tag=false
+
+  # Runs on every push to main, including the ones that publish nothing, so the
+  # run log always says why.
+  report:
+    name: Report
+    needs: decide
+    if: always() && needs.decide.outputs.publish != 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: No release for this push
+        run: |
+          echo "Version ${{ needs.decide.outputs.version }} is already on the index."
+          echo "Bump the version in src/quantfolio/__about__.py to cut a release."
+          {
+            echo "### No release"
+            echo ""
+            echo "Version \`${{ needs.decide.outputs.version }}\` already exists on the index."
+            echo "Bump \`src/quantfolio/__about__.py\` and add a \`CHANGELOG.md\` entry to publish."
+          } >> "$GITHUB_STEP_SUMMARY"

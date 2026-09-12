@@ -8,6 +8,7 @@ before it is used.
 
 | # | Milestone | Depends on | Est. | Planning depth |
 |---|---|---|---|---|
+| 0000 | Release engineering: CI gate + PyPI pipeline | — | done | proposal + spec + tasks |
 | 0001 | Foundation: data layer + CLI shell | — | ~27h | proposal + specs + design + tasks |
 | 0002 | **Portfolio optimization → v1.0.0** | 0001 | ~48h | proposal + spec + design + tasks |
 | 0003 | Equity & factor analysis → v1.1 | 0001, 0002 | ~35h est. | proposal + spec |

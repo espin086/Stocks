@@ -74,11 +74,28 @@ linear-programming portfolio optimizer and the `yfinance` puller that `quantfoli
 supersedes. `legacy_code/Financial Portfolio Optimization.R` is the reference
 implementation for `core/optimize.py` and the source of its regression fixtures.
 
+## Releasing
+
+Releases are **version-gated pushes to `main`** — bump `__version__` in
+`src/quantfolio/__about__.py`, add a `CHANGELOG.md` section for it, merge. The
+pipeline re-runs the full CI gate on that commit and publishes to PyPI. A push
+to `main` that does not change the version publishes nothing.
+
+- The release workflow **calls** `ci.yml` rather than restating its steps. When
+  adding a check, add it to `ci.yml` and the release inherits it.
+- Never add a PyPI token to this repo. Publishing is OIDC Trusted Publishing.
+- Never make `pip-audit` soft-fail. An unfixable advisory gets a named
+  `--ignore-vuln` with a written reason — see `docs/RELEASING.md`.
+- The distribution is `quantfolio-cli`; the import package and CLI stay
+  `quantfolio` / `qf`. `tests/test_packaging.py` pins this.
+
 ## Commands
 
 ```bash
 pip install -e ".[dev]"
+pre-commit install                         # same checks CI runs
 pytest -m "not network"                    # full suite, offline
 pytest tests/core/test_optimize.py -k sharpe
 ruff check . && ruff format --check . && mypy
+python .github/scripts/check_release.py    # what would the next merge publish?
 ```

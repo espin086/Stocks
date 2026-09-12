@@ -21,3 +21,10 @@ def test_version_flag_prints_version() -> None:
 def test_bare_invocation_shows_help() -> None:
     result = runner.invoke(app, [])
     assert "quantfolio" in result.stdout
+
+
+def test_version_callback_is_inert_when_flag_absent() -> None:
+    """`--version` short-circuits; its absence must not alter normal dispatch."""
+    from quantfolio.cli.main import _version_callback
+
+    assert _version_callback(False) is None

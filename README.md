@@ -1,5 +1,11 @@
 # quantfolio
 
+[![CI](https://github.com/espin086/Stocks/actions/workflows/ci.yml/badge.svg)](https://github.com/espin086/Stocks/actions/workflows/ci.yml)
+[![Release](https://github.com/espin086/Stocks/actions/workflows/release.yml/badge.svg)](https://github.com/espin086/Stocks/actions/workflows/release.yml)
+[![PyPI](https://img.shields.io/pypi/v/quantfolio-cli.svg)](https://pypi.org/project/quantfolio-cli/)
+[![Python](https://img.shields.io/pypi/pyversions/quantfolio-cli.svg)](https://pypi.org/project/quantfolio-cli/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 A one-stop **CLI for equity analysis** — market data, portfolio optimization, factor
 models, econometrics, and real-world goal planning, in one tool.
 
@@ -50,10 +56,21 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 ## Install
 
 ```bash
+pip install quantfolio-cli          # (once the first release is published)
+```
+
+Or for development:
+
+```bash
 git clone https://github.com/espin086/Stocks.git
 cd Stocks
-pip install -e ".[dev]"     # development
+pip install -e ".[dev]"
+pre-commit install                  # optional: run CI's checks before each commit
 ```
+
+> **On the name:** the distribution is `quantfolio-cli` because `quantfolio` on
+> PyPI is held by an unrelated 2019 package. The import package and the CLI are
+> both `quantfolio` — `import quantfolio`, `qf --help`.
 
 **No API key is required** for the core tool. Prices come from yfinance and factor
 returns from the Ken French Data Library, both keyless. A free
@@ -98,6 +115,26 @@ mypy
 
 Tests never hit the network by default. Provider payloads are recorded as fixtures;
 math is tested against hand-computed and textbook values.
+
+### CI
+
+Every pull request runs lint, format, `mypy --strict`, and the test suite on
+Python 3.11–3.13 (Linux) plus 3.12 on macOS and Windows, then builds the wheel
+and sdist, installs the wheel into a clean environment and runs it, and audits
+the dependency tree. CodeQL and Dependabot run alongside. One aggregated status
+check, **All checks passed**, gates merges.
+
+### Releases
+
+Releasing is a version bump. Change `__version__` in
+`src/quantfolio/__about__.py`, add a `CHANGELOG.md` section, merge to `main` —
+the pipeline re-runs the full gate on that commit and publishes to PyPI via
+Trusted Publishing (OIDC, no stored token) with PEP 740 attestations, then tags
+and creates the GitHub release. Any push to `main` that doesn't change the
+version publishes nothing.
+
+See **[docs/RELEASING.md](docs/RELEASING.md)** for the one-time setup and the
+failure playbook.
 
 ## Contributing
 
