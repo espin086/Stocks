@@ -168,7 +168,10 @@ jobs:
   report:
     name: Report
     needs: decide
-    if: always() && needs.decide.outputs.publish != 'true'
+    # Only when `decide` actually ran and said no. If `decide` itself failed the
+    # run is already red, and a cheerful "no release needed" summary there would
+    # be actively misleading.
+    if: needs.decide.result == 'success' && needs.decide.outputs.publish != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: No release for this push
