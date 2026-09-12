@@ -64,7 +64,7 @@ def test_reer_is_taken_as_published() -> None:
     frame = provider.get_reer(["US", "GB"], date(2020, 1, 1), date(2020, 12, 31))
     assert list(frame.columns) == ["US", "GB"] and len(frame) == 12
     assert frame.attrs["index_base"] == "2020 = 100" and frame.attrs["provider"] == "bis"
-    series = parse_bis("US", (FIXTURES / "bis" / "US.csv").read_text())
+    series = parse_bis("US", (FIXTURES / "bis" / "US.csv").read_text(encoding="utf-8"))
     assert series.loc["2020-06-30"] == pytest.approx(100.0, abs=0.01)  # the base month
 
 

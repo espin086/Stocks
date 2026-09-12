@@ -145,8 +145,8 @@ def record_documents(start: date, end: date) -> None:
         out = ROOT / name
         out.mkdir(parents=True, exist_ok=True)
         for code in codes:
-            (out / f"{code}.{ext}").write_text(source.payload(code))
-        (out / "meta.json").write_text(_meta(name))
+            (out / f"{code}.{ext}").write_text(source.payload(code), encoding="utf-8")
+        (out / "meta.json").write_text(_meta(name), encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:

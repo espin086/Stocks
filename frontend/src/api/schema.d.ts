@@ -1394,10 +1394,9 @@ export interface components {
             origin: string;
             /**
              * Return
-             * @description Annual return.
-             * @default 0.07
+             * @description Annual return for the years-to-goal effect (default 7%).
              */
-            return: number;
+            return?: number | null;
             /**
              * Target
              * @description Or a target amount directly.

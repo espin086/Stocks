@@ -398,12 +398,15 @@ def write_ppp(rng: np.random.Generator) -> None:
             "total": len(rows),
             "lastupdated": "2025-07-01",
         }
-        (wb / f"{code}.json").write_text(json.dumps([meta, rows], indent=1) + "\n")
+        (wb / f"{code}.json").write_text(
+            json.dumps([meta, rows], indent=1) + "\n", encoding="utf-8"
+        )
     (wb / "meta.json").write_text(
         json.dumps(
             {"recorded_at": None, "synthesized_at": stamp, "provider": "worldbank"}, indent=2
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     oe = ROOT / "oecd"
     oe.mkdir(parents=True, exist_ok=True)
@@ -421,10 +424,11 @@ def write_ppp(rng: np.random.Generator) -> None:
                 f"DATAFLOW,OECD.SDD.NAD:DSD_NAMAIN10@DF_TABLE4(1.0),I,{code},{code},A,PPP_B1GQ,"
                 f"{year},{level * drift:.4f},LCU_USD,2025-06-15"
             )
-        (oe / f"{code}.csv").write_text("\n".join(lines) + "\n")
+        (oe / f"{code}.csv").write_text("\n".join(lines) + "\n", encoding="utf-8")
     (oe / "meta.json").write_text(
         json.dumps({"recorded_at": None, "synthesized_at": stamp, "provider": "oecd"}, indent=2)
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     bis = ROOT / "bis"
     bis.mkdir(parents=True, exist_ok=True)
@@ -435,10 +439,11 @@ def write_ppp(rng: np.random.Generator) -> None:
         lines = ["KEY,FREQ,EER_TYPE,EER_BASKET,REF_AREA,TIME_PERIOD,OBS_VALUE,OBS_STATUS"]
         for m, v in zip(months, walk, strict=True):
             lines.append(f"M.R.B.{code},M,R,B,{code},{m},{v:.2f},A")
-        (bis / f"{code}.csv").write_text("\n".join(lines) + "\n")
+        (bis / f"{code}.csv").write_text("\n".join(lines) + "\n", encoding="utf-8")
     (bis / "meta.json").write_text(
         json.dumps({"recorded_at": None, "synthesized_at": stamp, "provider": "bis"}, indent=2)
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     fred = ROOT / "fred"
     monthly = pd.date_range(START, END, freq="MS")
@@ -457,7 +462,7 @@ def write_ppp(rng: np.random.Generator) -> None:
             for d, v in zip(monthly, values, strict=True)
         ]
         payload = {"file_type": "json", "count": len(rows), "observations": rows}
-        (fred / f"{name}.json").write_text(json.dumps(payload, indent=1) + "\n")
+        (fred / f"{name}.json").write_text(json.dumps(payload, indent=1) + "\n", encoding="utf-8")
 
 
 def main() -> None:

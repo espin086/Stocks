@@ -120,7 +120,7 @@ class FixtureDocumentSource:
                 f"{self.provider} has no series for {country}",
                 hint="check the ISO 3166-1 alpha-3 code",
             )
-        return path.read_text()
+        return path.read_text(encoding="utf-8")
 
 
 def fixture_source(provider: str, root: Path) -> Any:

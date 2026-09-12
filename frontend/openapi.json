@@ -55,10 +55,16 @@
             "type": "string"
           },
           "return": {
-            "default": 0.07,
-            "description": "Annual return.",
-            "title": "Return",
-            "type": "number"
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual return for the years-to-goal effect (default 7%).",
+            "title": "Return"
           },
           "target": {
             "anyOf": [
