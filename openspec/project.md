@@ -278,6 +278,40 @@ came before it.
 0011 is out of band: it renames the project and can land at any point, though the
 longer it waits the more published artifacts carry the old name.
 
+## Versioning and releasing
+
+SemVer, and the version has exactly one home: `src/sobres/__about__.py`. Nothing
+else declares it. `pyproject.toml` reads it dynamically, the wheel metadata, the
+container tag, and `sobres --version` all derive from it, and a packaging test
+fails the build if any of them disagree.
+
+**The version bump is the release trigger.** Merging a bump to `main` publishes;
+any other merge publishes nothing and says so. There is no separate release
+command to remember and no window where `main` is "about to be" released.
+
+| Rule | Enforced by |
+|---|---|
+| One version source | `tests/test_packaging.py` asserts installed metadata parity |
+| A published version is never re-published | `check_release.py` queries the index and fails closed on any non-404 error |
+| Every version has a CHANGELOG section | the release gate refuses a bump without one |
+| Every published version is tagged and has a GitHub release | the publish job creates both, from the CHANGELOG section |
+| Nothing publishes from a red build | `release.yml` calls `ci.yml` via `workflow_call`; one definition of green |
+| Nothing publishes from an unreviewed commit | `main` is protected: pull request required, `All checks passed` required, admin-only merge, linear history |
+| Publishing is off until deliberately armed | the repository variable `RELEASE_ENABLED` must be `true` |
+
+Pre-1.0 the minor version carries breaking changes. From v1.0.0 — shipped by 0002 —
+the CLI's command surface, its `--format json` shapes, and the `sobres.core` public
+functions are the compatibility surface, and breaking any of them is a major bump.
+Anything under a module named `_internal` is not part of it.
+
+Credentials, by index and registry:
+
+| Target | Credential | Scope |
+|---|---|---|
+| PyPI | `PYPI_PROD` | organization secret, shared across `AI-Solutions-Lab-LLC` |
+| TestPyPI | `PYPI_TEST` | organization secret |
+| Docker Hub | `DOCKERHUB_USERNAME`, `DOCKERHUB_TOKEN` | repository secrets — only this repository publishes an image |
+
 ## Non-negotiables
 
 1. **Not investment advice.** Every report-style output carries a disclaimer footer.
@@ -296,3 +330,6 @@ longer it waits the more published artifacts carry the old name.
    the build fails if it does not.
 9. **No forecasting of exchange rates, ever.** PPP is reported as a valuation
    gap, never as a signal, a target, or a convergence path.
+10. **Every release is versioned, gated, and recorded.** Nothing reaches an index
+    or a registry except through the pipeline in 0000, from a green `main`, with a
+    CHANGELOG section and a git tag. No manual upload, ever.

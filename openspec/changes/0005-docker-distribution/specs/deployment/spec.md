@@ -124,15 +124,37 @@
 
 #### Scenario: Provenance
 - **WHEN** an image is published
-- **THEN** a build attestation and an SBOM SHALL be attached, matching the
-  provenance guarantee 0000 already makes for the wheel
+- **THEN** `build-push-action` SHALL be configured with `provenance: mode=max` and
+  `sbom: true`, so BuildKit attaches a provenance attestation and an SBOM to the
+  manifest
+- **AND** the attestation SHALL be understood as a BuildKit build attestation, not
+  an OIDC-signed identity; the pipeline SHALL NOT claim provenance stronger than
+  that
+
+#### Scenario: Registry
+- **WHEN** an image is published
+- **THEN** the registry SHALL be Docker Hub
+- **AND** the repository SHALL be `aisolutionslab/sobres`
 
 #### Scenario: Credentials
-- **WHEN** the pipeline authenticates to the registry
-- **THEN** it SHALL use a scoped access token held as a repository secret, used by
-  no other job
+- **WHEN** the pipeline authenticates to Docker Hub
+- **THEN** it SHALL use `docker/login-action` with the repository secrets
+  `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`
+- **AND** `DOCKERHUB_TOKEN` SHALL be a scoped Docker Hub access token with write
+  access to this repository only, never the account password
+- **AND** the secrets SHALL be repository-level, not organization-level, because
+  only this repository publishes an image; they move to the organization the day a
+  second repository needs them
+- **AND** they SHALL be read by the push job alone
 - **AND** publishing SHALL be disarmed by default, as PyPI publishing is, until
   explicitly enabled
+
+#### Scenario: Build and push
+- **WHEN** the push job runs
+- **THEN** it SHALL use `docker/setup-qemu-action`, `docker/setup-buildx-action`
+  and `docker/build-push-action`
+- **AND** the image SHALL be built once per release and pushed for every
+  architecture from that single build, not rebuilt per tag
 
 #### Scenario: Size budget
 - **WHEN** the image is built

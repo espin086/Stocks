@@ -47,8 +47,10 @@ config resolution chain the CLI already uses keeps those the same thing.
   wheel, and a slim runtime stage carries neither toolchain.
 - `docker-compose.yml`, `.dockerignore`.
 - **New CLI group `sobres deploy`** — `compose`, `check`, `env`.
-- Docker Hub publishing added to 0000's release pipeline, on the same version gate
-  and the same OIDC identity, for `linux/amd64` and `linux/arm64`.
+- Docker Hub publishing added to 0000's release pipeline, on the same version gate,
+  for `linux/amd64` and `linux/arm64`. Authentication is `docker/login-action` with
+  the repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`; the push is
+  `docker/build-push-action` to `aisolutionslab/sobres`.
 
 ## The CLI is the entrypoint
 
