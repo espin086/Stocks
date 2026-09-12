@@ -8,6 +8,12 @@ the version declared in ``__about__.py`` is not yet on the index".
 Writes ``version``, ``target`` and ``publish`` as ``KEY=value`` lines on stdout,
 which the workflow appends to ``$GITHUB_OUTPUT``.
 
+stdout is therefore a machine interface: it carries ONLY ``key=value`` lines.
+Every human-facing message goes to stderr. ``$GITHUB_OUTPUT`` rejects any line
+that is not ``key=value``, so a stray informational print on stdout fails the
+whole job -- which is exactly what happened on the first push to ``main``.
+``tests/test_release_script.py`` enforces the contract.
+
 Run locally to see what the next push to main would do::
 
     python .github/scripts/check_release.py
@@ -36,6 +42,16 @@ INDEXES = {
 
 # PEP 440, restricted to the subset this project actually uses.
 VERSION_RE = re.compile(r"^\d+\.\d+\.\d+(?:(?:a|b|rc)\d+)?(?:\.dev\d+)?$")
+
+
+def note(message: str) -> None:
+    """Human-facing progress line. stderr, never stdout -- stdout is $GITHUB_OUTPUT."""
+    print(message, file=sys.stderr)
+
+
+def emit(key: str, value: str) -> None:
+    """The only writer to stdout: one ``key=value`` line for $GITHUB_OUTPUT."""
+    print(f"{key}={value}")
 
 
 def fail(message: str) -> None:
@@ -86,10 +102,11 @@ def main() -> None:
     # runs (workflow_dispatch) are always allowed -- that is how you rehearse.
     enabled = os.environ.get("RELEASE_ENABLED", "").strip().lower() == "true"
     if target == "pypi" and not enabled:
-        print("Releases to PyPI are not armed (repository variable RELEASE_ENABLED != 'true').")
-        print("See docs/RELEASING.md for the one-time Trusted Publishing setup.")
-        for key, value in (("version", read_version()), ("target", target), ("publish", "false")):
-            print(f"{key}={value}")
+        note("Releases to PyPI are not armed (repository variable RELEASE_ENABLED != 'true').")
+        note("See docs/RELEASING.md for the one-time Trusted Publishing setup.")
+        emit("version", read_version())
+        emit("target", target)
+        emit("publish", "false")
         return
 
     version = read_version()
@@ -103,13 +120,13 @@ def main() -> None:
     existing = released_versions(dist_name, target)
 
     if existing is None:
-        print(f"{dist_name} is not on {target} yet -- this would be the first release.")
+        note(f"{dist_name} is not on {target} yet -- this would be the first release.")
         publish = True
     elif version in existing:
-        print(f"{dist_name} {version} is already on {target}; nothing to publish.")
+        note(f"{dist_name} {version} is already on {target}; nothing to publish.")
         publish = False
     else:
-        print(f"{dist_name} {version} is not on {target}; it will be published.")
+        note(f"{dist_name} {version} is not on {target}; it will be published.")
         publish = True
 
     # Release discipline: a version that ships must be described. Checked only
@@ -122,12 +139,9 @@ def main() -> None:
                 f"Add a '## [{version}]' heading describing the release."
             )
 
-    for key, value in (
-        ("version", version),
-        ("target", target),
-        ("publish", str(publish).lower()),
-    ):
-        print(f"{key}={value}")
+    emit("version", version)
+    emit("target", target)
+    emit("publish", str(publish).lower())
 
 
 if __name__ == "__main__":
