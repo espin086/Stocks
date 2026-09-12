@@ -37,7 +37,7 @@ repos:
       - id: mypy
         # Match CI: type-check the package, not stray scripts, and give mypy the
         # real dependencies so `--strict` means the same thing in both places.
-        files: ^src/quantfolio/
+        files: ^src/sobres/
         additional_dependencies:
           - typer>=0.12
           - rich>=13.7

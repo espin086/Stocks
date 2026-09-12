@@ -54,8 +54,8 @@ Cross-field rules (weights match tickers, `--portfolio` excludes `--tickers`)
 are model validators, never handler code.
 
 **Never read `os.environ` for a setting.** Declare it in `settings.py` — env
-var, secret flag, how to obtain it, optional live validator — and `qf init`,
-`qf doctor`, `qf config`, and the 0004 settings page derive from that. A test
+var, secret flag, how to obtain it, optional live validator — and `sobres init`,
+`sobres doctor`, `sobres config`, and the 0004 settings page derive from that. A test
 fails the build on an undeclared env var. **When you add a provider, a setting,
 or a runtime dependency, register a doctor `Check` in the same change**; a
 test asserts every setting and provider has one. Every failing doctor line
@@ -76,7 +76,7 @@ output, never silently accepted or claimed to be corrected.
 ## Storage is a port, not a database
 
 Persistence goes through repository protocols in `data/storage/base.py`. The
-SQLite adapter is one implementation; `QUANTFOLIO_DB_URL` selects it.
+SQLite adapter is one implementation; `SOBRES_DB_URL` selects it.
 
 - **Never import a database driver outside `data/storage/adapters/`** — not
   `sqlite3`, not `sqlalchemy`. A test enforces this.
@@ -96,7 +96,7 @@ SQLite adapter is one implementation; `QUANTFOLIO_DB_URL` selects it.
 - One SQLite file holding everything is a property of the *default backend*, not
   of the system. Don't add a second store (a cache directory, a JSON sidecar, a
   pickle) — that would break it for no gain.
-- `qf cache clear` removes cached observations only. It must never touch
+- `sobres cache clear` removes cached observations only. It must never touch
   user-authored rows.
 - API keys and database URLs are secrets: config file at `0600`, never in the
   database, always redacted in output.
@@ -180,14 +180,14 @@ new code (see the table in `openspec/project.md` for what to lift from each):
 `fire-calculator`, `CompountInterestAPI`, `NewsWaveMetrics`, `jjutils`, `Econometrics`.
 
 This repository's own `legacy_code/` is the first place to look: it holds the R
-linear-programming portfolio optimizer and the `yfinance` puller that `quantfolio`
+linear-programming portfolio optimizer and the `yfinance` puller that `sobres`
 supersedes. `legacy_code/Financial Portfolio Optimization.R` is the reference
 implementation for `core/optimize.py` and the source of its regression fixtures.
 
 ## Releasing
 
 Releases are **version-gated pushes to `main`** — bump `__version__` in
-`src/quantfolio/__about__.py`, add a `CHANGELOG.md` section for it, merge. The
+`src/sobres/__about__.py`, add a `CHANGELOG.md` section for it, merge. The
 pipeline re-runs the full CI gate on that commit and publishes to PyPI. A push
 to `main` that does not change the version publishes nothing.
 
@@ -196,8 +196,9 @@ to `main` that does not change the version publishes nothing.
 - Never add a PyPI token to this repo. Publishing is OIDC Trusted Publishing.
 - Never make `pip-audit` soft-fail. An unfixable advisory gets a named
   `--ignore-vuln` with a written reason — see `docs/RELEASING.md`.
-- The distribution is `quantfolio-cli`; the import package and CLI stay
-  `quantfolio` / `qf`. `tests/test_packaging.py` pins this.
+- The distribution, the import package, and the CLI are all `sobres`.
+  `tests/test_packaging.py` pins this, and `tests/test_rebrand.py` fails on
+  any residual old name.
 
 ## Commands
 

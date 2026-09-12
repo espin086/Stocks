@@ -75,7 +75,7 @@ one arrives — which by 0002 is every risk and optimization function.
 - A metrics pipeline; logs and traces only
 - Exchange-rate forecasting, currency trading, carry strategies, or FX timing.
   Rates are near a random walk at these horizons and PPP has no short-run
-  predictive power; a `qf fx forecast` would be the most misleading thing here
+  predictive power; a `sobres fx forecast` would be the most misleading thing here
 - Derivatives pricing. Hedged returns come from interest-rate differentials under
   covered interest parity, not from a forward or options model
 - Tax, residency, visa, or healthcare modeling for relocation

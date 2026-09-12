@@ -129,9 +129,8 @@ jobs:
           python -m venv /tmp/smoke
           /tmp/smoke/bin/pip install --upgrade pip
           /tmp/smoke/bin/pip install dist/*.whl
-          /tmp/smoke/bin/qf --version
-          /tmp/smoke/bin/quantfolio --version
-          /tmp/smoke/bin/python -c "import quantfolio; print(quantfolio.__version__)"
+          /tmp/smoke/bin/sobres --version
+          /tmp/smoke/bin/python -c "import sobres; print(sobres.__version__)"
 
       - name: Confirm the sdist builds a wheel
         run: |

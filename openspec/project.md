@@ -12,9 +12,9 @@
 | Landing page | https://ai-solutions-lab-llc.github.io/sobres/ |
 | Env var prefix | `SOBRES_` |
 
-The project was previously `espin086/Stocks`, packaged as `quantfolio` / `quantfolio-cli`
-with a `qf` console script. Change 0011 carries that rename through the code; every
-document here already uses the new names.
+The project was previously `espin086/Stocks`, packaged and installed under a
+different name. Change 0011 carries that rename through the code; every document
+here already uses the new names.
 
 ## What this is
 
