@@ -74,6 +74,9 @@ packages = ["src/sobres"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+# `tests` is a package (tests/conftest.py, tests/data/contracts.py are imported by name),
+# so the repository root must be importable whether pytest is run as `pytest` or `python -m pytest`.
+pythonpath = ["."]
 addopts = "-q --strict-markers"
 markers = [
   "network: test requires live network access (deselect with '-m \"not network\"')",
@@ -113,7 +116,8 @@ select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
 "tests/core/*" = ["RUF002", "RUF003"]
 
 [tool.mypy]
-python_version = "3.11"
+# No pinned python_version: check under the interpreter that runs mypy. Third-party stubs
+# (numpy 2.5+) use `type` statements that a 3.11 target rejects even on a 3.12 interpreter.
 packages = ["sobres"]
 strict = true
 warn_unreachable = true
