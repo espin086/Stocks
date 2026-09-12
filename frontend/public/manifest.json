@@ -50,6 +50,11 @@
     "watchlist.remove": "/commands/watchlist.remove",
     "watchlist.show": "/commands/watchlist.show",
     "analyze.stock": "/commands/analyze.stock",
-    "analyze.factors": "/commands/analyze.factors"
+    "analyze.factors": "/commands/analyze.factors",
+    "plan.retire": "/commands/plan.retire",
+    "plan.house": "/commands/plan.house",
+    "plan.car": "/commands/plan.car",
+    "plan.education": "/commands/plan.education",
+    "plan.goal": "/commands/plan.goal"
   }
 }

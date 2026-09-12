@@ -149,6 +149,7 @@ GROUP_HELP: dict[str, str] = {
     "token": "Manage the deployment token.",
     "deploy": "Generate and check the container deployment.",
     "analyze": "Single-stock dashboards and factor-model regressions.",
+    "plan": "Retirement, house, car, education and generic goals, with simulation.",
 }
 
 
