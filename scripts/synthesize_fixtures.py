@@ -128,7 +128,8 @@ def write_yfinance(rng: np.random.Generator) -> None:
             },
             indent=2,
         )
-        + "\n"
+        + "\n",
+        encoding="utf-8",
     )
     (out / "meta.json").write_text(
         json.dumps(

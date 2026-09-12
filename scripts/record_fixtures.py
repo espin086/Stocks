@@ -71,7 +71,7 @@ def record_yfinance(start: date, end: date) -> None:
         if info:
             fundamentals[ticker] = {k: info.get(k) for k in keys}
     (out / "fundamentals.json").write_text(
-        _meta("yfinance", provider_version=yf.__version__, tickers=fundamentals)
+        _meta("yfinance", provider_version=yf.__version__, tickers=fundamentals), encoding="utf-8"
     )
     (out / "meta.json").write_text(
         _meta("yfinance", provider_version=yf.__version__, tickers=tickers), encoding="utf-8"

@@ -42,7 +42,7 @@ class FixtureYahooSource:
         path = self.root / "fundamentals.json"
         if not path.exists():
             return None
-        docs = json.loads(path.read_text()).get("tickers", {})
+        docs = json.loads(path.read_text(encoding="utf-8")).get("tickers", {})
         info = docs.get(ticker.upper())
         return dict(info) if info else None
 
