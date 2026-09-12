@@ -92,7 +92,7 @@ def main() -> None:
         "solution": {v: round(float(x), 10) for v, x in zip(VEHICLES, w, strict=True)},
         "objective": round(value, 10),
     }
-    (OUT / "allocation.json").write_text(json.dumps(payload, indent=2) + "\n")
+    (OUT / "allocation.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload["solution"], indent=2), payload["objective"])
 
 

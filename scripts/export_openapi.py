@@ -35,14 +35,14 @@ def main(argv: list[str]) -> int:
     doc = build_document()
     text = json.dumps(doc, indent=2, sort_keys=True) + "\n"
     if "--check" in argv:
-        current = OUT.read_text() if OUT.exists() else ""
+        current = OUT.read_text(encoding="utf-8") if OUT.exists() else ""
         if current != text:
             print(f"{OUT} is stale; run: python scripts/export_openapi.py", file=sys.stderr)
             return 1
         print("openapi.json is current")
         return 0
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(text)
+    OUT.write_text(text, encoding="utf-8")
     print(f"wrote {OUT}")
     return 0
 

@@ -12,10 +12,10 @@ import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[2]
-DOCKERFILE = (REPO / "Dockerfile").read_text()
-CI = (REPO / ".github" / "workflows" / "ci.yml").read_text()
-RELEASE = (REPO / ".github" / "workflows" / "release.yml").read_text()
-COMPOSE = (REPO / "docker-compose.yml").read_text()
+DOCKERFILE = (REPO / "Dockerfile").read_text(encoding="utf-8")
+CI = (REPO / ".github" / "workflows" / "ci.yml").read_text(encoding="utf-8")
+RELEASE = (REPO / ".github" / "workflows" / "release.yml").read_text(encoding="utf-8")
+COMPOSE = (REPO / "docker-compose.yml").read_text(encoding="utf-8")
 
 
 def _stage(name: str) -> str:
@@ -37,7 +37,7 @@ def test_runtime_stage_is_minimal_and_installs_only_the_wheel() -> None:
 def test_no_secret_reaches_the_image() -> None:
     for pattern in ("API_KEY=", "TOKEN=", "PASSWORD=", "COPY config"):
         assert pattern not in DOCKERFILE, pattern
-    ignore = (REPO / ".dockerignore").read_text()
+    ignore = (REPO / ".dockerignore").read_text(encoding="utf-8")
     for entry in (".env", ".git", "tests", "frontend/node_modules"):
         assert entry in ignore.splitlines(), entry
     assert "scanners: vuln,secret" in RELEASE  # asserted by a scan, not by review
@@ -46,7 +46,7 @@ def test_no_secret_reaches_the_image() -> None:
 def test_health_is_doctor_not_a_second_notion() -> None:
     assert re.search(r'HEALTHCHECK[^\n]*\\\n\s*CMD \["sobres", "deploy", "health"', DOCKERFILE)
     assert '"CMD", "sobres", "deploy", "health"' in COMPOSE
-    app = (REPO / "src" / "sobres" / "api" / "app.py").read_text()
+    app = (REPO / "src" / "sobres" / "api" / "app.py").read_text(encoding="utf-8")
     assert "run_checks(state.context(), offline=True, only=READINESS_CHECKS)" in app
 
 

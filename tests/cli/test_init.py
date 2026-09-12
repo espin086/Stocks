@@ -62,7 +62,7 @@ def test_non_interactive_takes_values_from_environment(
         env_extra={"SOBRES_LOG_LEVEL": "INFO"},
     )
     assert "log_level" in json.loads(result.stdout)["changed"]
-    assert 'log_level = "INFO"' in Path(env["SOBRES_CONFIG_FILE"]).read_text()
+    assert 'log_level = "INFO"' in Path(env["SOBRES_CONFIG_FILE"]).read_text(encoding="utf-8")
 
 
 def test_non_interactive_missing_required_exits_3_naming_it(
@@ -130,7 +130,7 @@ def test_guided_wizard_walks_every_setting_and_masks_secrets(
     # every declared setting was walked, in order
     walked = [q for q in wizard.seen if any(q.strip().startswith(s.key) for s in all_settings())]
     assert [q.strip().split(" ")[0] for q in walked] == [s.key for s in all_settings()]
-    text = ctx.config.path.read_text()
+    text = ctx.config.path.read_text(encoding="utf-8")
     assert 'fred_api_key = "SECRET9999"' in text
     # re-run: current values are shown masked and kept when not replaced
     wizard2 = _Wizard({}, {"replace it": [False]})
@@ -153,19 +153,19 @@ def test_failed_live_validation_never_stores_silently(
     )
     ctx = _interactive(make_context, wizard)
     init(InitParams(offline=True), ctx)
-    assert 'fred_api_key = "GOOD"' in ctx.config.path.read_text()
+    assert 'fred_api_key = "GOOD"' in ctx.config.path.read_text(encoding="utf-8")
     # skip after a failure: nothing stored
     ctx.config.path.unlink()
     wizard = _Wizard({"fred_api_key": ["BAD"], "[r]etry": ["s"]}, {"verify it": [True]})
     ctx = _interactive(make_context, wizard)
     init(InitParams(offline=True), ctx)
-    assert "fred_api_key" not in ctx.config.path.read_text()
+    assert "fred_api_key" not in ctx.config.path.read_text(encoding="utf-8")
     # keep anyway is an explicit choice
     ctx.config.path.unlink()
     wizard = _Wizard({"fred_api_key": ["BAD"], "[r]etry": ["k"]}, {"verify it": [True]})
     ctx = _interactive(make_context, wizard)
     init(InitParams(offline=True), ctx)
-    assert 'fred_api_key = "BAD"' in ctx.config.path.read_text()
+    assert 'fred_api_key = "BAD"' in ctx.config.path.read_text(encoding="utf-8")
 
 
 def test_optional_setting_skipped_names_affected_commands(
@@ -185,7 +185,7 @@ def test_invalid_interactive_value_is_re_prompted(make_context: Callable[..., Co
     wizard = _Wizard({"log_level": ["LOUD", "ERROR"]}, {})
     ctx = _interactive(make_context, wizard)
     init(InitParams(offline=True), ctx)
-    assert 'log_level = "ERROR"' in ctx.config.path.read_text()
+    assert 'log_level = "ERROR"' in ctx.config.path.read_text(encoding="utf-8")
 
 
 def test_ends_by_running_doctor(cli: Callable[..., Any]) -> None:

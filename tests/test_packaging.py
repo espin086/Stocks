@@ -38,7 +38,7 @@ def test_installed_metadata_matches_source() -> None:
 
 def test_changelog_documents_the_current_version() -> None:
     """Every shippable version is described before it can be published."""
-    changelog = (REPO_ROOT / "CHANGELOG.md").read_text()
+    changelog = (REPO_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
     assert f"## [{__version__}]" in changelog, (
         f"CHANGELOG.md has no '## [{__version__}]' section. "
         "The release pipeline will refuse to publish this version."
@@ -52,7 +52,7 @@ def test_console_script_is_registered() -> None:
 
 def test_exactly_one_console_script_is_declared() -> None:
     """One name across every surface: no second alias entry point."""
-    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     assert list(pyproject["project"]["scripts"]) == ["sobres"]
 
 
@@ -71,11 +71,11 @@ def test_console_script_runs(script: str) -> None:
 
 
 def scripts_target(script: str) -> str:
-    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     return str(pyproject["project"]["scripts"][script])
 
 
 def test_distribution_name_is_stable() -> None:
     """Renaming the distribution silently would orphan users on PyPI."""
-    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text())
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
     assert pyproject["project"]["name"] == DIST_NAME

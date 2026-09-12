@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import os
 from collections.abc import Iterable, Mapping
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from sobres.__about__ import __version__
@@ -29,7 +29,8 @@ from sobres.doctor import Check, CheckReport, CheckResult, declare_check
 from sobres.settings import CONTAINER, DB_URL, Setting, all_settings
 
 IMAGE = "aisolutionslab/sobres"
-DATA_DIR = Path("/data")
+# A path inside the (Linux) image, so a pure POSIX path: it renders as /data on every host.
+DATA_DIR = PurePosixPath("/data")
 CONTAINER_PORT = 8787
 CONTAINER_UID = 1000
 CONTAINER_GID = 1000
@@ -89,7 +90,10 @@ def require_data_volume(config: Config) -> None:
 def container_user_status(config: Config) -> CheckResult:
     if not in_container(config):
         return CheckResult("skip", "not running in the container image")
-    uid = os.getuid()
+    getuid = getattr(os, "getuid", None)
+    if getuid is None:  # pragma: no cover - Windows has no uids; the image is Linux
+        return CheckResult("skip", "no uid on this platform")
+    uid = getuid()
     if uid == 0:
         return CheckResult(
             "fail",
