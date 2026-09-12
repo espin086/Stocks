@@ -43,7 +43,7 @@ MIN_PYTHON = (3, 11)
 MIN_FREE_BYTES = 200 * 1024 * 1024
 EXTRAS: dict[str, tuple[str, ...]] = {
     "data": ("yfinance",),
-    "econ": ("statsmodels",),
+    "econ": ("statsmodels", "arch"),
     "opt": ("cvxpy",),
     "otel": ("opentelemetry.sdk",),
     "web": ("fastapi", "uvicorn"),

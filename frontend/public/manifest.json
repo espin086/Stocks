@@ -55,6 +55,10 @@
     "plan.house": "/commands/plan.house",
     "plan.car": "/commands/plan.car",
     "plan.education": "/commands/plan.education",
-    "plan.goal": "/commands/plan.goal"
+    "plan.goal": "/commands/plan.goal",
+    "econ.forecast": "/commands/econ.forecast",
+    "econ.volatility": "/commands/econ.volatility",
+    "econ.diagnose": "/commands/econ.diagnose",
+    "econ.regress": "/commands/econ.regress"
   }
 }

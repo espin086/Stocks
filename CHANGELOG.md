@@ -12,6 +12,16 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 ## [Unreleased]
 
 ### Added
+- **Econometrics and forecasting (change 0009).** `sobres econ diagnose`
+  (ADF and KPSS with disagreement stated, ACF/PACF with bounds), `econ
+  forecast` (ARIMA differenced to stationarity with `d` reported, grid order
+  selection with the runners-up, mandatory 80%/95% intervals, Ljung-Box on
+  residuals), `econ volatility` (GARCH, EGARCH, EWMA; annualized; simulated
+  bands; seed printed) and `econ regress` (hac/hc0–hc3/none named, VIF over
+  10 flagged, R², F, Durbin-Watson, Breusch-Pagan). A GARCH constant-
+  correlation covariance joins the optimizer's estimator registry. The econ
+  extra gains `arch`; without it every `econ` command exits 3 with the
+  install hint.
 - **Goal planning (change 0008).** `sobres plan retire|house|car|education|goal`:
   a funding solver for any one of target, time, contribution and return; FIRE
   math ported from fire-calculator with its golden fixture; real (default,

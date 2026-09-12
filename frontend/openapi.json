@@ -36,7 +36,8 @@
               "sample",
               "ledoit_wolf",
               "ewma",
-              "semicovariance"
+              "semicovariance",
+              "garch"
             ],
             "title": "Covariance",
             "type": "string"
@@ -549,6 +550,61 @@
         "title": "DbRepairParams",
         "type": "object"
       },
+      "DiagnoseParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "lags": {
+            "default": 20,
+            "description": "ACF/PACF lags.",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "title": "Lags",
+            "type": "integer"
+          },
+          "series": {
+            "description": "A FRED series (DGS10) or a ticker (SPY, or ticker:X).",
+            "positional": true,
+            "title": "Series",
+            "type": "string"
+          },
+          "source": {
+            "default": "auto",
+            "description": "How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.",
+            "enum": [
+              "auto",
+              "fred",
+              "ticker"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "start": {
+            "default": "2010-01-01",
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "series"
+        ],
+        "title": "DiagnoseParams",
+        "type": "object"
+      },
       "DoctorParams": {
         "additionalProperties": false,
         "properties": {
@@ -951,6 +1007,112 @@
         "title": "FactorsParams",
         "type": "object"
       },
+      "ForecastParams": {
+        "additionalProperties": false,
+        "properties": {
+          "auto": {
+            "default": true,
+            "description": "Select the order by information criterion.",
+            "title": "Auto",
+            "type": "boolean"
+          },
+          "criterion": {
+            "default": "aic",
+            "description": "Criterion for --auto.",
+            "enum": [
+              "aic",
+              "bic"
+            ],
+            "title": "Criterion",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "horizon": {
+            "default": 12,
+            "description": "Steps ahead.",
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Horizon",
+            "type": "integer"
+          },
+          "max_p": {
+            "default": 3,
+            "description": "Largest AR order on the grid.",
+            "maximum": 5.0,
+            "minimum": 0.0,
+            "title": "Max P",
+            "type": "integer"
+          },
+          "max_q": {
+            "default": 3,
+            "description": "Largest MA order on the grid.",
+            "maximum": 5.0,
+            "minimum": 0.0,
+            "title": "Max Q",
+            "type": "integer"
+          },
+          "model": {
+            "const": "arima",
+            "default": "arima",
+            "description": "Forecasting model.",
+            "title": "Model",
+            "type": "string"
+          },
+          "order": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fixed p,d,q (e.g. 1,1,0); default: --auto over a grid.",
+            "title": "Order"
+          },
+          "series": {
+            "description": "A FRED series (CPIAUCSL) or a ticker (levels).",
+            "positional": true,
+            "title": "Series",
+            "type": "string"
+          },
+          "source": {
+            "default": "auto",
+            "description": "How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.",
+            "enum": [
+              "auto",
+              "fred",
+              "ticker"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "start": {
+            "default": "2010-01-01",
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "series"
+        ],
+        "title": "ForecastParams",
+        "type": "object"
+      },
       "FrontierParams": {
         "additionalProperties": false,
         "properties": {
@@ -979,7 +1141,8 @@
               "sample",
               "ledoit_wolf",
               "ewma",
-              "semicovariance"
+              "semicovariance",
+              "garch"
             ],
             "title": "Covariance",
             "type": "string"
@@ -1652,7 +1815,8 @@
               "sample",
               "ledoit_wolf",
               "ewma",
-              "semicovariance"
+              "semicovariance",
+              "garch"
             ],
             "title": "Covariance",
             "type": "string"
@@ -1966,6 +2130,89 @@
           "tickers"
         ],
         "title": "PricesParams",
+        "type": "object"
+      },
+      "RegressParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "hac_lags": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Newey-West lags for --robust hac.",
+            "title": "Hac Lags"
+          },
+          "robust": {
+            "default": "hac",
+            "description": "Covariance: hac, hc0-hc3 or none.",
+            "enum": [
+              "hac",
+              "hc0",
+              "hc1",
+              "hc2",
+              "hc3",
+              "none"
+            ],
+            "title": "Robust",
+            "type": "string"
+          },
+          "source": {
+            "default": "auto",
+            "description": "How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.",
+            "enum": [
+              "auto",
+              "fred",
+              "ticker"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "start": {
+            "default": "2010-01-01",
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "x": {
+            "description": "Regressors, same conventions.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "X",
+            "type": "array"
+          },
+          "y": {
+            "description": "Dependent series: a ticker (returns) or fred:SERIES (differences).",
+            "title": "Y",
+            "type": "string"
+          }
+        },
+        "required": [
+          "y",
+          "x"
+        ],
+        "title": "RegressParams",
         "type": "object"
       },
       "RetireParams": {
@@ -2544,6 +2791,91 @@
           }
         },
         "title": "VerifyBody",
+        "type": "object"
+      },
+      "VolatilityParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "horizon": {
+            "default": 30,
+            "description": "Steps ahead.",
+            "maximum": 250.0,
+            "minimum": 1.0,
+            "title": "Horizon",
+            "type": "integer"
+          },
+          "model": {
+            "default": "garch",
+            "description": "garch, egarch or ewma.",
+            "enum": [
+              "garch",
+              "egarch",
+              "ewma"
+            ],
+            "title": "Model",
+            "type": "string"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Seed; printed even when auto-generated.",
+            "title": "Seed"
+          },
+          "simulations": {
+            "default": 1000,
+            "description": "Paths for the intervals.",
+            "minimum": 100.0,
+            "title": "Simulations",
+            "type": "integer"
+          },
+          "source": {
+            "default": "auto",
+            "description": "How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.",
+            "enum": [
+              "auto",
+              "fred",
+              "ticker"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "start": {
+            "default": "2010-01-01",
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "ticker": {
+            "description": "A ticker whose returns are modelled.",
+            "positional": true,
+            "title": "Ticker",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ticker"
+        ],
+        "title": "VolatilityParams",
         "type": "object"
       },
       "WatchlistAddParams": {
@@ -3579,6 +3911,166 @@
         "summary": "Diagnose the install; every failing line says how to fix it.",
         "tags": [
           "root"
+        ]
+      }
+    },
+    "/api/v1/econ/diagnose": {
+      "post": {
+        "description": "Stationarity tests (ADF, KPSS) and ACF/PACF through lag 20 for one series.",
+        "operationId": "econ_diagnose_api_v1_econ_diagnose_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DiagnoseParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Stationarity tests (ADF, KPSS) and ACF/PACF through lag 20 for one series.",
+        "tags": [
+          "econ"
+        ]
+      }
+    },
+    "/api/v1/econ/forecast": {
+      "post": {
+        "description": "ARIMA forecast with 80% and 95% prediction intervals; order selection made visible.",
+        "operationId": "econ_forecast_api_v1_econ_forecast_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForecastParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "ARIMA forecast with 80% and 95% prediction intervals; order selection made visible.",
+        "tags": [
+          "econ"
+        ]
+      }
+    },
+    "/api/v1/econ/regress": {
+      "post": {
+        "description": "OLS with robust standard errors, VIF and residual diagnostics.",
+        "operationId": "econ_regress_api_v1_econ_regress_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegressParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "OLS with robust standard errors, VIF and residual diagnostics.",
+        "tags": [
+          "econ"
+        ]
+      }
+    },
+    "/api/v1/econ/volatility": {
+      "post": {
+        "description": "GARCH, EGARCH or EWMA conditional volatility forecast, annualized, with intervals.",
+        "operationId": "econ_volatility_api_v1_econ_volatility_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VolatilityParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "GARCH, EGARCH or EWMA conditional volatility forecast, annualized, with intervals.",
+        "tags": [
+          "econ"
         ]
       }
     },

@@ -32,12 +32,14 @@ RET = pd.DataFrame(
 
 def test_available_estimators() -> None:
     assert RETURN_METHODS == ("mean_historical", "ewma", "capm")
-    assert COV_METHODS == ("sample", "ledoit_wolf", "ewma", "semicovariance")
+    assert COV_METHODS == ("sample", "ledoit_wolf", "ewma", "semicovariance", "garch")
     for method in RETURN_METHODS:
         if method == "capm":
             continue
         assert list(expected_returns(RET, "daily", method).index) == ["A", "B"]  # type: ignore[arg-type]
     for method in COV_METHODS:
+        if method == "garch":
+            continue  # needs 30+ observations and the econ extra: tests/core/test_timeseries.py
         sigma = covariance(RET, "daily", method)  # type: ignore[arg-type]
         assert sigma.shape == (2, 2) and sigma.attrs["estimator"] == method
     with pytest.raises(ValueError):
@@ -104,6 +106,8 @@ def test_singular_case_raises_with_both_counts() -> None:
 
 def test_every_covariance_is_symmetric_and_psd() -> None:
     for method in COV_METHODS:
+        if method == "garch":
+            continue  # proved on a long simulated series in tests/core/test_timeseries.py
         sigma = covariance(RET, "daily", method)  # type: ignore[arg-type]
         values = sigma.to_numpy()
         assert np.allclose(values, values.T, atol=1e-10)

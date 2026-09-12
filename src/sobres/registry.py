@@ -150,6 +150,7 @@ GROUP_HELP: dict[str, str] = {
     "deploy": "Generate and check the container deployment.",
     "analyze": "Single-stock dashboards and factor-model regressions.",
     "plan": "Retirement, house, car, education and generic goals, with simulation.",
+    "econ": "Stationarity diagnostics, ARIMA and GARCH forecasts, robust regression.",
 }
 
 

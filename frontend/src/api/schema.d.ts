@@ -459,6 +459,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/econ/diagnose": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stationarity tests (ADF, KPSS) and ACF/PACF through lag 20 for one series.
+         * @description Stationarity tests (ADF, KPSS) and ACF/PACF through lag 20 for one series.
+         */
+        post: operations["econ_diagnose_api_v1_econ_diagnose_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/econ/forecast": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * ARIMA forecast with 80% and 95% prediction intervals; order selection made visible.
+         * @description ARIMA forecast with 80% and 95% prediction intervals; order selection made visible.
+         */
+        post: operations["econ_forecast_api_v1_econ_forecast_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/econ/regress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * OLS with robust standard errors, VIF and residual diagnostics.
+         * @description OLS with robust standard errors, VIF and residual diagnostics.
+         */
+        post: operations["econ_regress_api_v1_econ_regress_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/econ/volatility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * GARCH, EGARCH or EWMA conditional volatility forecast, annualized, with intervals.
+         * @description GARCH, EGARCH or EWMA conditional volatility forecast, annualized, with intervals.
+         */
+        post: operations["econ_volatility_api_v1_econ_volatility_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -1148,7 +1228,7 @@ export interface components {
              * @default ledoit_wolf
              * @enum {string}
              */
-            covariance: "sample" | "ledoit_wolf" | "ewma" | "semicovariance";
+            covariance: "sample" | "ledoit_wolf" | "ewma" | "semicovariance" | "garch";
             /**
              * End
              * @description Last date (default: today).
@@ -1437,6 +1517,39 @@ export interface components {
              */
             to?: string | null;
         };
+        /** DiagnoseParams */
+        DiagnoseParams: {
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Lags
+             * @description ACF/PACF lags.
+             * @default 20
+             */
+            lags: number;
+            /**
+             * Series
+             * @description A FRED series (DGS10) or a ticker (SPY, or ticker:X).
+             */
+            series: string;
+            /**
+             * Source
+             * @description How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.
+             * @default auto
+             * @enum {string}
+             */
+            source: "auto" | "fred" | "ticker";
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             * @default 2010-01-01
+             */
+            start: string;
+        };
         /** DoctorParams */
         DoctorParams: {
             /**
@@ -1664,6 +1777,76 @@ export interface components {
              */
             start?: string | null;
         };
+        /** ForecastParams */
+        ForecastParams: {
+            /**
+             * Auto
+             * @description Select the order by information criterion.
+             * @default true
+             */
+            auto: boolean;
+            /**
+             * Criterion
+             * @description Criterion for --auto.
+             * @default aic
+             * @enum {string}
+             */
+            criterion: "aic" | "bic";
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Horizon
+             * @description Steps ahead.
+             * @default 12
+             */
+            horizon: number;
+            /**
+             * Max P
+             * @description Largest AR order on the grid.
+             * @default 3
+             */
+            max_p: number;
+            /**
+             * Max Q
+             * @description Largest MA order on the grid.
+             * @default 3
+             */
+            max_q: number;
+            /**
+             * Model
+             * @description Forecasting model.
+             * @default arima
+             * @constant
+             */
+            model: "arima";
+            /**
+             * Order
+             * @description Fixed p,d,q (e.g. 1,1,0); default: --auto over a grid.
+             */
+            order?: string | null;
+            /**
+             * Series
+             * @description A FRED series (CPIAUCSL) or a ticker (levels).
+             */
+            series: string;
+            /**
+             * Source
+             * @description How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.
+             * @default auto
+             * @enum {string}
+             */
+            source: "auto" | "fred" | "ticker";
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             * @default 2010-01-01
+             */
+            start: string;
+        };
         /** FrontierParams */
         FrontierParams: {
             /**
@@ -1683,7 +1866,7 @@ export interface components {
              * @default ledoit_wolf
              * @enum {string}
              */
-            covariance: "sample" | "ledoit_wolf" | "ewma" | "semicovariance";
+            covariance: "sample" | "ledoit_wolf" | "ewma" | "semicovariance" | "garch";
             /**
              * End
              * @description Last date (default: today).
@@ -2077,7 +2260,7 @@ export interface components {
              * @default ledoit_wolf
              * @enum {string}
              */
-            covariance: "sample" | "ledoit_wolf" | "ewma" | "semicovariance";
+            covariance: "sample" | "ledoit_wolf" | "ewma" | "semicovariance" | "garch";
             /**
              * End
              * @description Last date (default: today).
@@ -2240,6 +2423,50 @@ export interface components {
              * @description Ticker symbols, e.g. AAPL MSFT NESN.SW.
              */
             tickers: string[];
+        };
+        /** RegressParams */
+        RegressParams: {
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Hac Lags
+             * @description Newey-West lags for --robust hac.
+             */
+            hac_lags?: number | null;
+            /**
+             * Robust
+             * @description Covariance: hac, hc0-hc3 or none.
+             * @default hac
+             * @enum {string}
+             */
+            robust: "hac" | "hc0" | "hc1" | "hc2" | "hc3" | "none";
+            /**
+             * Source
+             * @description How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.
+             * @default auto
+             * @enum {string}
+             */
+            source: "auto" | "fred" | "ticker";
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             * @default 2010-01-01
+             */
+            start: string;
+            /**
+             * X
+             * @description Regressors, same conventions.
+             */
+            x: string[];
+            /**
+             * Y
+             * @description Dependent series: a ticker (returns) or fred:SERIES (differences).
+             */
+            y: string;
         };
         /** RetireParams */
         RetireParams: {
@@ -2552,6 +2779,57 @@ export interface components {
         VerifyBody: {
             /** Value */
             value?: string | null;
+        };
+        /** VolatilityParams */
+        VolatilityParams: {
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Horizon
+             * @description Steps ahead.
+             * @default 30
+             */
+            horizon: number;
+            /**
+             * Model
+             * @description garch, egarch or ewma.
+             * @default garch
+             * @enum {string}
+             */
+            model: "garch" | "egarch" | "ewma";
+            /**
+             * Seed
+             * @description Seed; printed even when auto-generated.
+             */
+            seed?: number | null;
+            /**
+             * Simulations
+             * @description Paths for the intervals.
+             * @default 1000
+             */
+            simulations: number;
+            /**
+             * Source
+             * @description How to read bare symbols: auto (digits or >5 chars = FRED), fred, ticker.
+             * @default auto
+             * @enum {string}
+             */
+            source: "auto" | "fred" | "ticker";
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             * @default 2010-01-01
+             */
+            start: string;
+            /**
+             * Ticker
+             * @description A ticker whose returns are modelled.
+             */
+            ticker: string;
         };
         /** WatchlistAddParams */
         WatchlistAddParams: {
@@ -3361,6 +3639,138 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["DoctorParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    econ_diagnose_api_v1_econ_diagnose_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiagnoseParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    econ_forecast_api_v1_econ_forecast_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ForecastParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    econ_regress_api_v1_econ_regress_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegressParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    econ_volatility_api_v1_econ_volatility_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VolatilityParams"];
             };
         };
         responses: {
