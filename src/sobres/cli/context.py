@@ -43,6 +43,12 @@ class Context:
     open_options: OpenOptions = field(default_factory=OpenOptions)
     pending_exit_code: int = 0
     """Set by a handler whose result renders normally but must exit non-zero (doctor)."""
+    progress: Callable[[float, str], None] | None = None
+    """Where a long computation's optional progress callback lands: a log line by default,
+    a job update when 0004's runner supplies one. ``report_progress`` also checks cancellation."""
+    cancel_requested: Callable[[], bool] | None = None
+    surface: str = "cli"
+    """Which adapter built this context: ``cli``, ``api`` or ``job``."""
     _storage: Storage | None = field(default=None, repr=False)
     _cache: ObservationCache | None = field(default=None, repr=False)
 
@@ -159,3 +165,14 @@ class Context:
     @property
     def slow_query_ms(self) -> int:
         return int(self.config.get(SLOW_QUERY_MS.key))
+
+    def report_progress(self, fraction: float, message: str) -> None:
+        """Forward a core progress callback; raise ``JobCancelled`` at a checkpoint if asked."""
+        if self.cancel_requested is not None and self.cancel_requested():
+            from sobres.core.errors import JobCancelledError
+
+            raise JobCancelledError("cancelled at a checkpoint")
+        if self.progress is not None:
+            self.progress(fraction, message)
+        else:
+            self.log.info("progress", fraction=round(fraction, 4), message=message)

@@ -45,7 +45,8 @@ otel = [
   "opentelemetry-sdk>=1.25",
   "opentelemetry-exporter-otlp-proto-http>=1.25",
 ]
-all = ["sobres[data,econ,opt,otel]"]
+web = ["fastapi>=0.115", "uvicorn>=0.30"]
+all = ["sobres[data,econ,opt,otel,web]"]
 dev = [
   "sobres[all]",
   "pytest>=8.2",
@@ -69,6 +70,11 @@ Source = "https://github.com/AI-Solutions-Lab-LLC/sobres"
 
 [tool.hatch.version]
 path = "src/sobres/__about__.py"
+
+[tool.hatch.build]
+# The built SPA (gitignored) ships in the sdist and the wheel so `pip install sobres[web]`
+# needs no Node. `python -m build` builds the wheel from the sdist, so both must carry it.
+artifacts = ["src/sobres/api/static/**"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sobres"]
@@ -124,5 +130,5 @@ strict = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["yfinance.*", "pandas_datareader.*", "statsmodels.*", "cvxpy.*", "scipy.*", "opentelemetry.*"]
+module = ["yfinance.*", "pandas_datareader.*", "statsmodels.*", "cvxpy.*", "scipy.*", "opentelemetry.*", "uvicorn.*"]
 ignore_missing_imports = true

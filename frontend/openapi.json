@@ -1,0 +1,3396 @@
+{
+  "components": {
+    "schemas": {
+      "BacktestParams": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_short": {
+            "default": false,
+            "description": "Relax the lower bound from 0 to -1.",
+            "title": "Allow Short",
+            "type": "boolean"
+          },
+          "base": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base currency for a multi-currency universe (e.g. USD).",
+            "title": "Base"
+          },
+          "cost_bps": {
+            "default": 10.0,
+            "description": "One-way transaction cost in basis points.",
+            "minimum": 0.0,
+            "title": "Cost Bps",
+            "type": "number"
+          },
+          "covariance": {
+            "default": "ledoit_wolf",
+            "description": "Covariance estimator; Ledoit-Wolf shrinkage by default.",
+            "enum": [
+              "sample",
+              "ledoit_wolf",
+              "ewma",
+              "semicovariance"
+            ],
+            "title": "Covariance",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "lookback": {
+            "default": "36m",
+            "description": "Estimation window: Nm months, Ny years or N observations.",
+            "title": "Lookback",
+            "type": "string"
+          },
+          "max_weight": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cap on any single weight.",
+            "title": "Max Weight"
+          },
+          "objective": {
+            "default": "max_sharpe",
+            "description": "Objective re-solved at each rebalance.",
+            "enum": [
+              "min_variance",
+              "max_sharpe",
+              "target_return",
+              "target_risk",
+              "risk_parity",
+              "equal_weight"
+            ],
+            "title": "Objective",
+            "type": "string"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "rebalance": {
+            "default": "quarterly",
+            "description": "Rebalance schedule.",
+            "enum": [
+              "monthly",
+              "quarterly",
+              "annual",
+              "never"
+            ],
+            "title": "Rebalance",
+            "type": "string"
+          },
+          "returns_estimator": {
+            "default": "mean_historical",
+            "description": "Expected-return estimator.",
+            "enum": [
+              "mean_historical",
+              "ewma",
+              "capm"
+            ],
+            "title": "Returns Estimator",
+            "type": "string"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.",
+            "title": "Risk Free"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "seed": {
+            "default": 0,
+            "description": "Seed for the max-Sharpe random restarts.",
+            "title": "Seed",
+            "type": "integer"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).",
+            "title": "Tickers"
+          }
+        },
+        "required": [
+          "start",
+          "fill"
+        ],
+        "title": "BacktestParams",
+        "type": "object"
+      },
+      "CacheClearParams": {
+        "additionalProperties": false,
+        "properties": {
+          "provider": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only clear one provider's observations.",
+            "title": "Provider"
+          },
+          "yes": {
+            "default": false,
+            "description": "Skip the confirmation prompt.",
+            "title": "Yes",
+            "type": "boolean"
+          }
+        },
+        "title": "CacheClearParams",
+        "type": "object"
+      },
+      "CacheInfoParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "CacheInfoParams",
+        "type": "object"
+      },
+      "CommandsParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "CommandsParams",
+        "type": "object"
+      },
+      "ConfigPathParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "ConfigPathParams",
+        "type": "object"
+      },
+      "ConfigSetParams": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "description": "Setting key, e.g. fred_api_key.",
+            "positional": true,
+            "title": "Key",
+            "type": "string"
+          },
+          "value": {
+            "description": "Value to store.",
+            "positional": true,
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "title": "ConfigSetParams",
+        "type": "object"
+      },
+      "ConfigShowParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "ConfigShowParams",
+        "type": "object"
+      },
+      "ConfigUnsetParams": {
+        "additionalProperties": false,
+        "properties": {
+          "key": {
+            "description": "Setting key to remove from the config file.",
+            "positional": true,
+            "title": "Key",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ],
+        "title": "ConfigUnsetParams",
+        "type": "object"
+      },
+      "DbExportParams": {
+        "additionalProperties": false,
+        "properties": {
+          "to": {
+            "description": "Destination file for the consistent copy.",
+            "format": "path",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "title": "DbExportParams",
+        "type": "object"
+      },
+      "DbInfoParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "DbInfoParams",
+        "type": "object"
+      },
+      "DbRepairParams": {
+        "additionalProperties": false,
+        "properties": {
+          "to": {
+            "anyOf": [
+              {
+                "format": "path",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recovery file (default: <db>.recovered).",
+            "title": "To"
+          }
+        },
+        "title": "DbRepairParams",
+        "type": "object"
+      },
+      "DoctorParams": {
+        "additionalProperties": false,
+        "properties": {
+          "fix": {
+            "default": false,
+            "description": "Apply every safe registered repair; never touches secrets.",
+            "title": "Fix",
+            "type": "boolean"
+          },
+          "offline": {
+            "default": false,
+            "description": "Skip network-dependent checks (reported as skipped).",
+            "title": "Offline",
+            "type": "boolean"
+          },
+          "strict": {
+            "default": false,
+            "description": "Exit 1 on warnings as well as failures.",
+            "title": "Strict",
+            "type": "boolean"
+          }
+        },
+        "title": "DoctorParams",
+        "type": "object"
+      },
+      "FactorsParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: latest).",
+            "title": "End"
+          },
+          "frequency": {
+            "default": "monthly",
+            "description": "Observation frequency.",
+            "enum": [
+              "daily",
+              "monthly"
+            ],
+            "title": "Frequency",
+            "type": "string"
+          },
+          "model": {
+            "default": "ff5",
+            "description": "Factor model.",
+            "enum": [
+              "ff3",
+              "ff5",
+              "ff5+mom"
+            ],
+            "title": "Model",
+            "type": "string"
+          },
+          "start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "First date (default: full history).",
+            "title": "Start"
+          }
+        },
+        "title": "FactorsParams",
+        "type": "object"
+      },
+      "FrontierParams": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_short": {
+            "default": false,
+            "description": "Relax the lower bound from 0 to -1.",
+            "title": "Allow Short",
+            "type": "boolean"
+          },
+          "base": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base currency for a multi-currency universe (e.g. USD).",
+            "title": "Base"
+          },
+          "covariance": {
+            "default": "ledoit_wolf",
+            "description": "Covariance estimator; Ledoit-Wolf shrinkage by default.",
+            "enum": [
+              "sample",
+              "ledoit_wolf",
+              "ewma",
+              "semicovariance"
+            ],
+            "title": "Covariance",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "max_weight": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cap on any single weight.",
+            "title": "Max Weight"
+          },
+          "points": {
+            "default": 50,
+            "description": "Number of frontier points.",
+            "maximum": 500.0,
+            "minimum": 2.0,
+            "title": "Points",
+            "type": "integer"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "returns_estimator": {
+            "default": "mean_historical",
+            "description": "Expected-return estimator.",
+            "enum": [
+              "mean_historical",
+              "ewma",
+              "capm"
+            ],
+            "title": "Returns Estimator",
+            "type": "string"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.",
+            "title": "Risk Free"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "seed": {
+            "default": 0,
+            "description": "Seed for the max-Sharpe random restarts.",
+            "title": "Seed",
+            "type": "integer"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).",
+            "title": "Tickers"
+          }
+        },
+        "required": [
+          "start",
+          "fill"
+        ],
+        "title": "FrontierParams",
+        "type": "object"
+      },
+      "FxParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "pairs": {
+            "description": "Currency pairs as EURUSD or EUR/USD: units of quote per one base.",
+            "items": {
+              "minLength": 6,
+              "type": "string"
+            },
+            "minItems": 1,
+            "positional": true,
+            "title": "Pairs",
+            "type": "array"
+          },
+          "source": {
+            "const": "ecb",
+            "default": "ecb",
+            "description": "Rate source.",
+            "title": "Source",
+            "type": "string"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "pairs"
+        ],
+        "title": "FxParams",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InitParams": {
+        "additionalProperties": false,
+        "properties": {
+          "non_interactive": {
+            "default": false,
+            "description": "Take values from flags and the environment only; never prompt.",
+            "title": "Non Interactive",
+            "type": "boolean"
+          },
+          "offline": {
+            "default": false,
+            "description": "Skip network checks in the closing doctor run.",
+            "title": "Offline",
+            "type": "boolean"
+          },
+          "set": {
+            "description": "key=value pairs to apply without prompting, e.g. --set fred_api_key=ABC.",
+            "items": {
+              "type": "string"
+            },
+            "title": "Set",
+            "type": "array"
+          },
+          "verify": {
+            "default": true,
+            "description": "Offer to verify keys with one live request (--no-verify to skip).",
+            "title": "Verify",
+            "type": "boolean"
+          },
+          "web": {
+            "default": false,
+            "description": "Open the settings page in the browser instead (sobres open settings).",
+            "title": "Web",
+            "type": "boolean"
+          }
+        },
+        "title": "InitParams",
+        "type": "object"
+      },
+      "LoginBody": {
+        "properties": {
+          "token": {
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "LoginBody",
+        "type": "object"
+      },
+      "MacroParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "series": {
+            "description": "FRED series ids, e.g. DGS10 CPIAUCSL.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "positional": true,
+            "title": "Series",
+            "type": "array"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "start",
+          "series"
+        ],
+        "title": "MacroParams",
+        "type": "object"
+      },
+      "MarkowitzParams": {
+        "additionalProperties": false,
+        "properties": {
+          "allow_short": {
+            "default": false,
+            "description": "Relax the lower bound from 0 to -1.",
+            "title": "Allow Short",
+            "type": "boolean"
+          },
+          "base": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base currency for a multi-currency universe (e.g. USD).",
+            "title": "Base"
+          },
+          "covariance": {
+            "default": "ledoit_wolf",
+            "description": "Covariance estimator; Ledoit-Wolf shrinkage by default.",
+            "enum": [
+              "sample",
+              "ledoit_wolf",
+              "ewma",
+              "semicovariance"
+            ],
+            "title": "Covariance",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "max_weight": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 1.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cap on any single weight.",
+            "title": "Max Weight"
+          },
+          "objective": {
+            "default": "max_sharpe",
+            "description": "Optimization objective.",
+            "enum": [
+              "min_variance",
+              "max_sharpe",
+              "target_return",
+              "target_risk",
+              "risk_parity",
+              "equal_weight"
+            ],
+            "title": "Objective",
+            "type": "string"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "returns_estimator": {
+            "default": "mean_historical",
+            "description": "Expected-return estimator.",
+            "enum": [
+              "mean_historical",
+              "ewma",
+              "capm"
+            ],
+            "title": "Returns Estimator",
+            "type": "string"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.",
+            "title": "Risk Free"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "seed": {
+            "default": 0,
+            "description": "Seed for the max-Sharpe random restarts (printed for reproducibility).",
+            "title": "Seed",
+            "type": "integer"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Target return or risk for target_* objectives.",
+            "title": "Target"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).",
+            "title": "Tickers"
+          }
+        },
+        "required": [
+          "start",
+          "fill"
+        ],
+        "title": "MarkowitzParams",
+        "type": "object"
+      },
+      "OpenParams": {
+        "additionalProperties": false,
+        "properties": {
+          "port": {
+            "default": 8787,
+            "description": "Port to use or start on.",
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          },
+          "print_url": {
+            "default": false,
+            "description": "Print the URL instead of launching a browser.",
+            "title": "Print Url",
+            "type": "boolean"
+          },
+          "target": {
+            "description": "View to open: settings, doctor, runs, run <id>, portfolio <name>, or a command name.",
+            "items": {
+              "type": "string"
+            },
+            "positional": true,
+            "title": "Target",
+            "type": "array"
+          }
+        },
+        "title": "OpenParams",
+        "type": "object"
+      },
+      "PortfolioDeleteParams": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Portfolio name.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          },
+          "yes": {
+            "default": false,
+            "description": "Skip the confirmation prompt.",
+            "title": "Yes",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PortfolioDeleteParams",
+        "type": "object"
+      },
+      "PortfolioListParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "PortfolioListParams",
+        "type": "object"
+      },
+      "PortfolioSaveParams": {
+        "additionalProperties": false,
+        "properties": {
+          "force": {
+            "default": false,
+            "description": "Replace an existing portfolio of this name.",
+            "title": "Force",
+            "type": "boolean"
+          },
+          "name": {
+            "description": "Portfolio name, e.g. core.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          },
+          "tickers": {
+            "description": "Ticker symbols.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Tickers",
+            "type": "array"
+          },
+          "weights": {
+            "description": "Optional weights, one per ticker, summing to 1.",
+            "items": {
+              "type": "number"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "tickers"
+        ],
+        "title": "PortfolioSaveParams",
+        "type": "object"
+      },
+      "PortfolioShowParams": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Portfolio name.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PortfolioShowParams",
+        "type": "object"
+      },
+      "PricesParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "field": {
+            "default": "adj_close",
+            "description": "Price field; adj_close is split- and dividend-adjusted (total return).",
+            "enum": [
+              "adj_close",
+              "close",
+              "open",
+              "high",
+              "low",
+              "volume"
+            ],
+            "title": "Field",
+            "type": "string"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "tickers": {
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "positional": true,
+            "title": "Tickers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "start",
+          "tickers"
+        ],
+        "title": "PricesParams",
+        "type": "object"
+      },
+      "RiskParams": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Base currency for a multi-currency universe (e.g. USD).",
+            "title": "Base"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.",
+            "title": "Risk Free"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).",
+            "title": "Tickers"
+          },
+          "weights": {
+            "description": "Portfolio weights, one per ticker, summing to 1 (from --portfolio if saved).",
+            "items": {
+              "type": "number"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "start",
+          "fill"
+        ],
+        "title": "RiskParams",
+        "type": "object"
+      },
+      "RunDeleteParams": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Run id.",
+            "positional": true,
+            "title": "Id",
+            "type": "string"
+          },
+          "yes": {
+            "default": false,
+            "description": "Skip the confirmation prompt.",
+            "title": "Yes",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "RunDeleteParams",
+        "type": "object"
+      },
+      "RunDiffParams": {
+        "additionalProperties": false,
+        "properties": {
+          "a": {
+            "description": "First run id.",
+            "positional": true,
+            "title": "A",
+            "type": "string"
+          },
+          "b": {
+            "description": "Second run id.",
+            "positional": true,
+            "title": "B",
+            "type": "string"
+          }
+        },
+        "required": [
+          "a",
+          "b"
+        ],
+        "title": "RunDiffParams",
+        "type": "object"
+      },
+      "RunListParams": {
+        "additionalProperties": false,
+        "properties": {
+          "command": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Only runs of this command.",
+            "title": "Command"
+          },
+          "limit": {
+            "default": 20,
+            "description": "How many runs to show.",
+            "maximum": 1000.0,
+            "minimum": 1.0,
+            "title": "Limit",
+            "type": "integer"
+          }
+        },
+        "title": "RunListParams",
+        "type": "object"
+      },
+      "RunShowParams": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Run id (see `sobres run list`).",
+            "positional": true,
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "RunShowParams",
+        "type": "object"
+      },
+      "ServeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "host": {
+            "default": "127.0.0.1",
+            "description": "Bind address; non-loopback needs a token.",
+            "title": "Host",
+            "type": "string"
+          },
+          "open": {
+            "default": false,
+            "description": "Open the browser once healthy.",
+            "title": "Open",
+            "type": "boolean"
+          },
+          "port": {
+            "default": 8787,
+            "description": "Port.",
+            "maximum": 65535.0,
+            "minimum": 1.0,
+            "title": "Port",
+            "type": "integer"
+          }
+        },
+        "title": "ServeParams",
+        "type": "object"
+      },
+      "SettingBody": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "value"
+        ],
+        "title": "SettingBody",
+        "type": "object"
+      },
+      "TokenRotateParams": {
+        "additionalProperties": false,
+        "properties": {
+          "token": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Use this token instead of a generated one (must be strong).",
+            "title": "Token"
+          }
+        },
+        "title": "TokenRotateParams",
+        "type": "object"
+      },
+      "UpgradeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "check": {
+            "default": false,
+            "description": "Only report whether a newer version exists.",
+            "title": "Check",
+            "type": "boolean"
+          },
+          "yes": {
+            "default": false,
+            "description": "Skip the confirmation prompt.",
+            "title": "Yes",
+            "type": "boolean"
+          }
+        },
+        "title": "UpgradeParams",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "VerifyBody": {
+        "properties": {
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "title": "VerifyBody",
+        "type": "object"
+      },
+      "WatchlistAddParams": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Watchlist name, e.g. tech.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          },
+          "symbols": {
+            "description": "Symbols to add.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "positional": true,
+            "title": "Symbols",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "symbols"
+        ],
+        "title": "WatchlistAddParams",
+        "type": "object"
+      },
+      "WatchlistDeleteParams": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Watchlist name.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          },
+          "yes": {
+            "default": false,
+            "description": "Skip the confirmation prompt.",
+            "title": "Yes",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "WatchlistDeleteParams",
+        "type": "object"
+      },
+      "WatchlistListParams": {
+        "additionalProperties": false,
+        "properties": {},
+        "title": "WatchlistListParams",
+        "type": "object"
+      },
+      "WatchlistRemoveParams": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Watchlist name.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          },
+          "symbols": {
+            "description": "Symbols to remove.",
+            "items": {
+              "minLength": 1,
+              "type": "string"
+            },
+            "minItems": 1,
+            "positional": true,
+            "title": "Symbols",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "symbols"
+        ],
+        "title": "WatchlistRemoveParams",
+        "type": "object"
+      },
+      "WatchlistShowParams": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "description": "Watchlist name.",
+            "positional": true,
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "WatchlistShowParams",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Every CLI command as POST /api/v1/<group>/<name>; long-running ones as jobs.",
+    "title": "sobres",
+    "version": "generated"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/auth/login": {
+      "post": {
+        "operationId": "login_api_v1_auth_login_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Login Api V1 Auth Login Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Login",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "operationId": "logout_api_v1_auth_logout_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Logout Api V1 Auth Logout Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Logout",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/cache/clear": {
+      "post": {
+        "description": "Delete cached provider observations (never user-authored rows).",
+        "operationId": "cache_clear_api_v1_cache_clear_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheClearParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete cached provider observations (never user-authored rows).",
+        "tags": [
+          "cache"
+        ]
+      }
+    },
+    "/api/v1/cache/info": {
+      "post": {
+        "description": "Show cache size on disk, entry count and oldest entry age.",
+        "operationId": "cache_info_api_v1_cache_info_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CacheInfoParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Show cache size on disk, entry count and oldest entry age.",
+        "tags": [
+          "cache"
+        ]
+      }
+    },
+    "/api/v1/commands": {
+      "get": {
+        "operationId": "commands_api_v1_commands_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Commands Api V1 Commands Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Commands",
+        "tags": [
+          "meta"
+        ]
+      },
+      "post": {
+        "description": "List every registered command with its parameters.",
+        "operationId": "commands_api_v1_commands_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommandsParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List every registered command with its parameters.",
+        "tags": [
+          "root"
+        ]
+      }
+    },
+    "/api/v1/config/path": {
+      "post": {
+        "description": "Print the config file location.",
+        "operationId": "config_path_api_v1_config_path_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigPathParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Print the config file location.",
+        "tags": [
+          "config"
+        ]
+      }
+    },
+    "/api/v1/config/set": {
+      "post": {
+        "description": "Persist a setting to the config file (mode 0600).",
+        "operationId": "config_set_api_v1_config_set_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigSetParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Persist a setting to the config file (mode 0600).",
+        "tags": [
+          "config"
+        ]
+      }
+    },
+    "/api/v1/config/show": {
+      "post": {
+        "description": "Show every setting, its value (secrets masked) and source.",
+        "operationId": "config_show_api_v1_config_show_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigShowParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Show every setting, its value (secrets masked) and source.",
+        "tags": [
+          "config"
+        ]
+      }
+    },
+    "/api/v1/config/unset": {
+      "post": {
+        "description": "Remove a setting from the config file.",
+        "operationId": "config_unset_api_v1_config_unset_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigUnsetParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove a setting from the config file.",
+        "tags": [
+          "config"
+        ]
+      }
+    },
+    "/api/v1/data/factors": {
+      "post": {
+        "description": "Fetch and cache Fama-French factor returns from the Ken French Data Library.",
+        "operationId": "data_factors_api_v1_data_factors_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FactorsParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fetch and cache Fama-French factor returns from the Ken French Data Library.",
+        "tags": [
+          "data"
+        ]
+      }
+    },
+    "/api/v1/data/fx": {
+      "post": {
+        "description": "Fetch and cache daily exchange rates (ECB reference rates, keyless).",
+        "operationId": "data_fx_api_v1_data_fx_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FxParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fetch and cache daily exchange rates (ECB reference rates, keyless).",
+        "tags": [
+          "data"
+        ]
+      }
+    },
+    "/api/v1/data/macro": {
+      "post": {
+        "description": "Fetch and cache FRED macro series (needs a free FRED API key).",
+        "operationId": "data_macro_api_v1_data_macro_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MacroParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fetch and cache FRED macro series (needs a free FRED API key).",
+        "tags": [
+          "data"
+        ]
+      }
+    },
+    "/api/v1/data/prices": {
+      "post": {
+        "description": "Fetch and cache daily prices for one or more tickers.",
+        "operationId": "data_prices_api_v1_data_prices_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PricesParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Fetch and cache daily prices for one or more tickers.",
+        "tags": [
+          "data"
+        ]
+      }
+    },
+    "/api/v1/db/export": {
+      "post": {
+        "description": "Write a consistent copy of the database (safe while in use).",
+        "operationId": "db_export_api_v1_db_export_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DbExportParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Write a consistent copy of the database (safe while in use).",
+        "tags": [
+          "db"
+        ]
+      }
+    },
+    "/api/v1/db/info": {
+      "post": {
+        "description": "Database path, schema version, size and per-table row counts.",
+        "operationId": "db_info_api_v1_db_info_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DbInfoParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Database path, schema version, size and per-table row counts.",
+        "tags": [
+          "db"
+        ]
+      }
+    },
+    "/api/v1/db/repair": {
+      "post": {
+        "description": "Recover what can be read from a damaged database into a new file; the original is untouched.",
+        "operationId": "db_repair_api_v1_db_repair_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DbRepairParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Recover what can be read from a damaged database into a new file; the original is untouched.",
+        "tags": [
+          "db"
+        ]
+      }
+    },
+    "/api/v1/doctor": {
+      "post": {
+        "description": "Diagnose the install; every failing line says how to fix it.",
+        "operationId": "doctor_api_v1_doctor_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DoctorParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Diagnose the install; every failing line says how to fix it.",
+        "tags": [
+          "root"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "operationId": "health_api_v1_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Health Api V1 Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "meta"
+        ]
+      }
+    },
+    "/api/v1/init": {
+      "post": {
+        "description": "Guided setup of every setting; ends by running doctor.",
+        "operationId": "init_api_v1_init_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InitParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Guided setup of every setting; ends by running doctor.",
+        "tags": [
+          "root"
+        ]
+      }
+    },
+    "/api/v1/jobs": {
+      "get": {
+        "operationId": "jobs_list_api_v1_jobs_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state_filter",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State Filter"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Jobs List Api V1 Jobs Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Jobs List",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/v1/jobs/{job_id}": {
+      "get": {
+        "operationId": "job_get_api_v1_jobs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Job Get Api V1 Jobs  Job Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Job Get",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/v1/jobs/{job_id}/cancel": {
+      "post": {
+        "operationId": "job_cancel_api_v1_jobs__job_id__cancel_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Job Cancel Api V1 Jobs  Job Id  Cancel Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Job Cancel",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/v1/jobs/{job_id}/events": {
+      "get": {
+        "operationId": "job_events_api_v1_jobs__job_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Job Events",
+        "tags": [
+          "jobs"
+        ]
+      }
+    },
+    "/api/v1/open": {
+      "post": {
+        "description": "Start the server if needed and open the browser to a view.",
+        "operationId": "open_api_v1_open_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Start the server if needed and open the browser to a view.",
+        "tags": [
+          "root"
+        ]
+      }
+    },
+    "/api/v1/optimize/backtest": {
+      "post": {
+        "description": "Walk-forward test: re-solve at each rebalance on prior data only, versus equal weight.",
+        "operationId": "optimize_backtest_api_v1_optimize_backtest_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BacktestParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Walk-forward test: re-solve at each rebalance on prior data only, versus equal weight.",
+        "tags": [
+          "optimize"
+        ]
+      }
+    },
+    "/api/v1/optimize/frontier": {
+      "post": {
+        "description": "The efficient frontier: one row per portfolio from min variance to max return.",
+        "operationId": "optimize_frontier_api_v1_optimize_frontier_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FrontierParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The efficient frontier: one row per portfolio from min variance to max return.",
+        "tags": [
+          "optimize"
+        ]
+      }
+    },
+    "/api/v1/optimize/markowitz": {
+      "post": {
+        "description": "Optimal weights for one objective, with the risk/return profile that produced them.",
+        "operationId": "optimize_markowitz_api_v1_optimize_markowitz_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkowitzParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Optimal weights for one objective, with the risk/return profile that produced them.",
+        "tags": [
+          "optimize"
+        ]
+      }
+    },
+    "/api/v1/optimize/risk": {
+      "post": {
+        "description": "The full risk panel for a fixed-weight portfolio.",
+        "operationId": "optimize_risk_api_v1_optimize_risk_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RiskParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "The full risk panel for a fixed-weight portfolio.",
+        "tags": [
+          "optimize"
+        ]
+      }
+    },
+    "/api/v1/portfolio/delete": {
+      "post": {
+        "description": "Delete a saved portfolio.",
+        "operationId": "portfolio_delete_api_v1_portfolio_delete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioDeleteParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a saved portfolio.",
+        "tags": [
+          "portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/list": {
+      "post": {
+        "description": "List saved portfolios.",
+        "operationId": "portfolio_list_api_v1_portfolio_list_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioListParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List saved portfolios.",
+        "tags": [
+          "portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/save": {
+      "post": {
+        "description": "Save a named portfolio (tickers, optionally weights).",
+        "operationId": "portfolio_save_api_v1_portfolio_save_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioSaveParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Save a named portfolio (tickers, optionally weights).",
+        "tags": [
+          "portfolio"
+        ]
+      }
+    },
+    "/api/v1/portfolio/show": {
+      "post": {
+        "description": "Show a saved portfolio's holdings.",
+        "operationId": "portfolio_show_api_v1_portfolio_show_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PortfolioShowParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Show a saved portfolio's holdings.",
+        "tags": [
+          "portfolio"
+        ]
+      }
+    },
+    "/api/v1/run/delete": {
+      "post": {
+        "description": "Delete a recorded run.",
+        "operationId": "run_delete_api_v1_run_delete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunDeleteParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a recorded run.",
+        "tags": [
+          "run"
+        ]
+      }
+    },
+    "/api/v1/run/diff": {
+      "post": {
+        "description": "Compare two runs of the same command side by side.",
+        "operationId": "run_diff_api_v1_run_diff_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunDiffParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Compare two runs of the same command side by side.",
+        "tags": [
+          "run"
+        ]
+      }
+    },
+    "/api/v1/run/list": {
+      "post": {
+        "description": "List recorded runs, newest first.",
+        "operationId": "run_list_api_v1_run_list_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunListParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List recorded runs, newest first.",
+        "tags": [
+          "run"
+        ]
+      }
+    },
+    "/api/v1/run/show": {
+      "post": {
+        "description": "Show one recorded run in full.",
+        "operationId": "run_show_api_v1_run_show_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunShowParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Show one recorded run in full.",
+        "tags": [
+          "run"
+        ]
+      }
+    },
+    "/api/v1/serve": {
+      "post": {
+        "description": "Run the web UI and API (loopback by default).",
+        "operationId": "serve_api_v1_serve_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServeParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Run the web UI and API (loopback by default).",
+        "tags": [
+          "root"
+        ]
+      }
+    },
+    "/api/v1/serve/token/rotate": {
+      "post": {
+        "description": "Replace the deployment token; every existing session stops working.",
+        "operationId": "serve_token_rotate_api_v1_serve_token_rotate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TokenRotateParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Replace the deployment token; every existing session stops working.",
+        "tags": [
+          "serve.token"
+        ]
+      }
+    },
+    "/api/v1/settings": {
+      "get": {
+        "operationId": "settings_list_api_v1_settings_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Settings List Api V1 Settings Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Settings List",
+        "tags": [
+          "settings"
+        ]
+      },
+      "put": {
+        "operationId": "settings_put_api_v1_settings_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SettingBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Settings Put Api V1 Settings Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Settings Put",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/settings/{key}/verify": {
+      "post": {
+        "operationId": "settings_verify_api_v1_settings__key__verify_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Settings Verify Api V1 Settings  Key  Verify Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Settings Verify",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
+    "/api/v1/upgrade": {
+      "post": {
+        "description": "Upgrade sobres with the installer that installed it.",
+        "operationId": "upgrade_api_v1_upgrade_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpgradeParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Upgrade sobres with the installer that installed it.",
+        "tags": [
+          "root"
+        ]
+      }
+    },
+    "/api/v1/watchlist/add": {
+      "post": {
+        "description": "Add symbols to a watchlist, creating it if absent; duplicates are no-ops.",
+        "operationId": "watchlist_add_api_v1_watchlist_add_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchlistAddParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Add symbols to a watchlist, creating it if absent; duplicates are no-ops.",
+        "tags": [
+          "watchlist"
+        ]
+      }
+    },
+    "/api/v1/watchlist/delete": {
+      "post": {
+        "description": "Delete a watchlist.",
+        "operationId": "watchlist_delete_api_v1_watchlist_delete_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchlistDeleteParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete a watchlist.",
+        "tags": [
+          "watchlist"
+        ]
+      }
+    },
+    "/api/v1/watchlist/list": {
+      "post": {
+        "description": "List watchlists.",
+        "operationId": "watchlist_list_api_v1_watchlist_list_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchlistListParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List watchlists.",
+        "tags": [
+          "watchlist"
+        ]
+      }
+    },
+    "/api/v1/watchlist/remove": {
+      "post": {
+        "description": "Remove symbols from a watchlist.",
+        "operationId": "watchlist_remove_api_v1_watchlist_remove_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchlistRemoveParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Remove symbols from a watchlist.",
+        "tags": [
+          "watchlist"
+        ]
+      }
+    },
+    "/api/v1/watchlist/show": {
+      "post": {
+        "description": "Show a watchlist's symbols.",
+        "operationId": "watchlist_show_api_v1_watchlist_show_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WatchlistShowParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Show a watchlist's symbols.",
+        "tags": [
+          "watchlist"
+        ]
+      }
+    }
+  }
+}

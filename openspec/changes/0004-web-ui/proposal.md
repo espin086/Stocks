@@ -2,8 +2,8 @@
 change: 0004-web-ui
 milestone: v1.2
 depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization, 0003-local-persistence]
-status: proposed
-planning_depth: proposal + 2 spec deltas + design (tasks written when 0003 lands)
+status: implemented
+planning_depth: proposal + 2 spec deltas + design + tasks
 ---
 
 # 0004 — Web UI

@@ -53,6 +53,7 @@ SAMPLE_ARGS: dict[str, list[str]] = {
     "db.repair": ["db", "repair"],
     "doctor": ["doctor", "--offline"],
     "init": ["init", "--non-interactive", "--offline"],
+    "open": ["open", "--print-url", "--port", "8797"],
     "optimize.backtest": [
         "optimize",
         "backtest",
@@ -125,6 +126,8 @@ SAMPLE_ARGS: dict[str, list[str]] = {
     "run.diff": ["run", "diff", "{run}", "{run}"],
     "run.list": ["run", "list"],
     "run.show": ["run", "show", "{run}"],
+    "serve": ["serve", "--port", "8798"],
+    "serve.token.rotate": ["serve", "token", "rotate"],
     "upgrade": ["upgrade", "--check"],
     "watchlist.add": ["watchlist", "add", "tech", "NVDA", "AMD"],
     "watchlist.delete": ["watchlist", "delete", "tech", "--yes"],
@@ -192,8 +195,22 @@ def _prepare(name: str, cli: Callable[..., Any], tmp_path: Any) -> list[str]:
 @pytest.fixture(autouse=True)
 def _no_pypi(monkeypatch: pytest.MonkeyPatch) -> None:
     from sobres import doctor as doc
+    from sobres.cli.commands import serve as serve_mod
 
     monkeypatch.setattr(doc, "latest_release", lambda: None)
+    # `serve`/`open` never bind a real socket here: the server is a stand-in that
+    # reports ready immediately, and the browser launch is recorded, not run.
+    import threading
+
+    def fake_run_server(
+        host: str, port: int, ctx: Any, *, ready: threading.Event | None = None
+    ) -> None:
+        if ready is not None:
+            ready.set()
+
+    monkeypatch.setattr(serve_mod, "run_server", fake_run_server)
+    monkeypatch.setattr(serve_mod, "probe", lambda url, timeout=1.0: None)
+    monkeypatch.setattr(serve_mod.webbrowser, "open", lambda url: False)
 
 
 VOLATILE_KEYS = {

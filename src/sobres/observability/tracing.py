@@ -169,9 +169,15 @@ def current_trace_ids() -> tuple[str, str] | None:
 
 
 class _SpanContext:
-    def __init__(self, name: str, attributes: Mapping[str, Any] | None) -> None:
+    def __init__(
+        self,
+        name: str,
+        attributes: Mapping[str, Any] | None,
+        carrier: Mapping[str, str] | None = None,
+    ) -> None:
         self._name = name
         self._attributes = dict(attributes or {})
+        self._carrier = dict(carrier or {})
         self._cm: Any = None
         self._span: Span = _NoopSpan()
 
@@ -179,7 +185,12 @@ class _SpanContext:
         tracer = _state["tracer"]
         if tracer is None:
             return self._span
-        self._cm = tracer.start_as_current_span(self._name)
+        parent = None
+        if self._carrier:
+            from opentelemetry.propagate import extract
+
+            parent = extract(self._carrier)
+        self._cm = tracer.start_as_current_span(self._name, context=parent)
         inner = self._cm.__enter__()
         self._span = _OtelSpan(inner)
         for key, value in self._attributes.items():
@@ -199,6 +210,15 @@ class _SpanContext:
             self._cm.__exit__(exc_type, exc, tb)
 
 
-def span(name: str, attributes: Mapping[str, Any] | None = None) -> _SpanContext:
-    """Open a span; a no-op unless tracing is active. Attributes are redacted."""
-    return _SpanContext(name, attributes)
+def span(
+    name: str,
+    attributes: Mapping[str, Any] | None = None,
+    *,
+    carrier: Mapping[str, str] | None = None,
+) -> _SpanContext:
+    """Open a span; a no-op unless tracing is active. Attributes are redacted.
+
+    ``carrier`` holds inbound W3C trace headers (``traceparent``) so an HTTP
+    request's span becomes a child of the caller's trace.
+    """
+    return _SpanContext(name, attributes, carrier)

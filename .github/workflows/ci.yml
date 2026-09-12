@@ -100,8 +100,45 @@ jobs:
           path: coverage.xml
           if-no-files-found: error
 
+  frontend:
+    name: Frontend (types, client drift, bundle budget)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: pip install -e ".[dev]"
+      - name: The committed OpenAPI document matches the registry
+        # The TypeScript client is generated from this file; drift is a build
+        # failure here rather than a runtime one in the browser.
+        run: python scripts/export_openapi.py --check
+      - run: npm ci
+        working-directory: frontend
+      - name: The generated client matches the OpenAPI document
+        run: npm run check:client
+        working-directory: frontend
+      - name: Type check, build, bundle budget
+        # `build` runs tsc --strict, vite, then the 300 KB gzip gate.
+        run: npm run build
+        working-directory: frontend
+      - name: Upload the built SPA
+        uses: actions/upload-artifact@v7
+        with:
+          name: frontend-static
+          path: src/sobres/api/static/
+          if-no-files-found: error
+
   build:
     name: Build and verify distributions
+    needs: [frontend]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -114,9 +151,20 @@ jobs:
           cache: pip
           cache-dependency-path: pyproject.toml
 
+      - name: Fetch the built SPA
+        # The wheel ships the frontend at sobres/api/static so `pip install
+        # sobres[web]` needs no Node.
+        uses: actions/download-artifact@v8
+        with:
+          name: frontend-static
+          path: src/sobres/api/static/
+
       - run: pip install build twine
       - name: Build sdist and wheel
         run: python -m build
+
+      - name: The wheel carries the SPA
+        run: unzip -l dist/*.whl | grep -q "sobres/api/static/index.html"
 
       - name: twine check
         run: twine check --strict dist/*
@@ -128,8 +176,9 @@ jobs:
         run: |
           python -m venv /tmp/smoke
           /tmp/smoke/bin/pip install --upgrade pip
-          /tmp/smoke/bin/pip install dist/*.whl
+          /tmp/smoke/bin/pip install "$(ls dist/*.whl)[web]"
           /tmp/smoke/bin/sobres --version
+          /tmp/smoke/bin/sobres serve --help > /dev/null
           /tmp/smoke/bin/python -c "import sobres; print(sobres.__version__)"
 
       - name: The three-command path, in the clean environment
@@ -192,7 +241,7 @@ jobs:
   all-green:
     name: All checks passed
     if: always()
-    needs: [lint, typecheck, test, build, security]
+    needs: [lint, typecheck, test, frontend, build, security]
     runs-on: ubuntu-latest
     steps:
       # `if: always()` means this job runs even when a dependency failed, so it

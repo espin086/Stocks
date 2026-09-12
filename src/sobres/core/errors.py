@@ -86,6 +86,12 @@ class OptimizationError(SobresError):
     exit_code = 1
 
 
+class JobCancelledError(SobresError):
+    """A long-running computation stopped at a checkpoint because it was cancelled."""
+
+    exit_code = 1
+
+
 class StorageError(SobresError):
     """A storage operation failed for a reason other than configuration."""
 

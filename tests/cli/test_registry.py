@@ -50,6 +50,7 @@ EXPECTED_COMMANDS = [
     "db.repair",
     "doctor",
     "init",
+    "open",
     "optimize.backtest",
     "optimize.frontier",
     "optimize.markowitz",
@@ -62,6 +63,8 @@ EXPECTED_COMMANDS = [
     "run.diff",
     "run.list",
     "run.show",
+    "serve",
+    "serve.token.rotate",
     "upgrade",
     "watchlist.add",
     "watchlist.delete",
@@ -83,6 +86,8 @@ def _click_commands(app: typer.Typer) -> dict[str, Any]:
         for name, sub in getattr(cmd, "commands", {}).items():
             full = f"{prefix}{name}"
             if hasattr(sub, "commands"):
+                if getattr(sub, "invoke_without_command", False) and sub.params:
+                    found[full] = sub  # a command that is also a group runs as its default
                 walk(sub, full + ".")
             elif not sub.hidden:
                 found[full] = sub

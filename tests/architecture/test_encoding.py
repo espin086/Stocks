@@ -42,11 +42,15 @@ def _names_encoding(call: ast.Call) -> bool:
     return any(keyword.arg == "encoding" for keyword in call.keywords)
 
 
+# ``.open`` on these is not a text file: descriptors, archives, compressed streams, a browser.
+NOT_A_TEXT_FILE = {"os", "webbrowser", "tarfile", "zipfile", "gzip", "bz2", "lzma", "socket"}
+
+
 def _is_os_call(func: ast.expr) -> bool:
     return (
         isinstance(func, ast.Attribute)
         and isinstance(func.value, ast.Name)
-        and func.value.id == "os"
+        and func.value.id in NOT_A_TEXT_FILE
     )
 
 
@@ -64,7 +68,7 @@ def _offenders(path: Path) -> list[int]:
             isinstance(func, ast.Attribute) and func.attr == "open"
         ):
             if _is_os_call(func):
-                continue  # os.open / os.fdopen take a file descriptor, not text
+                continue
             if not _binary_mode(node) and not _names_encoding(node):
                 lines.append(node.lineno)
     return lines

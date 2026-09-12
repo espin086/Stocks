@@ -166,6 +166,8 @@ def test_test_taxonomy_directories_and_markers() -> None:
             "core",
             "data",
             "cli",
+            "api",  # the HTTP surface (0004)
+            "ui",  # the SPA's source-level checks (0004)
             "architecture",
             "invariants",
             "network",
