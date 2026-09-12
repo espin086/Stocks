@@ -36,7 +36,7 @@ worse than no logging.
 #### Scenario: Levels
 - **WHEN** verbosity is set
 - **THEN** `-v` SHALL select INFO, `-vv` DEBUG, `--log-level` an explicit level,
-  and `QUANTFOLIO_LOG_LEVEL` the same via environment
+  and `SOBRES_LOG_LEVEL` the same via environment
 - **AND** the default SHALL be WARNING, so ordinary runs are quiet
 
 #### Scenario: Levels mean something specific
@@ -112,7 +112,7 @@ worse than no logging.
 #### Scenario: OpenTelemetry, opt-in
 - **WHEN** tracing is used
 - **THEN** it SHALL use the OpenTelemetry API
-- **AND** the SDK SHALL be an optional install (`quantfolio-cli[otel]`), with the
+- **AND** the SDK SHALL be an optional install (`sobres[otel]`), with the
   API's no-op implementation active by default so an ordinary install carries no
   tracing dependency and no measurable overhead
 

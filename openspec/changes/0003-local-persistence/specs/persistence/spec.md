@@ -18,7 +18,7 @@ The database SHALL carry a schema version and upgrade itself on open.
 
 #### Scenario: Newer database than the installed tool
 - **WHEN** the database's schema version is higher than the running code knows
-- **THEN** the system SHALL exit 3 telling the user to upgrade quantfolio
+- **THEN** the system SHALL exit 3 telling the user to upgrade sobres
 - **AND** SHALL NOT open the database, downgrade it, or write to it
 
 #### Scenario: Migrations are tested against real prior states
@@ -34,7 +34,7 @@ The database SHALL carry a schema version and upgrade itself on open.
 ### Requirement: Saved portfolios
 
 #### Scenario: Save
-- **WHEN** `qf portfolio save core --tickers AAPL MSFT --weights 0.6 0.4` runs
+- **WHEN** `sobres portfolio save core --tickers AAPL MSFT --weights 0.6 0.4` runs
 - **THEN** the portfolio SHALL persist under that name with its holdings
 - **AND** weights SHALL be validated as in 0002 before anything is written
 
@@ -53,14 +53,14 @@ The database SHALL carry a schema version and upgrade itself on open.
 - **THEN** the system SHALL refuse and say which name is taken
 
 #### Scenario: Listing and deletion
-- **WHEN** `qf portfolio list` runs
+- **WHEN** `sobres portfolio list` runs
 - **THEN** each portfolio's name, holding count, and last-modified time SHALL print
-- **AND** `qf portfolio delete <name>` SHALL require confirmation unless `--yes`
+- **AND** `sobres portfolio delete <name>` SHALL require confirmation unless `--yes`
 
 ### Requirement: Watchlists and goals
 
 #### Scenario: Watchlist
-- **WHEN** `qf watchlist add tech NVDA AMD` runs
+- **WHEN** `sobres watchlist add tech NVDA AMD` runs
 - **THEN** those symbols SHALL be added to the named watchlist, creating it if absent
 - **AND** adding a symbol already present SHALL be a no-op, not an error
 
@@ -84,12 +84,12 @@ The database SHALL carry a schema version and upgrade itself on open.
 - **AND** a run recorded today SHALL remain interpretable after a default changes
 
 #### Scenario: Inspecting runs
-- **WHEN** `qf run list` runs
+- **WHEN** `sobres run list` runs
 - **THEN** id, command, timestamp, and a one-line result summary SHALL print
-- **AND** `qf run show <id> --format json` SHALL emit the complete stored record
+- **AND** `sobres run show <id> --format json` SHALL emit the complete stored record
 
 #### Scenario: Comparing runs
-- **WHEN** `qf run diff <id-a> <id-b>` runs on two runs of the same command
+- **WHEN** `sobres run diff <id-a> <id-b>` runs on two runs of the same command
 - **THEN** parameter and result differences SHALL be shown side by side
 - **AND** comparing runs of different commands SHALL raise `UsageError`
 
@@ -101,17 +101,17 @@ The database SHALL carry a schema version and upgrade itself on open.
 ### Requirement: Database administration
 
 #### Scenario: Inspect
-- **WHEN** `qf db info` runs
+- **WHEN** `sobres db info` runs
 - **THEN** the file path, schema version, total size, and per-table row counts and
   sizes SHALL print
 
 #### Scenario: Export
-- **WHEN** `qf db export --to <path>` runs
+- **WHEN** `sobres db export --to <path>` runs
 - **THEN** a consistent copy SHALL be written using SQLite's backup API, safe to
   run while the database is in use
 
 #### Scenario: Cache and user data are never conflated
-- **WHEN** `qf cache clear` runs
+- **WHEN** `sobres cache clear` runs
 - **THEN** only cached provider observations SHALL be removed
 - **AND** portfolios, watchlists, goals and runs SHALL be untouched
 - **AND** the command SHALL report what it removed and what it preserved
@@ -121,7 +121,7 @@ The database SHALL carry a schema version and upgrade itself on open.
 - **THEN** it SHALL prompt for confirmation, with `--yes` for scripted use
 
 #### Scenario: Repair
-- **WHEN** `qf db repair` runs on a database failing its integrity check
+- **WHEN** `sobres db repair` runs on a database failing its integrity check
 - **THEN** the system SHALL attempt recovery into a new file, leaving the original
   in place, and report what was and was not recovered
 
@@ -144,7 +144,7 @@ The database SHALL carry a schema version and upgrade itself on open.
   identifiers, explicit UTC timestamps, and JSON encoded as text
 
 #### Scenario: Switching backends is configuration
-- **WHEN** `QUANTFOLIO_DB_URL` names a different registered backend
+- **WHEN** `SOBRES_DB_URL` names a different registered backend
 - **THEN** every command in this change SHALL behave identically
 - **AND** no module outside `data/storage/adapters/` SHALL require modification
 
@@ -153,7 +153,7 @@ The database SHALL carry a schema version and upgrade itself on open.
 #### Scenario: Repositories perform no computation
 - **WHEN** any module under `data/storage/` is reviewed
 - **THEN** it SHALL contain persistence logic only
-- **AND** SHALL NOT import from `quantfolio.core`
+- **AND** SHALL NOT import from `sobres.core`
 
 #### Scenario: Core remains I/O-free
 - **WHEN** any module under `core/` is reviewed
@@ -179,7 +179,7 @@ The database SHALL carry a schema version and upgrade itself on open.
 
 #### Scenario: One file is the whole state
 - **WHEN** the database file is copied to another machine and
-  `QUANTFOLIO_DB_URL` points at it
+  `SOBRES_DB_URL` points at it
 - **THEN** every saved portfolio, watchlist, goal, run and cached observation
   SHALL be available there
 

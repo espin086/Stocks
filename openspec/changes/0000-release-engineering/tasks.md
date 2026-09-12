@@ -36,8 +36,8 @@ All complete. Recorded so the change archives with its own checklist.
 - [x] **C5. Packaging tests** — `tests/test_packaging.py`: version format,
       installed metadata parity, changelog section, both entry points.
 - [x] **C6. `docs/RELEASING.md`** — the one-time setup and the failure playbook.
-- [x] **C7. Distribution rename** to `quantfolio-cli`; `quantfolio` on PyPI is
-      held by an unrelated 2019 package.
+- [x] **C7. Distribution name** is `sobres`, unclaimed on PyPI as of 2026-09-12.
+      An earlier `quantfolio` / `quantfolio-cli` naming is superseded by change 0011.
 
 ## Definition of done
 
@@ -45,6 +45,22 @@ All complete. Recorded so the change archives with its own checklist.
 - [x] Coverage at 100%, CI gate set at 90%
 - [x] `check_release.py` verified against the live index in every mode
 - [x] Every workflow parses as valid YAML
-- [ ] **Owner action:** Trusted Publishing configured, `pypi` / `testpypi`
-      environments created, `RELEASE_ENABLED` set, `main` protected
-      (see `docs/RELEASING.md`)
+### Owner actions
+
+- [x] `main` protected — pull request required, `All checks passed` required,
+      strict up-to-date branches, admin-only merge, linear history, no force push
+      or deletion. Configured 2026-09-12.
+- [x] `pypi` and `testpypi` environments created. Configured 2026-09-12.
+- [x] `RELEASE_ENABLED` repository variable exists and is `false`. Publishing is
+      deliberately disarmed until 0011 lands, because the code still declares the
+      old distribution name and arming now would publish it under a name nobody
+      wants and can never delete.
+- [ ] Add required reviewers to the `pypi` environment, making every production
+      publish an approval gate.
+- [ ] Set `RELEASE_ENABLED` to `true` — only after 0011 renames the distribution
+      and B5 switches the upload to token auth.
+- [ ] Reserve `sobres` on PyPI by publishing `0.0.0` once armed.
+- [ ] **B5. Token-auth upload** — `release.yml` passes `secrets.PYPI_PROD` /
+      `secrets.PYPI_TEST` as the upload password and drops the `id-token: write`
+      permission and the attestation step. → test: a TestPyPI rehearsal uploads
+      successfully and the run log contains no token fragment.

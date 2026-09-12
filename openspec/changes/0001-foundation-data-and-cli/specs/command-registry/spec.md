@@ -67,13 +67,13 @@ that 0004 adds surfaces rather than rewriting commands.
 ### Requirement: Introspection
 
 #### Scenario: The registry is queryable
-- **WHEN** `qf commands --format json` runs
+- **WHEN** `sobres commands --format json` runs
 - **THEN** every registered command SHALL be listed with its group, name, help,
   and parameter schema
 - **AND** this SHALL be the source the parity tests in 0004 enumerate
 
 #### Scenario: Registration is complete at import
-- **WHEN** `quantfolio.registry` is imported
+- **WHEN** `sobres.registry` is imported
 - **THEN** every command SHALL be registered
 - **AND** a test SHALL assert the count against an explicit list, so a command
   module that fails to import is caught rather than silently absent

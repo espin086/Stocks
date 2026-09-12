@@ -28,9 +28,9 @@ Three design responses, all in v1:
 
 1. **Shrinkage by default.** Ledoit-Wolf is the default covariance estimator, not an
    option a user has to discover. Sample covariance remains available and explicit.
-2. **The frontier, not the point.** `qf optimize frontier` shows the whole trade-off
+2. **The frontier, not the point.** `sobres optimize frontier` shows the whole trade-off
    curve. A single "optimal" portfolio invites false precision; a curve does not.
-3. **Walk-forward truth.** `qf optimize backtest` re-solves at each rebalance using
+3. **Walk-forward truth.** `sobres optimize backtest` re-solves at each rebalance using
    only prior data. The gap between the in-sample Sharpe and the walk-forward Sharpe
    is the most useful number this tool produces, and it ships in v1.
 
@@ -53,7 +53,7 @@ objective), and it is already a base dependency via `scipy`.
   `w_i * (Σw)_i / (wᵀΣw)` from `1/n`.
 - `equal_weight` — no solver.
 
-`cvxpy` stays an **opt-in extra** (`pip install quantfolio[opt]`). It is the right
+`cvxpy` stays an **opt-in extra** (`pip install sobres[opt]`). It is the right
 tool for convex objectives that SLSQP handles badly (CVaR, cardinality, robust
 formulations) — all post-v1. Making it a base dependency would drag a solver stack
 into an install that does not need it.

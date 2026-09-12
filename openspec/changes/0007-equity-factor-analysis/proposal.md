@@ -11,9 +11,9 @@ planning_depth: proposal + spec delta (design and tasks written when 0006 lands)
 ## Outcome
 
 ```bash
-qf analyze stock NVDA
-qf analyze factors NVDA --model ff5 --start 2015-01-01
-qf analyze factors --tickers AAPL MSFT NVDA --model ff5+mom --format csv
+sobres analyze stock NVDA
+sobres analyze factors NVDA --model ff5 --start 2015-01-01
+sobres analyze factors --tickers AAPL MSFT NVDA --model ff5+mom --format csv
 ```
 
 A single-stock dashboard, and a Fama-French regression that answers the question the
@@ -34,7 +34,7 @@ for the optimizer, and factor-tilted portfolio construction becomes possible.
 
 - **New capability `equity-analysis`**: `core/factors.py` (CAPM, FF3, FF5,
   FF5+momentum, rolling betas) and a fundamentals summary built on yfinance.
-- **New CLI group `qf analyze`**: `stock`, `factors`.
+- **New CLI group `sobres analyze`**: `stock`, `factors`.
 - `statsmodels` moves from the `econ` extra into the base install, or the regression
   is implemented on `numpy` directly — decided in design, based on whether the OLS
   diagnostics needed (HAC standard errors) justify the dependency.

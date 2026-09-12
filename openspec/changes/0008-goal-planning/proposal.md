@@ -11,10 +11,10 @@ planning_depth: proposal + spec delta (design and tasks written when 0007 lands)
 ## Outcome
 
 ```bash
-qf plan retire --income 200000 --expenses 90000 --portfolio 400000 --return 0.07
-qf plan house --price 950000 --down-pct 0.20 --by 2029-06-01 --monthly 3000
-qf plan car --price 45000 --by 2027-01-01 --current 5000
-qf plan goal --target 250000 --by 2032-01-01 --monthly 1500 --simulate 10000
+sobres plan retire --income 200000 --expenses 90000 --portfolio 400000 --return 0.07
+sobres plan house --price 950000 --down-pct 0.20 --by 2029-06-01 --monthly 3000
+sobres plan car --price 45000 --by 2027-01-01 --current 5000
+sobres plan goal --target 250000 --by 2032-01-01 --monthly 1500 --simulate 10000
 ```
 
 Deterministic answers to "when / how much," and a Monte Carlo distribution behind
@@ -36,7 +36,7 @@ whether holding it gets you there.
 - **New capability `goal-planning`**: `core/goals.py` (generic funding solver plus
   retirement, house, car, education specializations) and `core/simulate.py`
   (Monte Carlo and historical-bootstrap engines).
-- **New CLI group `qf plan`**: `retire`, `house`, `car`, `education`, `goal`.
+- **New CLI group `sobres plan`**: `retire`, `house`, `car`, `education`, `goal`.
 - Port `fire-calculator`'s core functions, with its tests carried over as regression
   fixtures so the ported math is provably identical.
 

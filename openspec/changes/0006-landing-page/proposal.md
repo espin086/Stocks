@@ -9,13 +9,13 @@ status: proposed
 
 ## Outcome
 
-A dark, animated single page at `https://espin086.github.io/Stocks/` that explains
-what quantfolio is in the time someone gives a link before closing the tab, and
+A dark, animated single page at `https://ai-solutions-lab-llc.github.io/sobres/` that explains
+what sobres is in the time someone gives a link before closing the tab, and
 sends them to one of two commands:
 
 ```bash
-pip install quantfolio-cli
-docker run -p 8787:8787 -v quantfolio:/data espin086/quantfolio serve --host 0.0.0.0
+pip install sobres
+docker run -p 8787:8787 -v sobres:/data aisolutionslab/sobres serve --host 0.0.0.0
 ```
 
 Published automatically from `main` by GitHub Actions.
@@ -29,7 +29,7 @@ seconds, and they decide on something moving.
 
 This tool's output is unusually well suited to that. An efficient frontier drawing
 itself along its curve *is* the explanation of what mean-variance optimization
-does. A terminal typing `qf optimize markowitz` and returning a weights table shows
+does. A terminal typing `sobres optimize markowitz` and returning a weights table shows
 the product working, in the product's own voice.
 
 It comes after 0005 because a landing page for something nobody can install yet is
@@ -58,7 +58,7 @@ output*, not decoration around it:
 
 1. **Hero** — an efficient frontier draws along its path; the max-Sharpe point
    lands last and labels itself.
-2. **Terminal** — a real `qf` command types itself and returns real output. The
+2. **Terminal** — a real `sobres` command types itself and returns real output. The
    text is the actual recorded output of that command, not invented.
 3. **Capabilities** — scroll-pinned sections, one per milestone, each with the
    command and the chart it produces.

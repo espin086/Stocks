@@ -5,7 +5,7 @@
 ### Requirement: Stationarity diagnostics
 
 #### Scenario: Tests reported
-- **WHEN** `qf econ diagnose <series>` runs
+- **WHEN** `sobres econ diagnose <series>` runs
 - **THEN** ADF and KPSS test statistics, p-values, and conclusions SHALL be reported
 - **AND** disagreement between the two SHALL be stated explicitly rather than
   resolved silently
@@ -42,7 +42,7 @@
 ### Requirement: Volatility forecasting
 
 #### Scenario: GARCH fit
-- **WHEN** `qf econ volatility SPY --model garch` runs
+- **WHEN** `sobres econ volatility SPY --model garch` runs
 - **THEN** a GARCH(1,1) model SHALL be fitted to returns and a conditional
   volatility forecast SHALL be produced with intervals
 - **AND** `--model` SHALL also accept `egarch` and `ewma`
@@ -61,7 +61,7 @@
 ### Requirement: Regression with robust inference
 
 #### Scenario: Robust standard errors
-- **WHEN** `qf econ regress --robust <kind>` runs
+- **WHEN** `sobres econ regress --robust <kind>` runs
 - **THEN** `hac`, `hc0`–`hc3`, and `none` SHALL be accepted, and the kind used SHALL
   be named in the output
 
@@ -77,7 +77,7 @@
 ### Requirement: Dependency gating
 
 #### Scenario: Missing extra
-- **WHEN** a `qf econ` command runs without the `econ` extra installed
+- **WHEN** a `sobres econ` command runs without the `econ` extra installed
 - **THEN** the system SHALL exit 3 with
-  `This command needs the econ extra. Install it with: pip install 'quantfolio[econ]'`
+  `This command needs the econ extra. Install it with: pip install 'sobres[econ]'`
 - **AND** SHALL NOT emit an `ImportError` traceback

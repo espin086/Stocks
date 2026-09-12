@@ -10,10 +10,10 @@ status: proposed
 ## Outcome
 
 Merging a version bump to `main` publishes the package to PyPI, with no manual
-upload step and no API token stored anywhere:
+upload step and no credential living in this repository:
 
 ```
-bump src/quantfolio/__about__.py  +  add a CHANGELOG.md section  →  merge  →  live on PyPI
+bump src/sobres/__about__.py  +  add a CHANGELOG.md section  →  merge  →  live on PyPI
 ```
 
 Every other push to `main` publishes nothing and says so.
@@ -41,8 +41,10 @@ added after the code is written never catches what it would have prevented.
 - `.github/workflows/codeql.yml`, `.github/dependabot.yml`,
   `.pre-commit-config.yaml`, `CHANGELOG.md`, `docs/RELEASING.md`.
 - `tests/test_packaging.py` — release invariants enforced by `pytest`.
-- Distribution renamed to `quantfolio-cli`; the import package and both console
-  scripts stay `quantfolio` / `qf`.
+- Distribution named `sobres`; the import package is `sobres` and the console
+  script is `sobres`.
+- Publishing authenticates with the organization-level secrets `PYPI_PROD` and
+  `PYPI_TEST`, which every `AI-Solutions-Lab-LLC` repository shares.
 
 ## Non-goals
 
@@ -62,7 +64,8 @@ added after the code is written never catches what it would have prevented.
 |---|---|
 | Merging the pipeline fires a publish before PyPI is configured, producing a red run on `main` | Publishing is disarmed until the repository variable `RELEASE_ENABLED` is `true`; `decide` reports "not armed" and exits clean |
 | A network blip makes the index look empty, and a published version is re-published | `check_release.py` fails closed on any non-404 error rather than treating an unreachable index as "nothing published" |
+| The organization PyPI token leaks and every repository in the organization is exposed | The token is org-scoped by design, so the blast radius is the organization. It is never echoed, the `pypi` environment can require human approval, and rotation is one place. Trusted Publishing would remove the token entirely and is the upgrade path once the org is ready for it |
 | A bad version reaches PyPI, where it can never be replaced | `verify` re-runs the whole CI gate on the release commit; the wheel is installed in a clean environment and executed before upload; the `pypi` environment can require a human approval |
 | The release gate drifts from the PR gate as CI grows | `release.yml` calls `ci.yml` via `workflow_call`; there is one definition of "green" |
 | A required check is silently skipped and reads as passing | The `all-green` aggregator treats `skipped` and `cancelled` as failures, and it is the only required status check |
-| `quantfolio` is taken on PyPI by an unrelated 2019 package | Ship as `quantfolio-cli`; a PEP 541 name transfer request can be filed separately and changes nothing structurally if it succeeds |
+| The distribution name is unavailable on PyPI at release time | `sobres` was unclaimed as of 2026-09-12 (PyPI returns 404). `check_release.py` fails closed if the name is claimed by anyone else before the first upload, and the name is reserved by publishing `0.0.0` early |

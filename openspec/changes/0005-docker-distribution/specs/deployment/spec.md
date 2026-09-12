@@ -6,7 +6,7 @@
 
 #### Scenario: The CLI is the entrypoint
 - **WHEN** the image runs with any arguments
-- **THEN** they SHALL be passed to `qf`
+- **THEN** they SHALL be passed to `sobres`
 - **AND** `docker run <image> --help` SHALL print the same help as a local install
 
 #### Scenario: No container-only code path
@@ -28,8 +28,8 @@
 ### Requirement: Data persistence in the container
 
 #### Scenario: Database lives on a volume
-- **WHEN** the image runs with no `QUANTFOLIO_DB_URL` set
-- **THEN** the database SHALL be SQLite at `/data/quantfolio.db`
+- **WHEN** the image runs with no `SOBRES_DB_URL` set
+- **THEN** the database SHALL be SQLite at `/data/sobres.db`
 - **AND** `/data` SHALL be declared as a volume
 
 #### Scenario: A missing volume fails loudly
@@ -43,7 +43,7 @@
 - **THEN** every saved portfolio, watchlist, goal, and run SHALL still be present
 
 #### Scenario: Host and container share one database
-- **WHEN** a host-side `qf` command and the container point at the same file
+- **WHEN** a host-side `sobres` command and the container point at the same file
 - **THEN** each SHALL see the other's writes, per 0003's portability requirement
 
 ### Requirement: Runtime security posture
@@ -81,7 +81,7 @@
   non-root user, resolved database URL, configured settings — with the same
   actionable lines as a local install
 
-#### Scenario: `qf open` in the container
+#### Scenario: `sobres open` in the container
 - **WHEN** `docker run <image> open` runs
 - **THEN** it SHALL print the URL to reach the UI from the host — using the
   published port when it can be determined, and the container port with a note
@@ -89,7 +89,7 @@
 - **AND** SHALL NOT attempt to launch a browser, since there is none
 
 #### Scenario: Non-interactive init in the container
-- **WHEN** `qf init` runs inside the container
+- **WHEN** `sobres init` runs inside the container
 - **THEN** it SHALL default to `--non-interactive`, reading settings from the
   environment, and SHALL exit 3 naming any missing required value rather than
   block on a prompt
@@ -108,7 +108,7 @@
 
 #### Scenario: Version parity is asserted
 - **WHEN** the image is built for release
-- **THEN** the version reported by `qf --version` inside it SHALL be asserted
+- **THEN** the version reported by `sobres --version` inside it SHALL be asserted
   equal to the wheel version being published
 - **AND** a mismatch SHALL fail the run before any push
 
@@ -124,15 +124,37 @@
 
 #### Scenario: Provenance
 - **WHEN** an image is published
-- **THEN** a build attestation and an SBOM SHALL be attached, matching the
-  provenance guarantee 0000 already makes for the wheel
+- **THEN** `build-push-action` SHALL be configured with `provenance: mode=max` and
+  `sbom: true`, so BuildKit attaches a provenance attestation and an SBOM to the
+  manifest
+- **AND** the attestation SHALL be understood as a BuildKit build attestation, not
+  an OIDC-signed identity; the pipeline SHALL NOT claim provenance stronger than
+  that
+
+#### Scenario: Registry
+- **WHEN** an image is published
+- **THEN** the registry SHALL be Docker Hub
+- **AND** the repository SHALL be `aisolutionslab/sobres`
 
 #### Scenario: Credentials
-- **WHEN** the pipeline authenticates to the registry
-- **THEN** it SHALL use a scoped access token held as a repository secret, used by
-  no other job
+- **WHEN** the pipeline authenticates to Docker Hub
+- **THEN** it SHALL use `docker/login-action` with the repository secrets
+  `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`
+- **AND** `DOCKERHUB_TOKEN` SHALL be a scoped Docker Hub access token with write
+  access to this repository only, never the account password
+- **AND** the secrets SHALL be repository-level, not organization-level, because
+  only this repository publishes an image; they move to the organization the day a
+  second repository needs them
+- **AND** they SHALL be read by the push job alone
 - **AND** publishing SHALL be disarmed by default, as PyPI publishing is, until
   explicitly enabled
+
+#### Scenario: Build and push
+- **WHEN** the push job runs
+- **THEN** it SHALL use `docker/setup-qemu-action`, `docker/setup-buildx-action`
+  and `docker/build-push-action`
+- **AND** the image SHALL be built once per release and pushed for every
+  architecture from that single build, not rebuilt per tag
 
 #### Scenario: Size budget
 - **WHEN** the image is built
@@ -153,7 +175,7 @@
   would grow unbounded in a layer nobody inspects
 
 #### Scenario: Log level is configurable at runtime
-- **WHEN** `QUANTFOLIO_LOG_LEVEL` is set in the environment
+- **WHEN** `SOBRES_LOG_LEVEL` is set in the environment
 - **THEN** it SHALL take effect with no image rebuild
 
 #### Scenario: Tracing is configured, not built in
@@ -169,24 +191,24 @@
 ### Requirement: The storage backend is a container concern too
 
 #### Scenario: The default stays SQLite on a volume
-- **WHEN** no `QUANTFOLIO_DB_URL` is supplied
-- **THEN** the container SHALL use SQLite at `/data/quantfolio.db`
+- **WHEN** no `SOBRES_DB_URL` is supplied
+- **THEN** the container SHALL use SQLite at `/data/sobres.db`
 
 #### Scenario: An external backend needs no different image
-- **WHEN** `QUANTFOLIO_DB_URL` names another registered backend
+- **WHEN** `SOBRES_DB_URL` names another registered backend
 - **THEN** the same image SHALL use it without rebuild
 - **AND** the `/data` volume SHALL become unnecessary, which
-  `qf deploy check` SHALL report rather than leave implied
+  `sobres deploy check` SHALL report rather than leave implied
 
 #### Scenario: A database URL is a secret
 - **WHEN** a connection URL containing credentials is supplied
-- **THEN** it SHALL be redacted in logs, spans, and every `qf deploy` output,
+- **THEN** it SHALL be redacted in logs, spans, and every `sobres deploy` output,
   under 0001's redaction rules
 
 ### Requirement: The CLI generates the deployment
 
 #### Scenario: Compose generation
-- **WHEN** `qf deploy compose` runs
+- **WHEN** `sobres deploy compose` runs
 - **THEN** a valid compose file SHALL print to stdout, with the image pinned to
   the running version, `/data` mounted, and the port published
 
@@ -202,18 +224,18 @@
   commit
 
 #### Scenario: Preflight
-- **WHEN** `qf deploy check` runs
+- **WHEN** `sobres deploy check` runs
 - **THEN** it SHALL run doctor's checks plus the deployment-specific ones below
 - **AND** it SHALL report the image and version, the resolved database path and
   whether it is writable, the bind address and port, whether a token is required
   and configured, and which credentials are present — naming each by key only
 
 #### Scenario: Exposure is called out
-- **WHEN** `qf deploy check` finds a non-loopback bind address with no token
+- **WHEN** `sobres deploy check` finds a non-loopback bind address with no token
 - **THEN** it SHALL report this as an error, not a warning
 
 #### Scenario: Environment template
-- **WHEN** `qf deploy env` runs
+- **WHEN** `sobres deploy env` runs
 - **THEN** a `.env` template SHALL print with every recognized variable, its
   default, and a one-line description
 - **AND** values of existing secrets SHALL NOT be included

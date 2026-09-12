@@ -4,7 +4,7 @@
 
 ### Requirement: Provider protocols
 
-The system SHALL define three typed protocols in `quantfolio.data.base` that every
+The system SHALL define three typed protocols in `sobres.data.base` that every
 data source implements, so that call sites depend on the protocol and never on a
 concrete vendor.
 
@@ -18,7 +18,7 @@ concrete vendor.
 - **AND** a shared contract test suite SHALL run against every registered provider
 
 #### Scenario: Call sites are vendor-agnostic
-- **WHEN** any code outside `quantfolio.data` needs prices
+- **WHEN** any code outside `sobres.data` needs prices
 - **THEN** it SHALL accept a `PriceProvider` and SHALL NOT import a vendor module
 
 ### Requirement: Canonical price frame shape
@@ -43,7 +43,7 @@ All price data SHALL be returned in one documented shape, regardless of source.
 
 ### Requirement: Explicit series alignment
 
-The system SHALL provide `quantfolio.data.align_frames(*frames, how)` as the single
+The system SHALL provide `sobres.data.align_frames(*frames, how)` as the single
 sanctioned way to combine series from different sources.
 
 #### Scenario: Prices aligned to factor returns
@@ -81,7 +81,7 @@ The system SHALL provide `FredProvider` for Federal Reserve economic series.
 #### Scenario: Key absent
 - **WHEN** `FRED_API_KEY` is unset and a FRED-backed command is invoked
 - **THEN** the system SHALL exit with code 3 and the message
-  `FRED_API_KEY is not set. Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html then run: qf config set fred_api_key <KEY>`
+  `FRED_API_KEY is not set. Get a free key at https://fred.stlouisfed.org/docs/api/api_key.html then run: sobres config set fred_api_key <KEY>`
 - **AND** SHALL NOT emit a traceback
 
 #### Scenario: Risk-free rate helper
@@ -127,8 +127,8 @@ Docker deployment in 0005 a single mounted volume.
 - **WHEN** no override is configured
 - **THEN** the default backend SHALL be SQLite in the platform user-data dir via
   `platformdirs`
-- **AND** the backend and location SHALL be overridable by `QUANTFOLIO_DB_URL`,
-  which 0005 sets to `sqlite:////data/quantfolio.db`
+- **AND** the backend and location SHALL be overridable by `SOBRES_DB_URL`,
+  which 0005 sets to `sqlite:////data/sobres.db`
 
 #### Scenario: Cache hit
 - **WHEN** an identical request is made within the dataset's TTL
@@ -160,7 +160,7 @@ Docker deployment in 0005 a single mounted volume.
 #### Scenario: Corrupt database
 - **WHEN** the database fails an integrity check on open
 - **THEN** the system SHALL exit with a message naming the file and the
-  `qf db repair` command, and SHALL NOT silently recreate it — the same file
+  `sobres db repair` command, and SHALL NOT silently recreate it — the same file
   holds user-authored state from 0003 onward, so discarding it is data loss
 
 ### Requirement: Data quality is checked on ingest

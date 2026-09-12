@@ -12,21 +12,21 @@ status: proposed
 One command, one image, the whole tool:
 
 ```bash
-docker run -p 8787:8787 -v quantfolio:/data espin086/quantfolio serve --host 0.0.0.0
+docker run -p 8787:8787 -v sobres:/data aisolutionslab/sobres serve --host 0.0.0.0
 ```
 
 The CLI is the image's entrypoint, so the container runs anything the tool can do:
 
 ```bash
-docker run -v quantfolio:/data espin086/quantfolio optimize markowitz --portfolio core
-docker run -v quantfolio:/data espin086/quantfolio db info
+docker run -v sobres:/data aisolutionslab/sobres optimize markowitz --portfolio core
+docker run -v sobres:/data aisolutionslab/sobres db info
 ```
 
 And the CLI generates the deployment rather than the user hand-writing it:
 
 ```bash
-qf deploy compose > docker-compose.yml    # generated from current config
-qf deploy check                           # what would run, with what config
+sobres deploy compose > docker-compose.yml    # generated from current config
+sobres deploy check                           # what would run, with what config
 ```
 
 ## Why
@@ -46,13 +46,15 @@ config resolution chain the CLI already uses keeps those the same thing.
 - Multi-stage `Dockerfile`: Node builds the 0004 frontend, Python builds the
   wheel, and a slim runtime stage carries neither toolchain.
 - `docker-compose.yml`, `.dockerignore`.
-- **New CLI group `qf deploy`** — `compose`, `check`, `env`.
-- Docker Hub publishing added to 0000's release pipeline, on the same version gate
-  and the same OIDC identity, for `linux/amd64` and `linux/arm64`.
+- **New CLI group `sobres deploy`** — `compose`, `check`, `env`.
+- Docker Hub publishing added to 0000's release pipeline, on the same version gate,
+  for `linux/amd64` and `linux/arm64`. Authentication is `docker/login-action` with
+  the repository secrets `DOCKERHUB_USERNAME` and `DOCKERHUB_TOKEN`; the push is
+  `docker/build-push-action` to `aisolutionslab/sobres`.
 
 ## The CLI is the entrypoint
 
-`ENTRYPOINT ["qf"]` rather than a shell or a server command. This is the decision
+`ENTRYPOINT ["sobres"]` rather than a shell or a server command. This is the decision
 that keeps the image honest: there is no container-only code path, no separate
 server binary, and no way for the containerized tool to diverge from the installed
 one. `docker run <image> <anything the CLI accepts>` works, and `serve` is just one
@@ -78,7 +80,7 @@ variable set in compose behaves exactly as it does in a shell.
 
 | Risk | Mitigation |
 |---|---|
-| The container writes the database to its own filesystem and the user loses everything on `docker rm` | `QUANTFOLIO_DB_URL` defaults to `sqlite:////data/quantfolio.db`; the image declares `/data` as a volume; startup fails loudly if `/data` is not writable, rather than silently persisting into the container layer |
+| The container writes the database to its own filesystem and the user loses everything on `docker rm` | `SOBRES_DB_URL` defaults to `sqlite:////data/sobres.db`; the image declares `/data` as a volume; startup fails loudly if `/data` is not writable, rather than silently persisting into the container layer |
 | Root-owned files in a mounted volume become unusable from the host | The image runs as a non-root user with a fixed, documented uid/gid |
 | Secrets baked into an image layer | Nothing is copied into the image but built artifacts; the build is proven secret-free by scanning the published image, and API keys arrive only as runtime environment or a mounted config |
 | Image bloat from a Node toolchain and scientific wheels | Multi-stage build discards both toolchains; a size budget is a CI gate |

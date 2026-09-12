@@ -11,10 +11,10 @@ planning_depth: proposal + spec delta (design and tasks written when 0008 lands)
 ## Outcome
 
 ```bash
-qf econ forecast CPIAUCSL --model arima --horizon 12
-qf econ volatility SPY --model garch --horizon 30
-qf econ diagnose DGS10          # stationarity, ACF/PACF, structural breaks
-qf econ regress --y AAPL --x SPY DGS10 --robust hac
+sobres econ forecast CPIAUCSL --model arima --horizon 12
+sobres econ volatility SPY --model garch --horizon 30
+sobres econ diagnose DGS10          # stationarity, ACF/PACF, structural breaks
+sobres econ regress --y AAPL --x SPY DGS10 --robust hac
 ```
 
 Time-series forecasting and regression diagnostics on the same data layer, with
@@ -35,7 +35,7 @@ being trustworthy first.
 - **New capability `econometrics`**: `core/timeseries.py` (stationarity tests,
   differencing, ARIMA, GARCH, forecast intervals) and `core/regression.py` (OLS with
   robust standard errors, multicollinearity and residual diagnostics).
-- **New CLI group `qf econ`**: `forecast`, `volatility`, `diagnose`, `regress`.
+- **New CLI group `sobres econ`**: `forecast`, `volatility`, `diagnose`, `regress`.
 - A GARCH-based covariance estimator registered into 0002's `core/moments.py`, which
   is why that module was built as a pluggable registry.
 - Reuse: `espin086/Econometrics` for statsmodels patterns, `espin086/jjutils`
