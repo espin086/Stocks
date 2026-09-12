@@ -1,4 +1,4 @@
-# equity-analysis — spec delta (0003)
+# equity-analysis — spec delta (0007)
 
 ## ADDED Requirements
 

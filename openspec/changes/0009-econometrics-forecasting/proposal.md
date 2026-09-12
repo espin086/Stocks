@@ -1,12 +1,12 @@
 ---
-change: 0005-econometrics-forecasting
-milestone: v1.3
-depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization, 0003-equity-factor-analysis]
+change: 0009-econometrics-forecasting
+milestone: v1.5
+depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization, 0007-equity-factor-analysis]
 status: proposed
-planning_depth: proposal + spec delta (design and tasks written when 0004 lands)
+planning_depth: proposal + spec delta (design and tasks written when 0008 lands)
 ---
 
-# 0005 — Econometrics and forecasting
+# 0009 — Econometrics and forecasting
 
 ## Outcome
 

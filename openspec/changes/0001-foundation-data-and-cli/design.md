@@ -56,15 +56,28 @@ for anyone who knows they want it.
 
 ## Cache
 
-Content-addressed parquet:
+One SQLite file, holding observations rather than opaque blobs:
 
-```
-<cache_dir>/<provider>/<sha256(canonical_request_json)[:16]>.parquet
-<cache_dir>/<provider>/<same>.meta.json   # request, fetched_at, ttl, rows
+```sql
+observation(provider, dataset, symbol, date, value, ...)  -- PK on all four keys
+fetch_log(provider, dataset, symbol, range_start, range_end, fetched_at, ttl)
 ```
 
-Parquet because it round-trips dtypes and the `DatetimeIndex` exactly — CSV does
-not, and a cache that silently changes dtypes is worse than no cache.
+**Why SQLite rather than a directory of cached response files.** A
+content-addressed blob cache keys on the exact request, so asking for
+2015–2024 after caching 2015–2025 is a cache miss and a second download of data
+already on disk. Storing observations instead makes any sub-range free and any
+extension a fetch of only the missing tail — which is the common case, since
+every new day's run extends yesterday's range by one bar.
+
+It also settles the deployment question before it is asked: 0003 puts saved
+portfolios and goals in this same file, and 0005 mounts it as a single Docker
+volume. One file is the whole of the tool's state, backed up by copying it.
+
+`fetch_log` is what makes TTL meaningful: it records which *ranges* were
+actually requested, so the system can tell "no data exists for these dates" from
+"these dates were never fetched" — a distinction a row-presence check cannot
+make, and the reason a naive cache re-downloads market holidays forever.
 
 TTL by dataset, reflecting how often the underlying data actually changes:
 
@@ -125,5 +138,5 @@ must never need a `grep -v`.
 |---|---|---|
 | Typer | Click (as in `fire-calculator`) | Type hints become the parser, which matches a `mypy --strict` codebase; Typer is Click underneath, so nothing is lost |
 | Protocol | ABC base class | Providers share no implementation; inheritance would only add ceremony |
-| Parquet cache | SQLite / CSV | Exact dtype and index round-trip; columnar reads; no schema migrations |
+| SQLite cache | Parquet blob cache | Sub-range reuse and incremental extension; one file for the whole deployment; the same store 0003 and 0005 build on |
 | `attrs` for provenance | A wrapper class | Keeps the return type plain `DataFrame`, so pandas knowledge transfers directly |

@@ -27,13 +27,33 @@ Do not implement a behavior that has no scenario. Add the scenario first.
 ## The one architectural rule
 
 ```
-cli/    Typer adapters — argv → data → core → render.   NO business logic.
-core/   Pure, I/O-free math over frames and dataclasses. NO network, NO disk.
-data/   Providers + cache → pandas objects.              NO math.
+registry.py  One declaration per command (0004). CLI, API and UI derive from it.
+cli/    Typer adapters — argv → data → core → render.    NO business logic.
+api/    FastAPI adapters (0004).                          NO business logic.
+core/   Pure, I/O-free math over frames and dataclasses.  NO network, NO disk.
+data/   Providers + SQLite → pandas objects.              NO math.
 ```
 
-If you find yourself computing something in `cli/`, it belongs in `core/`. If you
-find yourself calling a provider from `core/`, pass the frame in instead.
+If you find yourself computing something in `cli/` or `api/`, it belongs in
+`core/`. If you find yourself calling a provider or opening a connection from
+`core/`, pass the frame in instead.
+
+From 0004 on, never add a command to only one surface. Declare it in
+`registry.py`; the CLI, the HTTP route, and the UI form come from that. A parity
+test fails the build if a registered command lacks a route or a view.
+
+## Storage
+
+One SQLite file is the whole local state — cached observations, saved portfolios,
+goals, runs, jobs. Path from `QUANTFOLIO_DB`, `/data/quantfolio.db` in Docker.
+
+- Never add a second store (a cache directory, a JSON sidecar, a pickle). The
+  single-file property is what makes the container one volume and a backup one copy.
+- Migrations are forward-only and never edited after release; a correction is a new
+  migration.
+- `qf cache clear` removes cached observations only. It must never touch
+  user-authored rows.
+- API keys live in the config file at `0600`, never in the database.
 
 ## Conventions
 
@@ -62,6 +82,8 @@ find yourself calling a provider from `core/`, pass the frame in instead.
    the seed even when auto-generated.
 4. **Honest by default.** Shrinkage on, transaction costs on, prediction intervals
    mandatory, alpha reported with its t-statistic. Defaults must not flatter results.
+   This carries into the UI (0004) and the landing page (0006): in-sample results
+   are labelled as such, and the page may not claim an unshipped capability.
 
 ## Reuse before rebuilding
 

@@ -1,4 +1,4 @@
-# goal-planning — spec delta (0004)
+# goal-planning — spec delta (0008)
 
 ## ADDED Requirements
 

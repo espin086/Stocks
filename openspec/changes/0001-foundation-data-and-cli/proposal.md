@@ -34,8 +34,8 @@ the codebase is small enough that the rule is free to follow.
 ## What changes
 
 - **New capability `market-data`** — provider protocols, a yfinance price provider,
-  a FRED macro provider, a Ken French factor provider, and a content-addressed
-  on-disk parquet cache with TTL.
+  a FRED macro provider, a Ken French factor provider, and a SQLite-backed cache
+  with per-dataset TTL and sub-range reuse.
 - **New capability `cli-shell`** — root Typer app, `--format table|json|csv`,
   a config resolution chain, uniform error handling, and the `qf data` /
   `qf cache` command groups.
@@ -59,4 +59,5 @@ the codebase is small enough that the rule is free to follow.
 | yfinance is an unofficial, breakage-prone API | Isolate behind `PriceProvider`; pin a known-good version; contract tests against recorded fixtures catch shape drift |
 | Ken French CSVs have irregular, multi-table layouts | Parser is its own tested unit with a checked-in sample; fail loudly on unexpected structure rather than silently mis-slicing |
 | Cached data goes stale mid-analysis | Per-dataset TTL, `qf cache info` shows age, `--refresh` forces a re-fetch |
+| One SQLite file becomes a single point of failure for user-authored state | 0003 adds `qf db export` and a migration story; a corrupt database refuses to be silently recreated |
 | Silent timezone/calendar misalignment across sources | One rule, enforced at the data boundary: all series are tz-naive dates on a trading-day index; alignment is an explicit, tested operation |

@@ -112,28 +112,54 @@ no API key.
 - **THEN** the provider SHALL raise `ProviderError` describing what it expected
 - **AND** SHALL NOT return a partially-parsed frame
 
-### Requirement: On-disk cache
+### Requirement: SQLite-backed cache
 
-The system SHALL cache every provider response to disk, keyed by a content hash of
-the request parameters.
+The system SHALL cache every provider response in a single SQLite database, so
+that one file is the tool's entire local state — the property that makes the
+Docker deployment in 0005 a single mounted volume.
+
+#### Scenario: One database file
+- **WHEN** the system stores anything locally
+- **THEN** it SHALL be a single SQLite file, not a directory of loose artifacts
+- **AND** the same file SHALL later hold the application state added in 0003
+
+#### Scenario: Database location
+- **WHEN** no override is configured
+- **THEN** the database SHALL live in the platform user-data dir via `platformdirs`
+- **AND** SHALL be overridable by `QUANTFOLIO_DB`, which 0005 sets to `/data/quantfolio.db`
 
 #### Scenario: Cache hit
 - **WHEN** an identical request is made within the dataset's TTL
-- **THEN** the response SHALL be served from disk without a network call
+- **THEN** the response SHALL be served from the database without a network call
 - **AND** the call SHALL complete in under 1 second for a 10-ticker, 10-year frame
+
+#### Scenario: Partial-range reuse
+- **WHEN** a request overlaps a cached range but extends beyond it
+- **THEN** only the missing dates SHALL be fetched and merged with what is stored
+- **AND** re-requesting a narrower range than one already cached SHALL make no
+  network call at all
 
 #### Scenario: Forced refresh
 - **WHEN** any command is invoked with `--refresh`
 - **THEN** the cache SHALL be bypassed and the fresh response written back
 
-#### Scenario: Cache location
-- **WHEN** no override is configured
-- **THEN** the cache SHALL live in the platform user-cache dir via `platformdirs`
-- **AND** SHALL be overridable by `QUANTFOLIO_CACHE_DIR`
+#### Scenario: Observation identity
+- **WHEN** the same observation is fetched twice
+- **THEN** it SHALL be stored once, keyed by `(provider, dataset, symbol, date)`
+- **AND** the later fetch SHALL overwrite the earlier value, so provider
+  revisions land rather than duplicate
 
-#### Scenario: Corrupt cache entry
-- **WHEN** a cached parquet file fails to read
-- **THEN** the system SHALL delete the entry, re-fetch, and warn on stderr — not fail
+#### Scenario: Concurrent access
+- **WHEN** a CLI command and a running server touch the database at once
+- **THEN** the connection SHALL use WAL mode with a busy timeout so a read never
+  blocks a write into an error
+- **AND** foreign-key enforcement SHALL be on for every connection
+
+#### Scenario: Corrupt database
+- **WHEN** the database fails an integrity check on open
+- **THEN** the system SHALL exit with a message naming the file and the
+  `qf db repair` command, and SHALL NOT silently recreate it — the same file
+  holds user-authored state from 0003 onward, so discarding it is data loss
 
 ### Requirement: Offline test suite
 

@@ -39,19 +39,30 @@ qf plan retire --income 200000 --expenses 90000 --portfolio 400000
 ## Status
 
 🚧 **Pre-alpha — planning.** The repository currently contains the packaging
-scaffold and the full spec-driven development plan. No analytical code is
-implemented yet.
+scaffold, the release pipeline, and the full spec-driven development plan. No
+analytical code, UI, or container is implemented yet.
 
 **Start here: [`openspec/project.md`](openspec/project.md)** for the architecture, then
 the milestone plans in [`openspec/changes/`](openspec/changes/).
 
 | # | Milestone | Ships | State |
 |---|---|---|---|
-| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | Provider layer, cache, CLI shell, `qf data` | 📋 Planned |
+| [0000](openspec/changes/0000-release-engineering/) | Release engineering | CI gate, version-gated PyPI publishing | ✅ Done |
+| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | Provider layer, SQLite cache, CLI shell, `qf data` | 📋 Planned |
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
-| [0003](openspec/changes/0003-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
-| [0004](openspec/changes/0004-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
-| [0005](openspec/changes/0005-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
+| [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `qf db` | 📋 Planned |
+| [0004](openspec/changes/0004-web-ui/) | Web UI | Command registry, FastAPI + React SPA, `qf serve` | 📋 Planned |
+| [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `qf deploy` | 📋 Planned |
+| [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
+| [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
+| [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
+| [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
+
+Once 0005 lands, the whole tool runs from one container:
+
+```bash
+docker run -p 8787:8787 -v quantfolio:/data espin086/quantfolio serve --host 0.0.0.0
+```
 
 ## Install
 
@@ -94,15 +105,18 @@ qf config set fred_api_key <YOUR_KEY>
 One rule, and everything follows from it:
 
 ```
-adapters →  cli/ (Typer)    api/ (future)      no business logic
-math     →  core/           pure, I/O-free     no network, no disk
-I/O      →  data/           providers + cache  no math
+              registry.py — every command declared once
+                    │
+adapters →  cli/ (Typer)  api/ (FastAPI)  frontend/ (React)   no business logic
+math     →  core/         pure, I/O-free                      no network, no disk
+I/O      →  data/         providers + SQLite                  no math
 ```
 
-All math lives in `core/` as pure functions. The CLI is argv → data → core → render.
-This is what makes the math testable without a network and the tool portable to a
-web API later without moving a line of logic. Full detail:
-[`openspec/project.md`](openspec/project.md).
+All math lives in `core/` as pure functions. The CLI, the HTTP API, and the web UI
+are three renderings of one command registry — so "the UI has every CLI feature" is
+a test that fails the build, not an intention. One SQLite file holds the cache,
+saved portfolios, and run history, and is also the one thing Docker mounts. Full
+detail: [`openspec/project.md`](openspec/project.md).
 
 ## Development
 

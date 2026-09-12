@@ -25,11 +25,15 @@ Estimates are focused hours. Each task names the test that proves it.
       `validate_price_frame()` enforcing the canonical shape.
       → `tests/data/test_base.py::test_validate_rejects_tz_aware_index` (+ duplicate
         index, non-float dtype, descending index)
-- [ ] **B2. Cache** (2h)
-      `data/cache.py`: content-addressed parquet + `.meta.json`, per-entry TTL,
-      `--refresh` bypass, corrupt-entry self-heal.
+- [ ] **B2. SQLite cache** (3h)
+      `data/cache.py` + `data/db.py`: schema, WAL and foreign-key pragmas,
+      observation upsert keyed `(provider, dataset, symbol, date)`, `fetch_log`
+      ranges, per-dataset TTL, `--refresh` bypass, integrity check on open.
       → `tests/data/test_cache.py::test_hit_avoids_fetch`, `::test_ttl_expiry`,
-        `::test_corrupt_entry_refetches_and_warns`
+        `::test_subrange_of_cached_range_makes_no_network_call`,
+        `::test_extension_fetches_only_the_missing_tail`,
+        `::test_refetch_overwrites_revised_values`,
+        `::test_corrupt_database_exits_without_recreating`
 - [ ] **B3. Alignment** (1.5h)
       `data/align.py`: `align_frames(*frames, how)`, tz normalization, empty-overlap
       → `AlignmentError`.
@@ -64,6 +68,7 @@ Estimates are focused hours. Each task names the test that proves it.
 - [ ] **C2. `qf data` group** (2h) — `prices`, `macro`, `factors`.
       → `tests/cli/test_data_commands.py` (one test per subcommand × 3 formats)
 - [ ] **C3. `qf cache` group** (1h) — `info`, `clear` (with confirm + `--yes`).
+      Cache-only; the wider `qf db` group arrives with 0003.
       → `tests/cli/test_cache_commands.py::test_clear_requires_confirmation`
 - [ ] **C4. `qf config` group** (1h) — `set`, `show` (masked), `path`.
       → `tests/cli/test_config_commands.py::test_show_masks_api_keys`

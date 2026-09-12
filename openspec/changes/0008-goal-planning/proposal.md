@@ -1,12 +1,12 @@
 ---
-change: 0004-goal-planning
-milestone: v1.2
+change: 0008-goal-planning
+milestone: v1.4
 depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization]
 status: proposed
-planning_depth: proposal + spec delta (design and tasks written when 0003 lands)
+planning_depth: proposal + spec delta (design and tasks written when 0007 lands)
 ---
 
-# 0004 — Goal planning
+# 0008 — Goal planning
 
 ## Outcome
 
