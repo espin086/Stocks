@@ -37,7 +37,7 @@ from sobres.core.goals import (
 GOLDEN = json.loads(
     (
         Path(__file__).resolve().parents[1] / "fixtures" / "fire_calculator" / "golden.json"
-    ).read_text()
+    ).read_text(encoding="utf-8")
 )
 TOL = 1e-6  # the golden file's own tolerance
 
