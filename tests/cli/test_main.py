@@ -29,9 +29,9 @@ def test_bare_shows_help_exit_0(cli: Callable[..., Any]) -> None:
 
 def test_help_lists_exactly_the_shipped_groups(cli: Callable[..., Any]) -> None:
     result = cli("--help")
-    for group in ("data", "cache", "config"):
+    for group in ("data", "cache", "config", "optimize"):
         assert f"\n  {group} " in result.output
-    assert "optimize" not in result.output
+    assert "analyze" not in result.output
 
 
 def test_provider_error_exits_4_without_traceback(

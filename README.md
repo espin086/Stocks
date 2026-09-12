@@ -22,13 +22,13 @@ models, econometrics, and real-world goal planning, in one tool.
 ```bash
 # Optimize a portfolio
 sobres optimize markowitz --tickers AAPL MSFT NVDA JNJ XOM GLD \
-    --start 2015-01-01 --objective max-sharpe --max-weight 0.35
+    --start 2015-01-01 --fill ffill --objective max_sharpe --max-weight 0.35
 
 # See the whole risk/return trade-off, not one point
-sobres optimize frontier --tickers ... --points 50 --format csv > frontier.csv
+sobres optimize frontier --tickers ... --fill ffill --points 50 --format csv > frontier.csv
 
 # Find out whether that optimizer actually works out-of-sample
-sobres optimize backtest --tickers ... --rebalance quarterly --lookback 36m
+sobres optimize backtest --tickers ... --fill ffill --rebalance quarterly --lookback 36m
 
 # Is there alpha, or is it just factor exposure?
 sobres analyze factors NVDA --model ff5
@@ -45,11 +45,11 @@ sobres ppp adjust-goal --goal fire --to PRT
 
 ## Status
 
-🚧 **Pre-alpha.** The foundation is in: onboarding (`init`/`doctor`/`upgrade`),
-the command registry the CLI is generated from, the storage port with its SQLite
-adapter, keyless market, factor and exchange-rate providers, the currency model,
-and structured logging. Analytics, the UI and the container follow milestone by
-milestone below.
+**v1.0.0.** The foundation (onboarding, the registry-generated CLI, the storage
+port, keyless providers, the currency model, structured logging) and portfolio
+optimization: Markowitz weights, the efficient frontier, a walk-forward backtest
+and a risk panel. Persistence, the UI, the container and the remaining analytics
+follow milestone by milestone below.
 
 **Start here: [`openspec/project.md`](openspec/project.md)** for the architecture, then
 the milestone plans in [`openspec/changes/`](openspec/changes/).
@@ -58,7 +58,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 |---|---|---|---|
 | [0000](openspec/changes/0000-release-engineering/) | Release engineering | CI gate, version-gated PyPI publishing | ✅ Done |
 | [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | `init`/`doctor` onboarding, command registry, storage port, providers, currency, observability, `sobres data` | ✅ Done |
-| [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
+| [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | ✅ Done |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `sobres db` | 📋 Planned |
 | [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | 📋 Planned |
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | 📋 Planned |
@@ -117,6 +117,25 @@ document at full precision; logs never touch stdout) and `--refresh` to bypass
 the cache. A second identical call is served from the local SQLite file. Prices
 default to the split- and dividend-adjusted close, state their currency, and
 normalize pence- and cent-quoted listings to the major unit.
+
+## Quickstart: optimization
+
+```bash
+sobres optimize markowitz --tickers AAPL MSFT JNJ XOM GLD --start 2015-01-01 --fill ffill
+sobres optimize markowitz --tickers ... --fill ffill --objective min_variance --max-weight 0.35
+sobres optimize frontier  --tickers ... --fill ffill --points 50 --format csv > frontier.csv
+sobres optimize backtest  --tickers ... --fill ffill --rebalance quarterly --lookback 36m
+sobres optimize risk      --tickers AAPL MSFT --weights 0.6 0.4 --start 2015-01-01 --fill ffill
+```
+
+`--fill` has no default on purpose: how provider gaps are handled changes every
+number, so you say `drop`, `ffill` or `raise`. Ledoit-Wolf shrinkage is the
+default covariance, transaction costs default to 10 bps, the risk-free rate comes
+from FRED when a key is configured (and says `0.0 fallback` when not), and every
+in-sample result is labelled as such. A multi-currency universe needs `--base`;
+returns are converted before any moment is estimated. Read
+[why your backtest looks too good](docs/why-your-backtest-looks-too-good.md)
+before trusting the Sharpe ratio.
 
 **No API key is required** for the core tool. Prices come from yfinance and factor
 returns from the Ken French Data Library, both keyless. A free

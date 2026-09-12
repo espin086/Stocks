@@ -1,0 +1,42 @@
+{
+  "source": "legacy_code/Financial Portfolio Optimization.R (LP structure); values from exhaustive vertex enumeration, see scripts/r_reference.py",
+  "vehicles": [
+    "first_mortgages",
+    "second_mortgages",
+    "personal_loans",
+    "commercial_loans",
+    "savings",
+    "treasuries"
+  ],
+  "returns_pct": [
+    9.0,
+    12.0,
+    15.0,
+    8.0,
+    3.0,
+    5.0
+  ],
+  "risk": [
+    6.0,
+    8.0,
+    10.0,
+    4.0,
+    1.0,
+    2.0
+  ],
+  "constraints": {
+    "budget": "sum(w) == 1",
+    "average_risk": "(risk - 5) . w <= 0",
+    "commercial_minimum": "0.20 . 1 - e_4 . w <= 0",
+    "mortgage_ratio": "(-1, 2, 3, 0, 0, 0) . w <= 0"
+  },
+  "solution": {
+    "first_mortgages": 0.25,
+    "second_mortgages": -0.0,
+    "personal_loans": 0.0833333333,
+    "commercial_loans": 0.6666666667,
+    "savings": 0.0,
+    "treasuries": 0.0
+  },
+  "objective": 0.0883333333
+}

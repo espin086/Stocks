@@ -130,6 +130,7 @@ GROUP_HELP: dict[str, str] = {
     "data": "Fetch and cache market, macro, factor and exchange-rate data.",
     "cache": "Inspect and clear cached provider observations.",
     "config": "Show and set declared settings.",
+    "optimize": "Markowitz weights, the efficient frontier, a walk-forward backtest, a risk panel.",
 }
 
 

@@ -112,6 +112,10 @@ extend-exclude = ["*.md", "legacy_code"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+# Math tests quote formulas with Greek letters in comments and docstrings.
+"tests/core/*" = ["RUF002", "RUF003"]
+
 [tool.mypy]
 # No pinned python_version: check under the interpreter that runs mypy. Third-party stubs
 # (numpy 2.5+) use `type` statements that a 3.11 target rejects even on a 3.12 interpreter.

@@ -2,7 +2,7 @@
 change: 0002-portfolio-optimization
 milestone: v1 (part 2 of 2) — the v1.0.0 release
 depends_on: [0001-foundation-data-and-cli]
-status: proposed
+status: implemented
 ---
 
 # 0002 — Portfolio optimization

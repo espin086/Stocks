@@ -47,6 +47,10 @@ EXPECTED_COMMANDS = [
     "data.prices",
     "doctor",
     "init",
+    "optimize.backtest",
+    "optimize.frontier",
+    "optimize.markowitz",
+    "optimize.risk",
     "upgrade",
 ]
 
