@@ -72,6 +72,9 @@ class PlanParams(Params):
         default=date(2000, 1, 1), description="First date of the bootstrap history."
     )
     block: int = Field(default=sim.DEFAULT_BLOCK, ge=1, description="Bootstrap block length.")
+    save_goal: str | None = Field(
+        default=None, description="Save the target and inputs under this name (for sobres ppp)."
+    )
 
     @model_validator(mode="after")
     def _bootstrap_needs_history(self) -> PlanParams:
@@ -232,6 +235,38 @@ def _row(metric: str, value: Any, unit: str = "") -> dict[str, Any]:
     return {"metric": metric, "value": value, "unit": unit}
 
 
+def _save_goal(
+    p: PlanParams,
+    ctx: Context,
+    kind: str,
+    *,
+    target: float,
+    monthly: float | None,
+    current: float,
+    annual: float,
+) -> None:
+    """Persist the target and its inputs so `sobres ppp adjust-goal --goal` can restate it."""
+    if not p.save_goal:
+        return
+    from sobres.data.storage.base import GoalRecord
+
+    ctx.storage.goals.save(
+        GoalRecord(
+            name=p.save_goal,
+            kind=kind,
+            params={
+                "target": target,
+                "monthly": monthly,
+                "current": current,
+                "annual_return": annual,
+                "mode": p.mode,
+            },
+        ),
+        force=True,
+    )
+    ctx.note(f"saved goal {p.save_goal!r} ({kind}, target {target:,.0f})")
+
+
 # --------------------------------------------------------------------------- #
 # plan retire
 # --------------------------------------------------------------------------- #
@@ -317,6 +352,15 @@ def retire(p: RetireParams, ctx: Context) -> PlanResult:
             f"simulation horizon: {months} months (the deterministic years-to-FI, rounded up)"
         )
     rows += _sim_rows(doc, unit)
+    _save_goal(
+        p,
+        ctx,
+        "retire",
+        target=target,
+        monthly=contribution / PERIODS_PER_YEAR["monthly"],
+        current=p.portfolio,
+        annual=annual,
+    )
     return PlanResult(
         rows=rows,
         columns=["metric", "value", "unit"],
@@ -365,6 +409,15 @@ def _dated(
         annual=annual,
     )
     rows += _sim_rows(doc, unit)
+    _save_goal(
+        p,
+        ctx,
+        plan.kind,
+        target=plan.target,
+        monthly=contribution,
+        current=plan.present,
+        annual=annual,
+    )
     assumptions = [
         *notes,
         *plan.notes,
@@ -563,6 +616,15 @@ def goal(p: GoalParams, ctx: Context) -> PlanResult:
         annual=annual_solved if p.solve_return else annual,
     )
     rows += _sim_rows(doc, unit)
+    _save_goal(
+        p,
+        ctx,
+        "goal",
+        target=funding.target,
+        monthly=funding.contribution,
+        current=funding.present,
+        annual=annual_solved if p.solve_return else annual,
+    )
     return PlanResult(
         rows=rows,
         columns=["metric", "value", "unit"],

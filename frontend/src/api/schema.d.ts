@@ -539,6 +539,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/fx/attribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Split each asset's base-currency return into local, currency and cross components.
+         * @description Split each asset's base-currency return into local, currency and cross components.
+         */
+        post: operations["fx_attribution_api_v1_fx_attribution_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fx/convert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Convert an amount between currencies at a dated rate.
+         * @description Convert an amount between currencies at a dated rate.
+         */
+        post: operations["fx_convert_api_v1_fx_convert_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fx/hedge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Risk panels for hedged and unhedged returns side by side, and what the hedge cost.
+         * @description Risk panels for hedged and unhedged returns side by side, and what the hedge cost.
+         */
+        post: operations["fx_hedge_api_v1_fx_hedge_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/fx/rates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Daily exchange rates for one or more pairs.
+         * @description Daily exchange rates for one or more pairs.
+         */
+        post: operations["fx_rates_api_v1_fx_rates_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health": {
         parameters: {
             query?: never;
@@ -924,6 +1004,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ppp/adjust_goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restate a goal at another country's price level, beside the market-rate figure.
+         * @description Restate a goal at another country's price level, beside the market-rate figure.
+         */
+        post: operations["ppp_adjust_goal_api_v1_ppp_adjust_goal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ppp/compare": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Market rate against the PPP rate for each currency: the valuation gap, in words.
+         * @description Market rate against the PPP rate for each currency: the valuation gap, in words.
+         */
+        post: operations["ppp_compare_api_v1_ppp_compare_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ppp/reer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * BIS real effective exchange rates, taken as published.
+         * @description BIS real effective exchange rates, taken as published.
+         */
+        post: operations["ppp_reer_api_v1_ppp_reer_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/ppp/relative": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Relative PPP: the rate path implied by the inflation differential since an anchor date.
+         * @description Relative PPP: the rate path implied by the inflation differential since an anchor date.
+         */
+        post: operations["ppp_relative_api_v1_ppp_relative_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/run/delete": {
         parameters: {
             query?: never;
@@ -1203,6 +1363,108 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AdjustGoalParams */
+        AdjustGoalParams: {
+            /**
+             * Current
+             * @description Current balance (with --target).
+             * @default 0
+             */
+            current: number;
+            /**
+             * Goal
+             * @description A goal saved with `sobres plan ... --save-goal`.
+             */
+            goal?: string | null;
+            /**
+             * Monthly
+             * @description Monthly contribution (with --target).
+             */
+            monthly?: number | null;
+            /**
+             * On
+             * @description Market-rate date (default: today).
+             */
+            on?: string | null;
+            /**
+             * Origin
+             * @description ISO3 country the goal was priced in.
+             * @default USA
+             */
+            origin: string;
+            /**
+             * Return
+             * @description Annual return for the years-to-goal effect (default 7%).
+             */
+            return?: number | null;
+            /**
+             * Target
+             * @description Or a target amount directly.
+             */
+            target?: number | null;
+            /**
+             * To
+             * @description ISO3 destination country.
+             */
+            to: string;
+        };
+        /** AttributionParams */
+        AttributionParams: {
+            /**
+             * Base
+             * @description Base currency the return is measured in.
+             */
+            base: string;
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Fill
+             * @description Provider-gap policy: drop, ffill or raise. No default.
+             * @enum {string}
+             */
+            fill: "drop" | "ffill" | "raise";
+            /**
+             * Hedged
+             * @description Use currency-hedged returns (interest-rate-differential approximation).
+             * @default false
+             */
+            hedged: boolean;
+            /**
+             * Portfolio
+             * @description A saved portfolio's name in place of --tickers.
+             */
+            portfolio?: string | null;
+            /**
+             * Risk Free
+             * @description Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.
+             */
+            risk_free?: number | null;
+            /**
+             * Save Run
+             * @description Record this run in the run history.
+             * @default false
+             */
+            save_run: boolean;
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             */
+            start: string;
+            /**
+             * Tickers
+             * @description Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).
+             */
+            tickers?: string[] | null;
+            /**
+             * Weights
+             * @description Portfolio weights (default equal).
+             */
+            weights?: number[];
+        };
         /** BacktestParams */
         BacktestParams: {
             /**
@@ -1240,6 +1502,12 @@ export interface components {
              * @enum {string}
              */
             fill: "drop" | "ffill" | "raise";
+            /**
+             * Hedged
+             * @description Use currency-hedged returns (interest-rate-differential approximation).
+             * @default false
+             */
+            hedged: boolean;
             /**
              * Lookback
              * @description Estimation window: Nm months, Ny years or N observations.
@@ -1405,6 +1673,11 @@ export interface components {
              */
             return?: number | null;
             /**
+             * Save Goal
+             * @description Save the target and inputs under this name (for sobres ppp).
+             */
+            save_goal?: string | null;
+            /**
              * Seed
              * @description Seed; printed even when auto-generated.
              */
@@ -1458,6 +1731,25 @@ export interface components {
         };
         /** CommandsParams */
         CommandsParams: Record<string, never>;
+        /** CompareParams */
+        CompareParams: {
+            /**
+             * Base
+             * @description Base currency (or ISO3 country).
+             * @default USD
+             */
+            base: string;
+            /**
+             * On
+             * @description Market-rate date (default: today).
+             */
+            on?: string | null;
+            /**
+             * Vs
+             * @description Currencies or ISO3 countries to compare.
+             */
+            vs: string[];
+        };
         /** ComposeParams */
         ComposeParams: {
             /**
@@ -1497,6 +1789,29 @@ export interface components {
              * @description Setting key to remove from the config file.
              */
             key: string;
+        };
+        /** ConvertParams */
+        ConvertParams: {
+            /**
+             * Amount
+             * @description Amount in the source currency.
+             */
+            amount: number;
+            /**
+             * From
+             * @description Source currency code.
+             */
+            from: string;
+            /**
+             * On
+             * @description Rate date (default: today).
+             */
+            on?: string | null;
+            /**
+             * To
+             * @description Target currency code.
+             */
+            to: string;
         };
         /** DbExportParams */
         DbExportParams: {
@@ -1642,6 +1957,11 @@ export interface components {
              * @description Expected annual return (nominal), decimal; default 7%.
              */
             return?: number | null;
+            /**
+             * Save Goal
+             * @description Save the target and inputs under this name (for sobres ppp).
+             */
+            save_goal?: string | null;
             /**
              * Seed
              * @description Seed; printed even when auto-generated.
@@ -1879,6 +2199,12 @@ export interface components {
              */
             fill: "drop" | "ffill" | "raise";
             /**
+             * Hedged
+             * @description Use currency-hedged returns (interest-rate-differential approximation).
+             * @default false
+             */
+            hedged: boolean;
+            /**
              * Max Weight
              * @description Cap on any single weight.
              */
@@ -2022,6 +2348,11 @@ export interface components {
              */
             return?: number | null;
             /**
+             * Save Goal
+             * @description Save the target and inputs under this name (for sobres ppp).
+             */
+            save_goal?: string | null;
+            /**
              * Seed
              * @description Seed; printed even when auto-generated.
              */
@@ -2076,6 +2407,69 @@ export interface components {
              * @default 5
              */
             timeout: number;
+        };
+        /** HedgeParams */
+        HedgeParams: {
+            /**
+             * Base
+             * @description Base currency the return is measured in.
+             */
+            base: string;
+            /**
+             * Compare
+             * @description What to compare against (unhedged).
+             * @default unhedged
+             */
+            compare: string;
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Fill
+             * @description Provider-gap policy: drop, ffill or raise. No default.
+             * @enum {string}
+             */
+            fill: "drop" | "ffill" | "raise";
+            /**
+             * Hedged
+             * @description Use currency-hedged returns (interest-rate-differential approximation).
+             * @default false
+             */
+            hedged: boolean;
+            /**
+             * Portfolio
+             * @description A saved portfolio's name in place of --tickers.
+             */
+            portfolio?: string | null;
+            /**
+             * Risk Free
+             * @description Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.
+             */
+            risk_free?: number | null;
+            /**
+             * Save Run
+             * @description Record this run in the run history.
+             * @default false
+             */
+            save_run: boolean;
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             */
+            start: string;
+            /**
+             * Tickers
+             * @description Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).
+             */
+            tickers?: string[] | null;
+            /**
+             * Weights
+             * @description Portfolio weights (default equal).
+             */
+            weights?: number[];
         };
         /** HouseParams */
         HouseParams: {
@@ -2160,6 +2554,11 @@ export interface components {
              * @description Expected annual return (nominal), decimal; default 7%.
              */
             return?: number | null;
+            /**
+             * Save Goal
+             * @description Save the target and inputs under this name (for sobres ppp).
+             */
+            save_goal?: string | null;
             /**
              * Seed
              * @description Seed; printed even when auto-generated.
@@ -2272,6 +2671,12 @@ export interface components {
              * @enum {string}
              */
             fill: "drop" | "ffill" | "raise";
+            /**
+             * Hedged
+             * @description Use currency-hedged returns (interest-rate-differential approximation).
+             * @default false
+             */
+            hedged: boolean;
             /**
              * Max Weight
              * @description Cap on any single weight.
@@ -2424,6 +2829,45 @@ export interface components {
              */
             tickers: string[];
         };
+        /** RatesParams */
+        RatesParams: {
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Pairs
+             * @description Currency pairs as EURUSD or EUR/USD: units of quote per one base.
+             */
+            pairs: string[];
+            /**
+             * Start
+             * Format: date
+             * @description First date, YYYY-MM-DD.
+             */
+            start: string;
+        };
+        /** ReerParams */
+        ReerParams: {
+            /**
+             * Countries
+             * @description ISO3 countries (USA GBR JPN EMU MEX).
+             */
+            countries: string[];
+            /**
+             * End
+             * @description Last month (default: today).
+             */
+            end?: string | null;
+            /**
+             * Start
+             * Format: date
+             * @description First month.
+             * @default 2015-01-01
+             */
+            start: string;
+        };
         /** RegressParams */
         RegressParams: {
             /**
@@ -2467,6 +2911,25 @@ export interface components {
              * @description Dependent series: a ticker (returns) or fred:SERIES (differences).
              */
             y: string;
+        };
+        /** RelativeParams */
+        RelativeParams: {
+            /**
+             * Anchor
+             * Format: date
+             * @description Anchor date; relative PPP says nothing about the level.
+             */
+            anchor: string;
+            /**
+             * End
+             * @description Last date (default: today).
+             */
+            end?: string | null;
+            /**
+             * Pair
+             * @description Currency pair, e.g. USDGBP (units of quote per base).
+             */
+            pair: string;
         };
         /** RetireParams */
         RetireParams: {
@@ -2550,6 +3013,11 @@ export interface components {
              */
             return?: number | null;
             /**
+             * Save Goal
+             * @description Save the target and inputs under this name (for sobres ppp).
+             */
+            save_goal?: string | null;
+            /**
              * Seed
              * @description Seed; printed even when auto-generated.
              */
@@ -2598,6 +3066,12 @@ export interface components {
              * @enum {string}
              */
             fill: "drop" | "ffill" | "raise";
+            /**
+             * Hedged
+             * @description Use currency-hedged returns (interest-rate-differential approximation).
+             * @default false
+             */
+            hedged: boolean;
             /**
              * Portfolio
              * @description A saved portfolio's name in place of --tickers.
@@ -3794,6 +4268,138 @@ export interface operations {
             };
         };
     };
+    fx_attribution_api_v1_fx_attribution_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AttributionParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fx_convert_api_v1_fx_convert_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConvertParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fx_hedge_api_v1_fx_hedge_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HedgeParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fx_rates_api_v1_fx_rates_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RatesParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     health_api_v1_health_get: {
         parameters: {
             query?: never;
@@ -4419,6 +5025,138 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["PortfolioShowParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ppp_adjust_goal_api_v1_ppp_adjust_goal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdjustGoalParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ppp_compare_api_v1_ppp_compare_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompareParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ppp_reer_api_v1_ppp_reer_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ReerParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    ppp_relative_api_v1_ppp_relative_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RelativeParams"];
             };
         };
         responses: {

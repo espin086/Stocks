@@ -66,7 +66,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | ✅ Done |
 | [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | ✅ Done |
 | [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | ✅ Done |
-| [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
+| [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | ✅ Done |
 | [0011](openspec/changes/0011-rebrand-sobres/) | Rebrand | One name everywhere: `sobres` | 🔧 In progress |
 
 The whole tool also runs from one container — see [docs/DEPLOYING.md](docs/DEPLOYING.md):
@@ -189,6 +189,25 @@ non-stationary series is differenced to stationarity with `d` reported, the
 chosen ARIMA order comes with its criterion and the two runners-up, residuals
 get a Ljung-Box test, and no forecast is ever printed without its intervals.
 `--covariance garch` is available to the optimizer.
+
+## Quickstart: exchange rates and purchasing power
+
+```bash
+sobres fx rates EURUSD USDJPY --start 2015-01-01
+sobres fx convert 100000 --from USD --to EUR --on 2026-09-01
+sobres fx attribution --tickers NESN.SW 7203.T --base USD --start 2015-01-01 --fill drop
+sobres fx hedge --tickers NESN.SW 7203.T --base USD --start 2015-01-01 --fill drop
+sobres ppp compare --base USD --vs EUR GBP JPY
+sobres plan retire --income 200000 --expenses 90000 --save-goal fire
+sobres ppp adjust-goal --goal fire --to PRT
+```
+
+Attribution splits each asset's base-currency return into local, currency
+and cross components that reconcile exactly, and reports currency risk with
+the correlations that drive it. Hedged figures are a covered-interest-parity
+approximation and say so. PPP is reported as a valuation gap with its
+benchmark year and vintage, never as a forecast; `adjust-goal` restates a
+goal at another country's price level beside the market-rate figure.
 
 ## Quickstart: saved state
 

@@ -296,6 +296,27 @@ FIXTURE_DIR = declare(
     )
 )
 
+PPP_PROVIDER = declare(
+    Setting(
+        key="ppp_provider",
+        env="SOBRES_PPP_PROVIDER",
+        description="PPP conversion factors: worldbank (ICP PA.NUS.PPP, keyless) or oecd.",
+        type="str",
+        default="worldbank",
+        choices=("worldbank", "oecd"),
+    )
+)
+
+PPP_STALE_YEARS = declare(
+    Setting(
+        key="ppp_stale_years",
+        env="SOBRES_PPP_STALE_YEARS",
+        description="Flag a PPP figure whose benchmark year is older than this many years.",
+        type="int",
+        default=3,
+    )
+)
+
 CONTAINER = declare(
     Setting(
         key="container",

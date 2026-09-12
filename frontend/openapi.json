@@ -1,6 +1,203 @@
 {
   "components": {
     "schemas": {
+      "AdjustGoalParams": {
+        "additionalProperties": false,
+        "properties": {
+          "current": {
+            "default": 0.0,
+            "description": "Current balance (with --target).",
+            "minimum": 0.0,
+            "title": "Current",
+            "type": "number"
+          },
+          "goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A goal saved with `sobres plan ... --save-goal`.",
+            "title": "Goal"
+          },
+          "monthly": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Monthly contribution (with --target).",
+            "title": "Monthly"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Market-rate date (default: today).",
+            "title": "On"
+          },
+          "origin": {
+            "default": "USA",
+            "description": "ISO3 country the goal was priced in.",
+            "title": "Origin",
+            "type": "string"
+          },
+          "return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual return for the years-to-goal effect (default 7%).",
+            "title": "Return"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Or a target amount directly.",
+            "title": "Target"
+          },
+          "to": {
+            "description": "ISO3 destination country.",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "to"
+        ],
+        "title": "AdjustGoalParams",
+        "type": "object"
+      },
+      "AttributionParams": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "description": "Base currency the return is measured in.",
+            "title": "Base",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "hedged": {
+            "default": false,
+            "description": "Use currency-hedged returns (interest-rate-differential approximation).",
+            "title": "Hedged",
+            "type": "boolean"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.",
+            "title": "Risk Free"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).",
+            "title": "Tickers"
+          },
+          "weights": {
+            "description": "Portfolio weights (default equal).",
+            "items": {
+              "type": "number"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "start",
+          "fill",
+          "base"
+        ],
+        "title": "AttributionParams",
+        "type": "object"
+      },
       "BacktestParams": {
         "additionalProperties": false,
         "properties": {
@@ -64,6 +261,12 @@
             ],
             "title": "Fill",
             "type": "string"
+          },
+          "hedged": {
+            "default": false,
+            "description": "Use currency-hedged returns (interest-rate-differential approximation).",
+            "title": "Hedged",
+            "type": "boolean"
           },
           "lookback": {
             "default": "36m",
@@ -353,6 +556,18 @@
             "description": "Expected annual return (nominal), decimal; default 7%.",
             "title": "Return"
           },
+          "save_goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Save the target and inputs under this name (for sobres ppp).",
+            "title": "Save Goal"
+          },
           "seed": {
             "anyOf": [
               {
@@ -436,6 +651,44 @@
         "title": "CommandsParams",
         "type": "object"
       },
+      "CompareParams": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "default": "USD",
+            "description": "Base currency (or ISO3 country).",
+            "title": "Base",
+            "type": "string"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Market-rate date (default: today).",
+            "title": "On"
+          },
+          "vs": {
+            "description": "Currencies or ISO3 countries to compare.",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 1,
+            "title": "Vs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "vs"
+        ],
+        "title": "CompareParams",
+        "type": "object"
+      },
       "ComposeParams": {
         "additionalProperties": false,
         "properties": {
@@ -506,6 +759,47 @@
           "key"
         ],
         "title": "ConfigUnsetParams",
+        "type": "object"
+      },
+      "ConvertParams": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "description": "Amount in the source currency.",
+            "positional": true,
+            "title": "Amount",
+            "type": "number"
+          },
+          "from": {
+            "description": "Source currency code.",
+            "title": "From",
+            "type": "string"
+          },
+          "on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rate date (default: today).",
+            "title": "On"
+          },
+          "to": {
+            "description": "Target currency code.",
+            "title": "To",
+            "type": "string"
+          }
+        },
+        "required": [
+          "amount",
+          "from",
+          "to"
+        ],
+        "title": "ConvertParams",
         "type": "object"
       },
       "DbExportParams": {
@@ -741,6 +1035,18 @@
             ],
             "description": "Expected annual return (nominal), decimal; default 7%.",
             "title": "Return"
+          },
+          "save_goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Save the target and inputs under this name (for sobres ppp).",
+            "title": "Save Goal"
           },
           "seed": {
             "anyOf": [
@@ -1170,6 +1476,12 @@
             "title": "Fill",
             "type": "string"
           },
+          "hedged": {
+            "default": false,
+            "description": "Use currency-hedged returns (interest-rate-differential approximation).",
+            "title": "Hedged",
+            "type": "boolean"
+          },
           "max_weight": {
             "anyOf": [
               {
@@ -1430,6 +1742,18 @@
             "description": "Expected annual return (nominal), decimal; default 7%.",
             "title": "Return"
           },
+          "save_goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Save the target and inputs under this name (for sobres ppp).",
+            "title": "Save Goal"
+          },
           "seed": {
             "anyOf": [
               {
@@ -1522,6 +1846,119 @@
           }
         },
         "title": "HealthParams",
+        "type": "object"
+      },
+      "HedgeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "base": {
+            "description": "Base currency the return is measured in.",
+            "title": "Base",
+            "type": "string"
+          },
+          "compare": {
+            "default": "unhedged",
+            "description": "What to compare against (unhedged).",
+            "title": "Compare",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "fill": {
+            "description": "Provider-gap policy: drop, ffill or raise. No default.",
+            "enum": [
+              "drop",
+              "ffill",
+              "raise"
+            ],
+            "title": "Fill",
+            "type": "string"
+          },
+          "hedged": {
+            "default": false,
+            "description": "Use currency-hedged returns (interest-rate-differential approximation).",
+            "title": "Hedged",
+            "type": "boolean"
+          },
+          "portfolio": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A saved portfolio's name in place of --tickers.",
+            "title": "Portfolio"
+          },
+          "risk_free": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual decimal risk-free rate; default: FRED 3-month bill, or 0.0 without a key.",
+            "title": "Risk Free"
+          },
+          "save_run": {
+            "default": false,
+            "description": "Record this run in the run history.",
+            "title": "Save Run",
+            "type": "boolean"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          },
+          "tickers": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio).",
+            "title": "Tickers"
+          },
+          "weights": {
+            "description": "Portfolio weights (default equal).",
+            "items": {
+              "type": "number"
+            },
+            "title": "Weights",
+            "type": "array"
+          }
+        },
+        "required": [
+          "start",
+          "fill",
+          "base"
+        ],
+        "title": "HedgeParams",
         "type": "object"
       },
       "HouseParams": {
@@ -1649,6 +2086,18 @@
             ],
             "description": "Expected annual return (nominal), decimal; default 7%.",
             "title": "Return"
+          },
+          "save_goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Save the target and inputs under this name (for sobres ppp).",
+            "title": "Save Goal"
           },
           "seed": {
             "anyOf": [
@@ -1843,6 +2292,12 @@
             ],
             "title": "Fill",
             "type": "string"
+          },
+          "hedged": {
+            "default": false,
+            "description": "Use currency-hedged returns (interest-rate-differential approximation).",
+            "title": "Hedged",
+            "type": "boolean"
           },
           "max_weight": {
             "anyOf": [
@@ -2132,6 +2587,86 @@
         "title": "PricesParams",
         "type": "object"
       },
+      "RatesParams": {
+        "additionalProperties": false,
+        "properties": {
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "pairs": {
+            "description": "Currency pairs as EURUSD or EUR/USD: units of quote per one base.",
+            "items": {
+              "minLength": 6,
+              "type": "string"
+            },
+            "minItems": 1,
+            "positional": true,
+            "title": "Pairs",
+            "type": "array"
+          },
+          "start": {
+            "description": "First date, YYYY-MM-DD.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pairs",
+          "start"
+        ],
+        "title": "RatesParams",
+        "type": "object"
+      },
+      "ReerParams": {
+        "additionalProperties": false,
+        "properties": {
+          "countries": {
+            "description": "ISO3 countries (USA GBR JPN EMU MEX).",
+            "items": {
+              "type": "string"
+            },
+            "positional": true,
+            "title": "Countries",
+            "type": "array"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last month (default: today).",
+            "title": "End"
+          },
+          "start": {
+            "default": "2015-01-01",
+            "description": "First month.",
+            "format": "date",
+            "title": "Start",
+            "type": "string"
+          }
+        },
+        "required": [
+          "countries"
+        ],
+        "title": "ReerParams",
+        "type": "object"
+      },
       "RegressParams": {
         "additionalProperties": false,
         "properties": {
@@ -2213,6 +2748,42 @@
           "x"
         ],
         "title": "RegressParams",
+        "type": "object"
+      },
+      "RelativeParams": {
+        "additionalProperties": false,
+        "properties": {
+          "anchor": {
+            "description": "Anchor date; relative PPP says nothing about the level.",
+            "format": "date",
+            "title": "Anchor",
+            "type": "string"
+          },
+          "end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Last date (default: today).",
+            "title": "End"
+          },
+          "pair": {
+            "description": "Currency pair, e.g. USDGBP (units of quote per base).",
+            "positional": true,
+            "title": "Pair",
+            "type": "string"
+          }
+        },
+        "required": [
+          "pair",
+          "anchor"
+        ],
+        "title": "RelativeParams",
         "type": "object"
       },
       "RetireParams": {
@@ -2346,6 +2917,18 @@
             "description": "Expected annual return (nominal), decimal; default 7%.",
             "title": "Return"
           },
+          "save_goal": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Save the target and inputs under this name (for sobres ppp).",
+            "title": "Save Goal"
+          },
           "seed": {
             "anyOf": [
               {
@@ -2435,6 +3018,12 @@
             ],
             "title": "Fill",
             "type": "string"
+          },
+          "hedged": {
+            "default": false,
+            "description": "Use currency-hedged returns (interest-rate-differential approximation).",
+            "title": "Hedged",
+            "type": "boolean"
           },
           "portfolio": {
             "anyOf": [
@@ -4074,6 +4663,166 @@
         ]
       }
     },
+    "/api/v1/fx/attribution": {
+      "post": {
+        "description": "Split each asset's base-currency return into local, currency and cross components.",
+        "operationId": "fx_attribution_api_v1_fx_attribution_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttributionParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Split each asset's base-currency return into local, currency and cross components.",
+        "tags": [
+          "fx"
+        ]
+      }
+    },
+    "/api/v1/fx/convert": {
+      "post": {
+        "description": "Convert an amount between currencies at a dated rate.",
+        "operationId": "fx_convert_api_v1_fx_convert_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConvertParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Convert an amount between currencies at a dated rate.",
+        "tags": [
+          "fx"
+        ]
+      }
+    },
+    "/api/v1/fx/hedge": {
+      "post": {
+        "description": "Risk panels for hedged and unhedged returns side by side, and what the hedge cost.",
+        "operationId": "fx_hedge_api_v1_fx_hedge_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HedgeParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Risk panels for hedged and unhedged returns side by side, and what the hedge cost.",
+        "tags": [
+          "fx"
+        ]
+      }
+    },
+    "/api/v1/fx/rates": {
+      "post": {
+        "description": "Daily exchange rates for one or more pairs.",
+        "operationId": "fx_rates_api_v1_fx_rates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RatesParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Daily exchange rates for one or more pairs.",
+        "tags": [
+          "fx"
+        ]
+      }
+    },
     "/api/v1/health": {
       "get": {
         "operationId": "health_api_v1_health_get",
@@ -4883,6 +5632,166 @@
         "summary": "Show a saved portfolio's holdings.",
         "tags": [
           "portfolio"
+        ]
+      }
+    },
+    "/api/v1/ppp/adjust_goal": {
+      "post": {
+        "description": "Restate a goal at another country's price level, beside the market-rate figure.",
+        "operationId": "ppp_adjust_goal_api_v1_ppp_adjust_goal_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdjustGoalParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Restate a goal at another country's price level, beside the market-rate figure.",
+        "tags": [
+          "ppp"
+        ]
+      }
+    },
+    "/api/v1/ppp/compare": {
+      "post": {
+        "description": "Market rate against the PPP rate for each currency: the valuation gap, in words.",
+        "operationId": "ppp_compare_api_v1_ppp_compare_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompareParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Market rate against the PPP rate for each currency: the valuation gap, in words.",
+        "tags": [
+          "ppp"
+        ]
+      }
+    },
+    "/api/v1/ppp/reer": {
+      "post": {
+        "description": "BIS real effective exchange rates, taken as published.",
+        "operationId": "ppp_reer_api_v1_ppp_reer_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReerParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "BIS real effective exchange rates, taken as published.",
+        "tags": [
+          "ppp"
+        ]
+      }
+    },
+    "/api/v1/ppp/relative": {
+      "post": {
+        "description": "Relative PPP: the rate path implied by the inflation differential since an anchor date.",
+        "operationId": "ppp_relative_api_v1_ppp_relative_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RelativeParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Relative PPP: the rate path implied by the inflation differential since an anchor date.",
+        "tags": [
+          "ppp"
         ]
       }
     },

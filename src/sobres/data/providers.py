@@ -46,6 +46,24 @@ PROVIDERS: tuple[ProviderSpec, ...] = (
         description="Daily euro reference exchange rates from the ECB (keyless).",
         reachability_url="https://data-api.ecb.europa.eu/service/data/EXR/D.USD.EUR.SP00.A?lastNObservations=1",
     ),
+    ProviderSpec(
+        name="worldbank",
+        kind="ppp",
+        description="PPP conversion factors from the World Bank ICP, PA.NUS.PPP (keyless).",
+        reachability_url="https://api.worldbank.org/v2/country/USA/indicator/PA.NUS.PPP?format=json&per_page=1",
+    ),
+    ProviderSpec(
+        name="oecd",
+        kind="ppp",
+        description="PPP and comparative price levels from the OECD (keyless alternative).",
+        reachability_url="https://sdmx.oecd.org/public/rest/dataflow/OECD.SDD.NAD/DSD_NAMAIN10@DF_TABLE4",
+    ),
+    ProviderSpec(
+        name="bis",
+        kind="reer",
+        description="Real effective exchange rates published by the BIS (keyless).",
+        reachability_url="https://stats.bis.org/api/v1/data/WS_EER/M.R.B.US?lastNObservations=1&format=csv",
+    ),
 )
 
 

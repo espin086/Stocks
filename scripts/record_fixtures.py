@@ -20,7 +20,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1] / "tests" / "fixtures"
 TICKERS = ("AAPL", "MSFT", "NVDA", "JNJ", "XOM", "GLD", "VOD.L")
-FRED_SERIES = ("DGS10", "DTB3", "DEXUSEU", "CPIAUCSL")
+FRED_SERIES = ("DGS10", "DTB3", "DEXUSEU", "CPIAUCSL", "IR3TIB01GBM156N", "GBRCPIALLMINMEI")
 ECB_CURRENCIES = ("USD", "GBP", "JPY", "CHF")
 KEN_FRENCH_FILES = (
     "F-F_Research_Data_Factors",
@@ -129,14 +129,38 @@ def record_ken_french() -> None:
     (out / "meta.json").write_text(_meta("ken_french"), encoding="utf-8")
 
 
+PPP_COUNTRIES = ("USA", "GBR", "JPN", "CHE", "MEX", "PRT", "EMU", "DEU", "ESP", "CAN", "AUS")
+REER_AREAS = ("US", "GB", "JP", "XM", "MX")
+
+
+def record_documents(start: date, end: date) -> None:
+    """0010: one raw document per country from the World Bank, the OECD and the BIS."""
+    from sobres.data.ppp_provider import LiveBisSource, LiveOecdSource, LiveWorldBankSource
+
+    for name, source, codes, ext in (
+        ("worldbank", LiveWorldBankSource(), PPP_COUNTRIES, "json"),
+        ("oecd", LiveOecdSource(), PPP_COUNTRIES, "csv"),
+        ("bis", LiveBisSource(), REER_AREAS, "csv"),
+    ):
+        out = ROOT / name
+        out.mkdir(parents=True, exist_ok=True)
+        for code in codes:
+            (out / f"{code}.{ext}").write_text(source.payload(code), encoding="utf-8")
+        (out / "meta.json").write_text(_meta(name), encoding="utf-8")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--start", type=date.fromisoformat, default=date(2015, 1, 2))
     parser.add_argument("--end", type=date.fromisoformat, default=date(2024, 12, 31))
     parser.add_argument("--fred-api-key", default=None, help="needed to record FRED")
-    parser.add_argument("--only", nargs="*", choices=["yfinance", "fred", "ecb", "ken_french"])
+    parser.add_argument(
+        "--only", nargs="*", choices=["yfinance", "fred", "ecb", "ken_french", "documents"]
+    )
     args = parser.parse_args(argv)
-    wanted = set(args.only or ["yfinance", "fred", "ecb", "ken_french"])
+    wanted = set(args.only or ["yfinance", "fred", "ecb", "ken_french", "documents"])
+    if "documents" in wanted:
+        record_documents(args.start, args.end)
     if "yfinance" in wanted:
         record_yfinance(args.start, args.end)
     if "fred" in wanted:

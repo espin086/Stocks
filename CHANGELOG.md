@@ -12,6 +12,17 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 ## [Unreleased]
 
 ### Added
+- **Exchange rates and purchasing power parity (change 0010).** `sobres fx
+  rates|convert|attribution|hedge` (exact local/currency/cross decomposition,
+  currency risk with correlations and exposure, covered-interest-parity
+  hedging with its caveat, carry-forward stated) and `--hedged` on the
+  optimizer; `sobres ppp compare|relative|reer|adjust-goal` (absolute and
+  relative PPP kept apart, valuation gaps in words with mandatory framing,
+  BIS real effective rates taken as published, goals restated at another
+  price level beside the market-rate figure); `sobres plan … --save-goal`.
+  New keyless providers: World Bank ICP (default), OECD, BIS, with vintages
+  carried and stale benchmarks flagged (`SOBRES_PPP_PROVIDER`,
+  `SOBRES_PPP_STALE_YEARS`).
 - **Econometrics and forecasting (change 0009).** `sobres econ diagnose`
   (ADF and KPSS with disagreement stated, ACF/PACF with bounds), `econ
   forecast` (ARIMA differenced to stationarity with `d` reported, grid order

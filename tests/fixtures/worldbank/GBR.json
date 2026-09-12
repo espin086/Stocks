@@ -1,0 +1,252 @@
+[
+ {
+  "page": 1,
+  "pages": 1,
+  "per_page": 100,
+  "total": 15,
+  "sourceid": "2",
+  "lastupdated": "2025-07-01"
+ },
+ [
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2024",
+   "value": null,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2023",
+   "value": 0.7314,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2022",
+   "value": 0.7245,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2021",
+   "value": 0.7176,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2020",
+   "value": 0.7107,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2019",
+   "value": 0.7038,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2018",
+   "value": 0.6969,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2017",
+   "value": 0.69,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2016",
+   "value": 0.6831,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2015",
+   "value": 0.6762,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2014",
+   "value": 0.6693,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2013",
+   "value": 0.6624,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2012",
+   "value": 0.6555,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2011",
+   "value": 0.6486,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "GB",
+    "value": "GBR"
+   },
+   "countryiso3code": "GBR",
+   "date": "2010",
+   "value": 0.6417,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  }
+ ]
+]

@@ -1,0 +1,7 @@
+{
+  "recorded_at": null,
+  "synthesized_at": "2026-09-12T20:02:05.988732+00:00",
+  "provider": "bis",
+  "api": "stats.bis.org WS_EER M.R.B.{REF_AREA} csv",
+  "note": "synthesized in the SDMX-CSV shape, index 2020 = 100; see tests/fixtures/README.md"
+}

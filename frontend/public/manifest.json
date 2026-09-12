@@ -59,6 +59,14 @@
     "econ.forecast": "/commands/econ.forecast",
     "econ.volatility": "/commands/econ.volatility",
     "econ.diagnose": "/commands/econ.diagnose",
-    "econ.regress": "/commands/econ.regress"
+    "econ.regress": "/commands/econ.regress",
+    "fx.rates": "/commands/fx.rates",
+    "fx.convert": "/commands/fx.convert",
+    "fx.attribution": "/commands/fx.attribution",
+    "fx.hedge": "/commands/fx.hedge",
+    "ppp.compare": "/commands/ppp.compare",
+    "ppp.relative": "/commands/ppp.relative",
+    "ppp.reer": "/commands/ppp.reer",
+    "ppp.adjust_goal": "/commands/ppp.adjust_goal"
   }
 }

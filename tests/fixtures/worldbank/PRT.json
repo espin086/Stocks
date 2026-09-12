@@ -1,0 +1,252 @@
+[
+ {
+  "page": 1,
+  "pages": 1,
+  "per_page": 100,
+  "total": 15,
+  "sourceid": "2",
+  "lastupdated": "2025-07-01"
+ },
+ [
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2024",
+   "value": null,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2023",
+   "value": 0.6148,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2022",
+   "value": 0.609,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2021",
+   "value": 0.6032,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2020",
+   "value": 0.5974,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2019",
+   "value": 0.5916,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2018",
+   "value": 0.5858,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2017",
+   "value": 0.58,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2016",
+   "value": 0.5742,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2015",
+   "value": 0.5684,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2014",
+   "value": 0.5626,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2013",
+   "value": 0.5568,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2012",
+   "value": 0.551,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2011",
+   "value": 0.5452,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  },
+  {
+   "indicator": {
+    "id": "PA.NUS.PPP",
+    "value": "PPP conversion factor, GDP (LCU per international $)"
+   },
+   "country": {
+    "id": "PR",
+    "value": "PRT"
+   },
+   "countryiso3code": "PRT",
+   "date": "2010",
+   "value": 0.5394,
+   "unit": "",
+   "obs_status": "",
+   "decimal": 4
+  }
+ ]
+]

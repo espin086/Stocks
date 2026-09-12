@@ -2,8 +2,8 @@
 change: 0010-currency-and-ppp
 milestone: v1.6
 depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization, 0008-goal-planning]
-status: proposed
-planning_depth: proposal + spec deltas (design and tasks written when 0009 lands)
+status: implemented
+planning_depth: proposal + spec deltas + design + tasks
 ---
 
 # 0010 — Exchange rates and purchasing power parity
