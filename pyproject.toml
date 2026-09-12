@@ -108,6 +108,10 @@ extend-exclude = ["*.md", "legacy_code"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B", "SIM", "RUF"]
 
+[tool.ruff.lint.per-file-ignores]
+# Math tests quote formulas with Greek letters in comments and docstrings.
+"tests/core/*" = ["RUF002", "RUF003"]
+
 [tool.mypy]
 python_version = "3.11"
 packages = ["sobres"]

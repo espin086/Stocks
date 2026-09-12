@@ -11,7 +11,23 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-12
+
+The first release: the foundation plus portfolio optimization. From here the
+CLI's command surface, its `--format json` shapes and the `sobres.core` public
+functions are the compatibility surface.
+
 ### Added
+- **Portfolio optimization (change 0002).** `sobres optimize markowitz`
+  (min variance, max Sharpe, target return, target risk, risk parity, equal
+  weight; Ledoit-Wolf shrinkage by default; a concentration warning), `sobres
+  optimize frontier`, `sobres optimize backtest` (walk-forward with weight
+  drift, 10 bps default costs and an equal-weight benchmark on the same
+  schedule) and `sobres optimize risk`. Returns, annualization, the risk panel
+  (Sharpe, Sortino, Calmar, drawdown with dates, VaR/CVaR, skew, kurtosis,
+  beta), expected-return and covariance estimators with PSD conditioning, and
+  the budget-allocation LP ported from the legacy R script.
+- `docs/why-your-backtest-looks-too-good.md`.
 - **Foundation (change 0001).** The command registry and the Typer CLI
   generated from it; the settings registry behind `sobres init`, `sobres doctor`
   and `sobres config`; `sobres upgrade`; the storage port with its SQLite adapter,
@@ -49,5 +65,6 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 - Distributed as `quantfolio-cli` because the `quantfolio` name on PyPI is held
   by an unrelated package. The import package and CLI are both `quantfolio`.
 
-[Unreleased]: https://github.com/AI-Solutions-Lab-LLC/sobres/compare/v0.0.1...HEAD
+[Unreleased]: https://github.com/AI-Solutions-Lab-LLC/sobres/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/AI-Solutions-Lab-LLC/sobres/compare/v0.0.1...v1.0.0
 [0.0.1]: https://github.com/espin086/Stocks/releases/tag/v0.0.1
