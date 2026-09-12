@@ -1,0 +1,45 @@
+# Local parity with CI. Install once:
+#   pip install pre-commit && pre-commit install
+# The hooks here are the same checks CI runs, so a clean commit is a green PR.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-toml
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: detect-private-key
+      - id: end-of-file-fixer
+        exclude: ^legacy_code/
+      - id: mixed-line-ending
+      - id: trailing-whitespace
+        exclude: ^legacy_code/
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+      - id: ruff-format
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.7
+    hooks:
+      - id: actionlint
+        # Workflow expressions are rejected before any job starts, so a bad one
+        # shows up as a failed run with zero jobs and no log. Catch it here.
+
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.14.1
+    hooks:
+      - id: mypy
+        # Match CI: type-check the package, not stray scripts, and give mypy the
+        # real dependencies so `--strict` means the same thing in both places.
+        files: ^src/quantfolio/
+        additional_dependencies:
+          - typer>=0.12
+          - rich>=13.7
+          - pydantic>=2.7
+          - pandas-stubs

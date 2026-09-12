@@ -1,0 +1,34 @@
+schema: spec-driven
+
+context: |
+  quantfolio is a Python 3.11+ CLI and library for equity analysis.
+
+  Hard architectural rule (inherited from espin086/fire-calculator, which proved it):
+  ALL math and business logic live in `src/quantfolio/core/**` as pure, I/O-free
+  functions over plain dataclasses / pandas objects. Every other surface — the Typer
+  CLI, any future FastAPI app, any notebook helper — is a thin adapter that imports
+  core and holds no business logic of its own.
+
+  Data access is the other pure boundary: `src/quantfolio/data/**` owns all network
+  I/O and caching and returns plain pandas objects. Core never performs I/O; adapters
+  never do math.
+
+  Conventions:
+  - Typer + Rich for the CLI. Every command supports `--format table|json|csv`.
+  - Base `pip install` must work with no API keys. Keyed providers are opt-in.
+  - Tests: pytest. Math is tested against hand-computed or textbook fixtures, never
+    against live data. Live-network tests carry the `network` marker and are excluded
+    from CI.
+  - Money is never floats-with-rounding-surprises in output: format at the edge.
+  - Every number the CLI prints must be traceable to a cited formula in the spec.
+
+  This is a personal-finance / research tool. It is NOT investment advice and must
+  never present outputs as a recommendation to buy or sell.
+
+rules:
+  proposal:
+    - State the user-visible outcome first, in terms of a command someone can run.
+    - Always include a "Non-goals" section.
+  tasks:
+    - Break tasks into chunks of at most ~2 hours.
+    - Every capability task must name the test that proves it.

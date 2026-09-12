@@ -1,0 +1,27 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "ci"
+    groups:
+      # One PR per week for routine action bumps rather than five.
+      actions:
+        patterns: ["*"]
+
+  - package-ecosystem: pip
+    directory: "/"
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: "deps"
+    groups:
+      dev-dependencies:
+        dependency-type: development
+        patterns: ["*"]
+    # Runtime dependency majors are a deliberate decision, not a weekly chore.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

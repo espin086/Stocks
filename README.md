@@ -1,154 +1,177 @@
-# Stocks
+# quantfolio
 
-A small set of scripts for deciding where money should go. Two R scripts solve allocation
-problems with linear programming: one splits a fixed budget across investment vehicles to
-maximize average return under risk and category constraints, the other spreads money across
-personal financial choices (extra student-loan payments, 401k, paying off a home, buying a
-home, buying stocks, saving cash) to maximize total net present value subject to how much cash
-is available each year. Two Python files pull daily price history from Yahoo Finance. A
-`legacy_code/` folder holds an older R pipeline that downloaded S&P 500 prices and Federal
-Reserve macro series, cleaned and merged them, and trained models with `caret`.
+[![CI](https://github.com/espin086/Stocks/actions/workflows/ci.yml/badge.svg)](https://github.com/espin086/Stocks/actions/workflows/ci.yml)
+[![Release](https://github.com/espin086/Stocks/actions/workflows/release.yml/badge.svg)](https://github.com/espin086/Stocks/actions/workflows/release.yml)
+[![PyPI](https://img.shields.io/pypi/v/quantfolio-cli.svg)](https://pypi.org/project/quantfolio-cli/)
+[![Python](https://img.shields.io/pypi/pyversions/quantfolio-cli.svg)](https://pypi.org/project/quantfolio-cli/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-The R optimization scripts and the Python data puller are not wired together. They are separate
-pieces in one repo, not one pipeline.
+A one-stop **CLI for equity analysis** — market data, portfolio optimization, factor
+models, econometrics, and real-world goal planning, in one tool.
 
-## Features
+> ⚠️ **For research and education only. Not investment advice.**
 
-- Portfolio allocation by linear program: maximize return per dollar with a budget equality, an
-  average-risk ceiling, a category minimum, and a cross-category ratio constraint.
-- Multi-year personal finance allocation by linear program: maximize NPV of six competing uses
-  of money against a per-year cash constraint read from a CSV.
-- `StockMarketData`, a thin wrapper over `yfinance` that downloads OHLC history for one ticker
-  and exposes open, close, high, and low as pandas Series. Runnable as a CLI.
-- `npv.data.csv`, 49 periods of payment and return cash flows used by the NPV script.
+> 📍 **This repository is `espin086/Stocks`, being rebuilt as `quantfolio`.** The
+> prior R linear-programming scripts and `yfinance` pullers have moved to
+> [`legacy_code/`](legacy_code/) — nothing was deleted, and
+> `legacy_code/Financial Portfolio Optimization.R` is the reference implementation
+> that milestone 0002 ports and tests against. The original README is preserved at
+> [`legacy_code/ORIGINAL-README.md`](legacy_code/ORIGINAL-README.md).
 
-## Requirements
+```bash
+# Optimize a portfolio
+qf optimize markowitz --tickers AAPL MSFT NVDA JNJ XOM GLD \
+    --start 2015-01-01 --objective max-sharpe --max-weight 0.35
 
-There is no `requirements.txt` or `DESCRIPTION` file in the repo. The imports in the code call for:
+# See the whole risk/return trade-off, not one point
+qf optimize frontier --tickers ... --points 50 --format csv > frontier.csv
 
-**Python 3**
-- `yfinance`
-- `pandas`
-- `numpy`
-- `torch` (imported by `StockHunter.py` but not used yet)
-- `scikit-learn` (`MinMaxScaler` imported by `StockHunter.py` but not used yet)
+# Find out whether that optimizer actually works out-of-sample
+qf optimize backtest --tickers ... --rebalance quarterly --lookback 36m
 
-**R**
-- `linprog` (both optimization scripts)
-- `RCurl`, `foreign` (Financial Portfolio Optimization)
-- `FinCal` (Investing Over Time, for `npv()`)
+# Is there alpha, or is it just factor exposure?
+qf analyze factors NVDA --model ff5
 
-The `legacy_code/` scripts additionally use `quantmod`, `zoo`, `tseries`, `caret`, `reshape`,
-`DataCombine`, `lubridate`, `doParallel`, and `Rlinkedin`.
+# When can I retire?
+qf plan retire --income 200000 --expenses 90000 --portfolio 400000
 
-## Installation
+# How much of my international return was the company, and how much was the dollar?
+qf fx attribution --tickers NESN.SW 7203.T ASML.AS --base USD
+
+# That FIRE number buys a US lifestyle. What does it buy in Portugal?
+qf ppp adjust-goal --goal fire --to PRT
+```
+
+## Status
+
+🚧 **Pre-alpha — planning.** The repository currently contains the packaging
+scaffold, the release pipeline, and the full spec-driven development plan. No
+analytical code, UI, or container is implemented yet.
+
+**Start here: [`openspec/project.md`](openspec/project.md)** for the architecture, then
+the milestone plans in [`openspec/changes/`](openspec/changes/).
+
+| # | Milestone | Ships | State |
+|---|---|---|---|
+| [0000](openspec/changes/0000-release-engineering/) | Release engineering | CI gate, version-gated PyPI publishing | ✅ Done |
+| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | Command registry, storage port, providers, currency, observability, `qf data` | 📋 Planned |
+| [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
+| [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `qf db` | 📋 Planned |
+| [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `qf serve` | 📋 Planned |
+| [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `qf deploy` | 📋 Planned |
+| [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
+| [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
+| [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
+| [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
+| [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
+
+Once 0005 lands, the whole tool runs from one container:
+
+```bash
+docker run -p 8787:8787 -v quantfolio:/data espin086/quantfolio serve --host 0.0.0.0
+```
+
+## Install
+
+```bash
+pip install quantfolio-cli          # (once the first release is published)
+```
+
+Or for development:
 
 ```bash
 git clone https://github.com/espin086/Stocks.git
 cd Stocks
-pip install yfinance pandas numpy torch scikit-learn
+pip install -e ".[dev]"
+pre-commit install                  # optional: run CI's checks before each commit
 ```
 
-For the R side, from an R session:
+> **On the name:** the distribution is `quantfolio-cli` because `quantfolio` on
+> PyPI is held by an unrelated 2019 package. The import package and the CLI are
+> both `quantfolio` — `import quantfolio`, `qf --help`.
 
-```r
-install.packages(c("linprog", "RCurl", "foreign", "FinCal"))
-```
-
-## Usage
-
-Download price history for one ticker. The CLI takes three positional arguments and prints open,
-close, high, and low:
+**No API key is required** for the core tool. Prices come from yfinance and factor
+returns from the Ken French Data Library, both keyless. A free
+[FRED key](https://fred.stlouisfed.org/docs/api/api_key.html) unlocks macro series
+and the live risk-free rate:
 
 ```bash
-python StockMarketData.py AAPL 2022-01-01 2022-02-01
+qf config set fred_api_key <YOUR_KEY>
 ```
 
-Or from Python:
+## Data sources
 
-```python
-from StockMarketData import StockMarketData
+| Source | Key | Used for |
+|---|---|---|
+| [yfinance](https://github.com/ranaroussi/yfinance) | — | Prices, dividends, splits, fundamentals |
+| [FRED](https://fred.stlouisfed.org/) | free | Risk-free rate, CPI, macro series |
+| [Ken French Data Library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html) | — | Fama-French 3/5-factor + momentum returns |
+| [ECB reference rates](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html) | — | Daily exchange rates |
+| [World Bank ICP](https://data.worldbank.org/indicator/PA.NUS.PPP) / [OECD](https://data.oecd.org/conversion/purchasing-power-parities-ppp.htm) | — | PPP conversion factors and price levels |
 
-data = StockMarketData('AAPL')
-data.get_data('2022-01-01', '2022-02-01')
-print(data.get_close_price())
+## Architecture
+
+One rule, and everything follows from it:
+
+```
+              registry.py — every command declared once
+                    │
+adapters →  cli/ (Typer)  api/ (FastAPI)  frontend/ (React)   no business logic
+math     →  core/         pure, I/O-free                      no network, no disk
+I/O      →  data/         providers + SQLite                  no math
 ```
 
-`StockHunter.py` takes no arguments. Run it and it pulls five years of AAPL history ending today
-and prints the close series:
+All math lives in `core/` as pure functions. The CLI, the HTTP API, and the web UI
+are three renderings of one command registry — so "the UI has every CLI feature" is
+a test that fails the build, not an intention. One SQLite file holds the cache,
+saved portfolios, and run history, and is also the one thing Docker mounts. Full
+detail: [`openspec/project.md`](openspec/project.md).
+
+## Development
 
 ```bash
-python StockHunter.py
+pytest -m "not network"   # full suite, offline
+pytest -m network         # live provider contract tests (run deliberately)
+ruff check . && ruff format --check .
+mypy
 ```
 
-Run the budget allocation LP. It fetches the investment table (return and risk per vehicle) from
-a published Google Sheet over HTTP, so it needs network access:
+Tests never hit the network by default. Provider payloads are recorded as fixtures;
+math is tested against hand-computed and textbook values.
 
-```bash
-Rscript "Financial Portfolio Optimization.R"
-```
+### CI
 
-Run the NPV allocation LP. It reads `npv.data.csv`. Note that the script calls
-`setwd("~/Desktop")` before reading, so either move the CSV to your Desktop or edit that line to
-point at the repo:
+Every pull request runs lint, format, `mypy --strict`, and the test suite on
+Python 3.11–3.13 (Linux) plus 3.12 on macOS and Windows, then builds the wheel
+and sdist, installs the wheel into a clean environment and runs it, and audits
+the dependency tree. CodeQL and Dependabot run alongside. One aggregated status
+check, **All checks passed**, gates merges.
 
-```bash
-Rscript "Investing Over Time.R"
-```
+### Releases
 
-There are no environment variables or API keys anywhere in the code. Yahoo Finance and the
-Google Sheet are both fetched unauthenticated.
+Releasing is a version bump. Change `__version__` in
+`src/quantfolio/__about__.py`, add a `CHANGELOG.md` section, merge to `main` —
+the pipeline re-runs the full gate on that commit and publishes to PyPI via
+Trusted Publishing (OIDC, no stored token) with PEP 740 attestations, then tags
+and creates the GitHub release. Any push to `main` that doesn't change the
+version publishes nothing.
 
-## Project structure
+See **[docs/RELEASING.md](docs/RELEASING.md)** for the one-time setup and the
+failure playbook.
 
-```
-Financial Portfolio Optimization.R   Budget-allocation LP; pulls returns and risk from a Google Sheet
-Investing Over Time.R                NPV-maximizing LP across six personal financial choices
-StockMarketData.py                   yfinance wrapper class plus an argparse CLI
-StockHunter.py                       Script that pulls 5 years of AAPL closes; ML imports unused
-npv.data.csv                         49 periods of cash flows and per-year cash constraints
-legacy_code/                         Older R pipeline, hardcoded Windows paths, not runnable as-is
-  Import - All Stock Prices.R        Downloads S&P 500 constituent prices via tseries
-  Import - Fed Macro Data.R          Pulls FRED series (rates, oil, FX) via quantmod
-  Import - Company Financials.R      Pulls balance sheet, income, cash flow via quantmod
-  Import - Linkedin CEO Data.R       LinkedIn connection pull via Rlinkedin
-  Clean - All Stock Prices.R         Reshapes wide price data to tidy date/ticker/price
-  Clean - Fed Macro Data.R           Builds log-return lags of each Fed series
-  Merge.R                            Joins prices and macro data, splits train/test/validation
-  Analysis - Merged.R                Trains models per ticker with caret and doParallel
-  Initial Analysis - 01-23-15.R      First-pass filtering of a stock universe file
-  *.rattle                           Saved Rattle GUI project files
-  README.md                          Unfilled Code for San Francisco template
-```
+## Contributing
 
-## How it works
-
-Both R scripts are linear programs solved with `linprog::solveLP`.
-
-**Financial Portfolio Optimization.R** treats the fraction of the budget going to each of six
-vehicles as the decision variables. The objective is the vector of returns (column 2 of the
-sheet, divided by 100), maximized. Four constraints:
-
-1. Budget: the fractions sum to exactly 1.
-2. Average risk: `risk - 5` dotted with the allocation must be at most 0, which enforces a
-   weighted average risk score of 5 or less.
-3. Commercial loans: at least 20% of the total goes to the fourth vehicle.
-4. Mortgages: second mortgages and personal loans, weighted 2 and 3, must not exceed first
-   mortgages. The comment describes a plain sum; the coefficients `c(-1, 2, 3, 0, 0, 0)` weight
-   the two terms rather than summing them, so the code and the comment disagree.
-
-**Investing Over Time.R** computes, at a 5% discount rate, the NPV of the net cash-flow column
-for each of the six options in `npv.data.csv`, then maximizes total NPV. The constraint matrix
-is the per-option payment columns with signs flipped, and the right-hand side is the
-`financial.constraints` column, so in each period the money committed cannot exceed the money
-available. The script prints `answer$opt`, `answer$solution`, and `answer$con`. The header
-comments say the assumptions were not validated and recommend checking the NPV math with a
-wealth advisor.
-
-The Python side does no optimization. `StockMarketData` calls `yfinance.download` and returns
-columns off the resulting DataFrame. `StockHunter.py` imports torch and `MinMaxScaler` but never
-uses them, so the price-prediction work those imports point at has not been written yet.
+This project is spec-driven. Behavior changes start with an OpenSpec change under
+`openspec/changes/` — proposal, spec delta, design, tasks — before implementation.
+The spec delta is the contract; every scenario in it gets a test.
 
 ## License
 
-No LICENSE file in the repo.
+MIT — see [LICENSE](LICENSE).
+
+## Disclaimer
+
+quantfolio is a research and education tool. It is not investment advice, not a
+recommendation to buy or sell any security, and carries no warranty of accuracy.
+Data comes from third-party sources that may be delayed, revised, or wrong.
+Backtested results are hypothetical and do not indicate future performance.
