@@ -64,7 +64,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | ✅ Done |
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | ✅ Done |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | ✅ Done |
-| [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | 📋 Planned |
+| [0008](openspec/changes/0008-goal-planning/) | Goal planning | Retirement/FIRE, house, car, education, Monte Carlo | ✅ Done |
 | [0009](openspec/changes/0009-econometrics-forecasting/) | Econometrics | ARIMA, GARCH, robust regression | 📋 Planned |
 | [0010](openspec/changes/0010-currency-and-ppp/) | Exchange rates & PPP | FX attribution, hedging, PPP-adjusted goals | 📋 Planned |
 | [0011](openspec/changes/0011-rebrand-sobres/) | Rebrand | One name everywhere: `sobres` | 🔧 In progress |
@@ -155,6 +155,23 @@ p-values; alpha is annualized and, when its HAC p-value exceeds 0.05, the output
 says it is not distinguishable from zero. `analyze stock` adds the price summary,
 the 0002 risk panel, CAPM beta and current fundamentals with the note that they
 are not point-in-time.
+
+## Quickstart: goal planning
+
+```bash
+sobres plan retire --income 200000 --expenses 90000 --portfolio 400000 --return 0.07
+sobres plan house --price 950000 --down-pct 0.20 --by 2029-06-01 --monthly 3000
+sobres plan car --price 45000 --by 2027-01-01 --current 5000
+sobres plan education --annual-cost 35000 --years 4 --starting 2038
+sobres plan goal --target 250000 --by 2032-01-01 --monthly 1500 --simulate 10000
+```
+
+Real by default (today's dollars; the return you give is deflated by trailing
+10-year CPI, or 2.5% without a FRED key) with `--nominal` as the alternative.
+Every answer comes with a simulated success probability and the 10th to 90th
+percentile outcomes; `--method bootstrap --history SPY` resamples real return
+blocks so bad-early-years paths appear. The seed is printed. Taxes are not
+modeled and the output says so.
 
 ## Quickstart: saved state
 

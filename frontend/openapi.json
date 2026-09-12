@@ -219,6 +219,183 @@
         "title": "CacheInfoParams",
         "type": "object"
       },
+      "CarParams": {
+        "additionalProperties": false,
+        "properties": {
+          "block": {
+            "default": 12,
+            "description": "Bootstrap block length.",
+            "minimum": 1.0,
+            "title": "Block",
+            "type": "integer"
+          },
+          "by": {
+            "description": "Target purchase date.",
+            "format": "date",
+            "title": "By",
+            "type": "string"
+          },
+          "current": {
+            "default": 0.0,
+            "description": "Saved so far.",
+            "minimum": 0.0,
+            "title": "Current",
+            "type": "number"
+          },
+          "depreciation": {
+            "anyOf": [
+              {
+                "exclusiveMaximum": 1.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual depreciation, for the resale estimate.",
+            "title": "Depreciation"
+          },
+          "history": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tickers whose equal-weight monthly returns the bootstrap resamples.",
+            "title": "History"
+          },
+          "history_start": {
+            "default": "2000-01-01",
+            "description": "First date of the bootstrap history.",
+            "format": "date",
+            "title": "History Start",
+            "type": "string"
+          },
+          "inflation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).",
+            "title": "Inflation"
+          },
+          "method": {
+            "default": "montecarlo",
+            "description": "Simulation method.",
+            "enum": [
+              "montecarlo",
+              "bootstrap"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "monthly": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What you can save monthly.",
+            "title": "Monthly"
+          },
+          "nominal": {
+            "default": false,
+            "description": "Nominal dollars: no inflation adjustment.",
+            "title": "Nominal",
+            "type": "boolean"
+          },
+          "price": {
+            "description": "Purchase price.",
+            "exclusiveMinimum": 0.0,
+            "title": "Price",
+            "type": "number"
+          },
+          "real": {
+            "default": false,
+            "description": "Today's dollars: the return is deflated by inflation (the default).",
+            "title": "Real",
+            "type": "boolean"
+          },
+          "resale_years": {
+            "default": 5.0,
+            "description": "Years until resale (with --depreciation).",
+            "exclusiveMinimum": 0.0,
+            "title": "Resale Years",
+            "type": "number"
+          },
+          "return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Expected annual return (nominal), decimal; default 7%.",
+            "title": "Return"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Seed; printed even when auto-generated.",
+            "title": "Seed"
+          },
+          "simulate": {
+            "default": 10000,
+            "description": "Simulated paths; 0 for a deterministic answer only.",
+            "minimum": 0.0,
+            "title": "Simulate",
+            "type": "integer"
+          },
+          "timing": {
+            "default": "end",
+            "description": "Contribution timing: end (ordinary annuity) or begin (due).",
+            "enum": [
+              "end",
+              "begin"
+            ],
+            "title": "Timing",
+            "type": "string"
+          },
+          "vol": {
+            "default": 0.15,
+            "description": "Annual return volatility for the simulation.",
+            "minimum": 0.0,
+            "title": "Vol",
+            "type": "number"
+          }
+        },
+        "required": [
+          "price",
+          "by"
+        ],
+        "title": "CarParams",
+        "type": "object"
+      },
       "CheckParams": {
         "additionalProperties": false,
         "properties": {
@@ -395,6 +572,174 @@
           }
         },
         "title": "DoctorParams",
+        "type": "object"
+      },
+      "EducationParams": {
+        "additionalProperties": false,
+        "properties": {
+          "annual_cost": {
+            "description": "Cost per year in today's dollars.",
+            "exclusiveMinimum": 0.0,
+            "title": "Annual Cost",
+            "type": "number"
+          },
+          "block": {
+            "default": 12,
+            "description": "Bootstrap block length.",
+            "minimum": 1.0,
+            "title": "Block",
+            "type": "integer"
+          },
+          "cost_inflation": {
+            "default": 0.05,
+            "description": "Education-cost inflation (separate from CPI).",
+            "title": "Cost Inflation",
+            "type": "number"
+          },
+          "current": {
+            "default": 0.0,
+            "description": "Saved so far.",
+            "minimum": 0.0,
+            "title": "Current",
+            "type": "number"
+          },
+          "history": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tickers whose equal-weight monthly returns the bootstrap resamples.",
+            "title": "History"
+          },
+          "history_start": {
+            "default": "2000-01-01",
+            "description": "First date of the bootstrap history.",
+            "format": "date",
+            "title": "History Start",
+            "type": "string"
+          },
+          "inflation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).",
+            "title": "Inflation"
+          },
+          "method": {
+            "default": "montecarlo",
+            "description": "Simulation method.",
+            "enum": [
+              "montecarlo",
+              "bootstrap"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "monthly": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What you can save monthly.",
+            "title": "Monthly"
+          },
+          "nominal": {
+            "default": false,
+            "description": "Nominal dollars: no inflation adjustment.",
+            "title": "Nominal",
+            "type": "boolean"
+          },
+          "real": {
+            "default": false,
+            "description": "Today's dollars: the return is deflated by inflation (the default).",
+            "title": "Real",
+            "type": "boolean"
+          },
+          "return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Expected annual return (nominal), decimal; default 7%.",
+            "title": "Return"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Seed; printed even when auto-generated.",
+            "title": "Seed"
+          },
+          "simulate": {
+            "default": 10000,
+            "description": "Simulated paths; 0 for a deterministic answer only.",
+            "minimum": 0.0,
+            "title": "Simulate",
+            "type": "integer"
+          },
+          "starting": {
+            "description": "First year of study.",
+            "title": "Starting",
+            "type": "integer"
+          },
+          "timing": {
+            "default": "end",
+            "description": "Contribution timing: end (ordinary annuity) or begin (due).",
+            "enum": [
+              "end",
+              "begin"
+            ],
+            "title": "Timing",
+            "type": "string"
+          },
+          "vol": {
+            "default": 0.15,
+            "description": "Annual return volatility for the simulation.",
+            "minimum": 0.0,
+            "title": "Vol",
+            "type": "number"
+          },
+          "years": {
+            "default": 4,
+            "description": "Years of study.",
+            "minimum": 1.0,
+            "title": "Years",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "annual_cost",
+          "starting"
+        ],
+        "title": "EducationParams",
         "type": "object"
       },
       "EnvParams": {
@@ -810,6 +1155,177 @@
         "title": "FxParams",
         "type": "object"
       },
+      "GoalParams": {
+        "additionalProperties": false,
+        "properties": {
+          "block": {
+            "default": 12,
+            "description": "Bootstrap block length.",
+            "minimum": 1.0,
+            "title": "Block",
+            "type": "integer"
+          },
+          "by": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Date to reach it by.",
+            "title": "By"
+          },
+          "current": {
+            "default": 0.0,
+            "description": "Saved so far.",
+            "minimum": 0.0,
+            "title": "Current",
+            "type": "number"
+          },
+          "history": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tickers whose equal-weight monthly returns the bootstrap resamples.",
+            "title": "History"
+          },
+          "history_start": {
+            "default": "2000-01-01",
+            "description": "First date of the bootstrap history.",
+            "format": "date",
+            "title": "History Start",
+            "type": "string"
+          },
+          "inflation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).",
+            "title": "Inflation"
+          },
+          "method": {
+            "default": "montecarlo",
+            "description": "Simulation method.",
+            "enum": [
+              "montecarlo",
+              "bootstrap"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "monthly": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Monthly contribution.",
+            "title": "Monthly"
+          },
+          "nominal": {
+            "default": false,
+            "description": "Nominal dollars: no inflation adjustment.",
+            "title": "Nominal",
+            "type": "boolean"
+          },
+          "real": {
+            "default": false,
+            "description": "Today's dollars: the return is deflated by inflation (the default).",
+            "title": "Real",
+            "type": "boolean"
+          },
+          "return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Expected annual return (nominal), decimal; default 7%.",
+            "title": "Return"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Seed; printed even when auto-generated.",
+            "title": "Seed"
+          },
+          "simulate": {
+            "default": 10000,
+            "description": "Simulated paths; 0 for a deterministic answer only.",
+            "minimum": 0.0,
+            "title": "Simulate",
+            "type": "integer"
+          },
+          "solve_return": {
+            "default": false,
+            "description": "Solve for the return that makes the plan work (give the others).",
+            "title": "Solve Return",
+            "type": "boolean"
+          },
+          "target": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Amount to reach.",
+            "title": "Target"
+          },
+          "timing": {
+            "default": "end",
+            "description": "Contribution timing: end (ordinary annuity) or begin (due).",
+            "enum": [
+              "end",
+              "begin"
+            ],
+            "title": "Timing",
+            "type": "string"
+          },
+          "vol": {
+            "default": 0.15,
+            "description": "Annual return volatility for the simulation.",
+            "minimum": 0.0,
+            "title": "Vol",
+            "type": "number"
+          }
+        },
+        "title": "GoalParams",
+        "type": "object"
+      },
       "HTTPValidationError": {
         "properties": {
           "detail": {
@@ -843,6 +1359,176 @@
           }
         },
         "title": "HealthParams",
+        "type": "object"
+      },
+      "HouseParams": {
+        "additionalProperties": false,
+        "properties": {
+          "block": {
+            "default": 12,
+            "description": "Bootstrap block length.",
+            "minimum": 1.0,
+            "title": "Block",
+            "type": "integer"
+          },
+          "by": {
+            "description": "Target purchase date.",
+            "format": "date",
+            "title": "By",
+            "type": "string"
+          },
+          "current": {
+            "default": 0.0,
+            "description": "Saved so far.",
+            "minimum": 0.0,
+            "title": "Current",
+            "type": "number"
+          },
+          "down_pct": {
+            "default": 0.2,
+            "description": "Down payment as a fraction.",
+            "exclusiveMinimum": 0.0,
+            "maximum": 1.0,
+            "title": "Down Pct",
+            "type": "number"
+          },
+          "history": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tickers whose equal-weight monthly returns the bootstrap resamples.",
+            "title": "History"
+          },
+          "history_start": {
+            "default": "2000-01-01",
+            "description": "First date of the bootstrap history.",
+            "format": "date",
+            "title": "History Start",
+            "type": "string"
+          },
+          "inflation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).",
+            "title": "Inflation"
+          },
+          "method": {
+            "default": "montecarlo",
+            "description": "Simulation method.",
+            "enum": [
+              "montecarlo",
+              "bootstrap"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "monthly": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "What you can save monthly.",
+            "title": "Monthly"
+          },
+          "nominal": {
+            "default": false,
+            "description": "Nominal dollars: no inflation adjustment.",
+            "title": "Nominal",
+            "type": "boolean"
+          },
+          "price": {
+            "description": "Purchase price today.",
+            "exclusiveMinimum": 0.0,
+            "title": "Price",
+            "type": "number"
+          },
+          "price_growth": {
+            "default": 0.0,
+            "description": "Annual house-price growth.",
+            "title": "Price Growth",
+            "type": "number"
+          },
+          "real": {
+            "default": false,
+            "description": "Today's dollars: the return is deflated by inflation (the default).",
+            "title": "Real",
+            "type": "boolean"
+          },
+          "return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Expected annual return (nominal), decimal; default 7%.",
+            "title": "Return"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Seed; printed even when auto-generated.",
+            "title": "Seed"
+          },
+          "simulate": {
+            "default": 10000,
+            "description": "Simulated paths; 0 for a deterministic answer only.",
+            "minimum": 0.0,
+            "title": "Simulate",
+            "type": "integer"
+          },
+          "timing": {
+            "default": "end",
+            "description": "Contribution timing: end (ordinary annuity) or begin (due).",
+            "enum": [
+              "end",
+              "begin"
+            ],
+            "title": "Timing",
+            "type": "string"
+          },
+          "vol": {
+            "default": 0.15,
+            "description": "Annual return volatility for the simulation.",
+            "minimum": 0.0,
+            "title": "Vol",
+            "type": "number"
+          }
+        },
+        "required": [
+          "price",
+          "by"
+        ],
+        "title": "HouseParams",
         "type": "object"
       },
       "InitParams": {
@@ -1280,6 +1966,189 @@
           "tickers"
         ],
         "title": "PricesParams",
+        "type": "object"
+      },
+      "RetireParams": {
+        "additionalProperties": false,
+        "properties": {
+          "age": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Current age (for --coast).",
+            "title": "Age"
+          },
+          "block": {
+            "default": 12,
+            "description": "Bootstrap block length.",
+            "minimum": 1.0,
+            "title": "Block",
+            "type": "integer"
+          },
+          "coast": {
+            "default": false,
+            "description": "Also report the Coast FI balance.",
+            "title": "Coast",
+            "type": "boolean"
+          },
+          "expenses": {
+            "description": "Annual expenses (today's dollars).",
+            "exclusiveMinimum": 0.0,
+            "title": "Expenses",
+            "type": "number"
+          },
+          "history": {
+            "anyOf": [
+              {
+                "items": {
+                  "minLength": 1,
+                  "type": "string"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tickers whose equal-weight monthly returns the bootstrap resamples.",
+            "title": "History"
+          },
+          "history_start": {
+            "default": "2000-01-01",
+            "description": "First date of the bootstrap history.",
+            "format": "date",
+            "title": "History Start",
+            "type": "string"
+          },
+          "income": {
+            "description": "Annual after-tax income.",
+            "exclusiveMinimum": 0.0,
+            "title": "Income",
+            "type": "number"
+          },
+          "inflation": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).",
+            "title": "Inflation"
+          },
+          "method": {
+            "default": "montecarlo",
+            "description": "Simulation method.",
+            "enum": [
+              "montecarlo",
+              "bootstrap"
+            ],
+            "title": "Method",
+            "type": "string"
+          },
+          "nominal": {
+            "default": false,
+            "description": "Nominal dollars: no inflation adjustment.",
+            "title": "Nominal",
+            "type": "boolean"
+          },
+          "portfolio": {
+            "default": 0.0,
+            "description": "Current invested balance.",
+            "minimum": 0.0,
+            "title": "Portfolio",
+            "type": "number"
+          },
+          "real": {
+            "default": false,
+            "description": "Today's dollars: the return is deflated by inflation (the default).",
+            "title": "Real",
+            "type": "boolean"
+          },
+          "retire_age": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Target age (for --coast).",
+            "title": "Retire Age"
+          },
+          "return": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Expected annual return (nominal), decimal; default 7%.",
+            "title": "Return"
+          },
+          "seed": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Seed; printed even when auto-generated.",
+            "title": "Seed"
+          },
+          "simulate": {
+            "default": 10000,
+            "description": "Simulated paths; 0 for a deterministic answer only.",
+            "minimum": 0.0,
+            "title": "Simulate",
+            "type": "integer"
+          },
+          "timing": {
+            "default": "end",
+            "description": "Contribution timing: end (ordinary annuity) or begin (due).",
+            "enum": [
+              "end",
+              "begin"
+            ],
+            "title": "Timing",
+            "type": "string"
+          },
+          "vol": {
+            "default": 0.15,
+            "description": "Annual return volatility for the simulation.",
+            "minimum": 0.0,
+            "title": "Vol",
+            "type": "number"
+          },
+          "withdrawal_rate": {
+            "default": 0.04,
+            "description": "Safe withdrawal rate.",
+            "exclusiveMaximum": 1.0,
+            "exclusiveMinimum": 0.0,
+            "title": "Withdrawal Rate",
+            "type": "number"
+          }
+        },
+        "required": [
+          "income",
+          "expenses"
+        ],
+        "title": "RetireParams",
         "type": "object"
       },
       "RiskParams": {
@@ -3162,6 +4031,206 @@
         "summary": "The full risk panel for a fixed-weight portfolio.",
         "tags": [
           "optimize"
+        ]
+      }
+    },
+    "/api/v1/plan/car": {
+      "post": {
+        "description": "Monthly saving for a car, with an optional resale estimate.",
+        "operationId": "plan_car_api_v1_plan_car_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CarParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Monthly saving for a car, with an optional resale estimate.",
+        "tags": [
+          "plan"
+        ]
+      }
+    },
+    "/api/v1/plan/education": {
+      "post": {
+        "description": "Inflated total cost of an education and the monthly saving.",
+        "operationId": "plan_education_api_v1_plan_education_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EducationParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Inflated total cost of an education and the monthly saving.",
+        "tags": [
+          "plan"
+        ]
+      }
+    },
+    "/api/v1/plan/goal": {
+      "post": {
+        "description": "Generic funding: give three of target, date, monthly and return; the fourth is solved.",
+        "operationId": "plan_goal_api_v1_plan_goal_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GoalParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Generic funding: give three of target, date, monthly and return; the fourth is solved.",
+        "tags": [
+          "plan"
+        ]
+      }
+    },
+    "/api/v1/plan/house": {
+      "post": {
+        "description": "Down-payment target and the monthly saving it needs.",
+        "operationId": "plan_house_api_v1_plan_house_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/HouseParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Down-payment target and the monthly saving it needs.",
+        "tags": [
+          "plan"
+        ]
+      }
+    },
+    "/api/v1/plan/retire": {
+      "post": {
+        "description": "FI number, savings rate, years to FI and the probability of getting there.",
+        "operationId": "plan_retire_api_v1_plan_retire_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetireParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "FI number, savings rate, years to FI and the probability of getting there.",
+        "tags": [
+          "plan"
         ]
       }
     },

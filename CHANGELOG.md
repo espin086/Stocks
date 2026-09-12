@@ -12,6 +12,14 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 ## [Unreleased]
 
 ### Added
+- **Goal planning (change 0008).** `sobres plan retire|house|car|education|goal`:
+  a funding solver for any one of target, time, contribution and return; FIRE
+  math ported from fire-calculator with its golden fixture; real (default,
+  Fisher-deflated, CPI from FRED or a stated 2.5% fallback) or nominal, every
+  amount labelled; Monte Carlo by default and moving-block bootstrap on real
+  return history, with the success probability, the 10th–90th percentiles and
+  the seed printed; the deterministic figures labelled as the median case; the
+  4% rule named as an assumption; taxes stated as not modeled.
 - **Equity and factor analysis (change 0007).** `sobres analyze factors`
   (CAPM, FF3, FF5, FF5+momentum on excess returns; OLS and Newey-West
   statistics per term; annualized alpha with an explicit "not distinguishable

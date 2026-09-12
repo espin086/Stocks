@@ -13,6 +13,7 @@ MODULES: tuple[str, ...] = (
     "doctor",
     "init",
     "optimize",
+    "plan",
     "portfolio",
     "run",
     "serve",

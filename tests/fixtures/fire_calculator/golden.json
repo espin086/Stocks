@@ -1,0 +1,26 @@
+{
+  "_comment": "Shared contract test fixture. The FIRE math lives in two languages (Python src/fire_calc/core.py and Java java-api/.../core/FireCalc.java). Both test suites load THIS file and assert their implementation matches it, so the two copies cannot silently drift. Values were generated from the Python core (the original source of truth). Floats are compared with a small tolerance.",
+  "fi_number": [
+    { "annual_expenses": 90000, "withdrawal_rate": 0.04, "expected": 2250000.0 },
+    { "annual_expenses": 40000, "withdrawal_rate": 0.035, "expected": 1142857.1428571427 }
+  ],
+  "savings_rate": [
+    { "income": 200000, "expenses": 90000, "expected": 0.55 },
+    { "income": 0, "expenses": 50000, "expected": 0.0 },
+    { "income": 100000, "expenses": 100000, "expected": 0.0 }
+  ],
+  "project": [
+    {
+      "income": 200000, "expenses": 90000, "annual_return": 0.07,
+      "starting_balance": 0.0, "withdrawal_rate": 0.04, "max_years": 60,
+      "savings_rate": 0.55, "fi_number": 2250000.0, "years_to_fi": 13.130258416906988,
+      "schedule_len": 60, "first_balance": 110000.0, "last_balance": 89487242.16855283
+    },
+    {
+      "income": 120000, "expenses": 80000, "annual_return": 0.05,
+      "starting_balance": 50000.0, "withdrawal_rate": 0.04, "max_years": 60,
+      "savings_rate": 0.3333333333333333, "fi_number": 2000000.0, "years_to_fi": 24.4280035009746,
+      "schedule_len": 60, "first_balance": 92500.0, "last_balance": 15077308.010004528
+    }
+  ]
+}

@@ -664,6 +664,106 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/plan/car": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Monthly saving for a car, with an optional resale estimate.
+         * @description Monthly saving for a car, with an optional resale estimate.
+         */
+        post: operations["plan_car_api_v1_plan_car_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan/education": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Inflated total cost of an education and the monthly saving.
+         * @description Inflated total cost of an education and the monthly saving.
+         */
+        post: operations["plan_education_api_v1_plan_education_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan/goal": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Generic funding: give three of target, date, monthly and return; the fourth is solved.
+         * @description Generic funding: give three of target, date, monthly and return; the fourth is solved.
+         */
+        post: operations["plan_goal_api_v1_plan_goal_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan/house": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Down-payment target and the monthly saving it needs.
+         * @description Down-payment target and the monthly saving it needs.
+         */
+        post: operations["plan_house_api_v1_plan_house_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/plan/retire": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * FI number, savings rate, years to FI and the probability of getting there.
+         * @description FI number, savings rate, years to FI and the probability of getting there.
+         */
+        post: operations["plan_retire_api_v1_plan_retire_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/portfolio/delete": {
         parameters: {
             query?: never;
@@ -1142,6 +1242,113 @@ export interface components {
         };
         /** CacheInfoParams */
         CacheInfoParams: Record<string, never>;
+        /** CarParams */
+        CarParams: {
+            /**
+             * Block
+             * @description Bootstrap block length.
+             * @default 12
+             */
+            block: number;
+            /**
+             * By
+             * Format: date
+             * @description Target purchase date.
+             */
+            by: string;
+            /**
+             * Current
+             * @description Saved so far.
+             * @default 0
+             */
+            current: number;
+            /**
+             * Depreciation
+             * @description Annual depreciation, for the resale estimate.
+             */
+            depreciation?: number | null;
+            /**
+             * History
+             * @description Tickers whose equal-weight monthly returns the bootstrap resamples.
+             */
+            history?: string[] | null;
+            /**
+             * History Start
+             * Format: date
+             * @description First date of the bootstrap history.
+             * @default 2000-01-01
+             */
+            history_start: string;
+            /**
+             * Inflation
+             * @description Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).
+             */
+            inflation?: number | null;
+            /**
+             * Method
+             * @description Simulation method.
+             * @default montecarlo
+             * @enum {string}
+             */
+            method: "montecarlo" | "bootstrap";
+            /**
+             * Monthly
+             * @description What you can save monthly.
+             */
+            monthly?: number | null;
+            /**
+             * Nominal
+             * @description Nominal dollars: no inflation adjustment.
+             * @default false
+             */
+            nominal: boolean;
+            /**
+             * Price
+             * @description Purchase price.
+             */
+            price: number;
+            /**
+             * Real
+             * @description Today's dollars: the return is deflated by inflation (the default).
+             * @default false
+             */
+            real: boolean;
+            /**
+             * Resale Years
+             * @description Years until resale (with --depreciation).
+             * @default 5
+             */
+            resale_years: number;
+            /**
+             * Return
+             * @description Expected annual return (nominal), decimal; default 7%.
+             */
+            return?: number | null;
+            /**
+             * Seed
+             * @description Seed; printed even when auto-generated.
+             */
+            seed?: number | null;
+            /**
+             * Simulate
+             * @description Simulated paths; 0 for a deterministic answer only.
+             * @default 10000
+             */
+            simulate: number;
+            /**
+             * Timing
+             * @description Contribution timing: end (ordinary annuity) or begin (due).
+             * @default end
+             * @enum {string}
+             */
+            timing: "end" | "begin";
+            /**
+             * Vol
+             * @description Annual return volatility for the simulation.
+             * @default 0.15
+             */
+            vol: number;
+        };
         /** CheckParams */
         CheckParams: {
             /**
@@ -1250,6 +1457,113 @@ export interface components {
              * @default false
              */
             strict: boolean;
+        };
+        /** EducationParams */
+        EducationParams: {
+            /**
+             * Annual Cost
+             * @description Cost per year in today's dollars.
+             */
+            annual_cost: number;
+            /**
+             * Block
+             * @description Bootstrap block length.
+             * @default 12
+             */
+            block: number;
+            /**
+             * Cost Inflation
+             * @description Education-cost inflation (separate from CPI).
+             * @default 0.05
+             */
+            cost_inflation: number;
+            /**
+             * Current
+             * @description Saved so far.
+             * @default 0
+             */
+            current: number;
+            /**
+             * History
+             * @description Tickers whose equal-weight monthly returns the bootstrap resamples.
+             */
+            history?: string[] | null;
+            /**
+             * History Start
+             * Format: date
+             * @description First date of the bootstrap history.
+             * @default 2000-01-01
+             */
+            history_start: string;
+            /**
+             * Inflation
+             * @description Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).
+             */
+            inflation?: number | null;
+            /**
+             * Method
+             * @description Simulation method.
+             * @default montecarlo
+             * @enum {string}
+             */
+            method: "montecarlo" | "bootstrap";
+            /**
+             * Monthly
+             * @description What you can save monthly.
+             */
+            monthly?: number | null;
+            /**
+             * Nominal
+             * @description Nominal dollars: no inflation adjustment.
+             * @default false
+             */
+            nominal: boolean;
+            /**
+             * Real
+             * @description Today's dollars: the return is deflated by inflation (the default).
+             * @default false
+             */
+            real: boolean;
+            /**
+             * Return
+             * @description Expected annual return (nominal), decimal; default 7%.
+             */
+            return?: number | null;
+            /**
+             * Seed
+             * @description Seed; printed even when auto-generated.
+             */
+            seed?: number | null;
+            /**
+             * Simulate
+             * @description Simulated paths; 0 for a deterministic answer only.
+             * @default 10000
+             */
+            simulate: number;
+            /**
+             * Starting
+             * @description First year of study.
+             */
+            starting: number;
+            /**
+             * Timing
+             * @description Contribution timing: end (ordinary annuity) or begin (due).
+             * @default end
+             * @enum {string}
+             */
+            timing: "end" | "begin";
+            /**
+             * Vol
+             * @description Annual return volatility for the simulation.
+             * @default 0.15
+             */
+            vol: number;
+            /**
+             * Years
+             * @description Years of study.
+             * @default 4
+             */
+            years: number;
         };
         /** EnvParams */
         EnvParams: Record<string, never>;
@@ -1459,6 +1773,107 @@ export interface components {
              */
             start: string;
         };
+        /** GoalParams */
+        GoalParams: {
+            /**
+             * Block
+             * @description Bootstrap block length.
+             * @default 12
+             */
+            block: number;
+            /**
+             * By
+             * @description Date to reach it by.
+             */
+            by?: string | null;
+            /**
+             * Current
+             * @description Saved so far.
+             * @default 0
+             */
+            current: number;
+            /**
+             * History
+             * @description Tickers whose equal-weight monthly returns the bootstrap resamples.
+             */
+            history?: string[] | null;
+            /**
+             * History Start
+             * Format: date
+             * @description First date of the bootstrap history.
+             * @default 2000-01-01
+             */
+            history_start: string;
+            /**
+             * Inflation
+             * @description Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).
+             */
+            inflation?: number | null;
+            /**
+             * Method
+             * @description Simulation method.
+             * @default montecarlo
+             * @enum {string}
+             */
+            method: "montecarlo" | "bootstrap";
+            /**
+             * Monthly
+             * @description Monthly contribution.
+             */
+            monthly?: number | null;
+            /**
+             * Nominal
+             * @description Nominal dollars: no inflation adjustment.
+             * @default false
+             */
+            nominal: boolean;
+            /**
+             * Real
+             * @description Today's dollars: the return is deflated by inflation (the default).
+             * @default false
+             */
+            real: boolean;
+            /**
+             * Return
+             * @description Expected annual return (nominal), decimal; default 7%.
+             */
+            return?: number | null;
+            /**
+             * Seed
+             * @description Seed; printed even when auto-generated.
+             */
+            seed?: number | null;
+            /**
+             * Simulate
+             * @description Simulated paths; 0 for a deterministic answer only.
+             * @default 10000
+             */
+            simulate: number;
+            /**
+             * Solve Return
+             * @description Solve for the return that makes the plan work (give the others).
+             * @default false
+             */
+            solve_return: boolean;
+            /**
+             * Target
+             * @description Amount to reach.
+             */
+            target?: number | null;
+            /**
+             * Timing
+             * @description Contribution timing: end (ordinary annuity) or begin (due).
+             * @default end
+             * @enum {string}
+             */
+            timing: "end" | "begin";
+            /**
+             * Vol
+             * @description Annual return volatility for the simulation.
+             * @default 0.15
+             */
+            vol: number;
+        };
         /** HTTPValidationError */
         HTTPValidationError: {
             /** Detail */
@@ -1478,6 +1893,114 @@ export interface components {
              * @default 5
              */
             timeout: number;
+        };
+        /** HouseParams */
+        HouseParams: {
+            /**
+             * Block
+             * @description Bootstrap block length.
+             * @default 12
+             */
+            block: number;
+            /**
+             * By
+             * Format: date
+             * @description Target purchase date.
+             */
+            by: string;
+            /**
+             * Current
+             * @description Saved so far.
+             * @default 0
+             */
+            current: number;
+            /**
+             * Down Pct
+             * @description Down payment as a fraction.
+             * @default 0.2
+             */
+            down_pct: number;
+            /**
+             * History
+             * @description Tickers whose equal-weight monthly returns the bootstrap resamples.
+             */
+            history?: string[] | null;
+            /**
+             * History Start
+             * Format: date
+             * @description First date of the bootstrap history.
+             * @default 2000-01-01
+             */
+            history_start: string;
+            /**
+             * Inflation
+             * @description Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).
+             */
+            inflation?: number | null;
+            /**
+             * Method
+             * @description Simulation method.
+             * @default montecarlo
+             * @enum {string}
+             */
+            method: "montecarlo" | "bootstrap";
+            /**
+             * Monthly
+             * @description What you can save monthly.
+             */
+            monthly?: number | null;
+            /**
+             * Nominal
+             * @description Nominal dollars: no inflation adjustment.
+             * @default false
+             */
+            nominal: boolean;
+            /**
+             * Price
+             * @description Purchase price today.
+             */
+            price: number;
+            /**
+             * Price Growth
+             * @description Annual house-price growth.
+             * @default 0
+             */
+            price_growth: number;
+            /**
+             * Real
+             * @description Today's dollars: the return is deflated by inflation (the default).
+             * @default false
+             */
+            real: boolean;
+            /**
+             * Return
+             * @description Expected annual return (nominal), decimal; default 7%.
+             */
+            return?: number | null;
+            /**
+             * Seed
+             * @description Seed; printed even when auto-generated.
+             */
+            seed?: number | null;
+            /**
+             * Simulate
+             * @description Simulated paths; 0 for a deterministic answer only.
+             * @default 10000
+             */
+            simulate: number;
+            /**
+             * Timing
+             * @description Contribution timing: end (ordinary annuity) or begin (due).
+             * @default end
+             * @enum {string}
+             */
+            timing: "end" | "begin";
+            /**
+             * Vol
+             * @description Annual return volatility for the simulation.
+             * @default 0.15
+             */
+            vol: number;
         };
         /** InitParams */
         InitParams: {
@@ -1717,6 +2240,118 @@ export interface components {
              * @description Ticker symbols, e.g. AAPL MSFT NESN.SW.
              */
             tickers: string[];
+        };
+        /** RetireParams */
+        RetireParams: {
+            /**
+             * Age
+             * @description Current age (for --coast).
+             */
+            age?: number | null;
+            /**
+             * Block
+             * @description Bootstrap block length.
+             * @default 12
+             */
+            block: number;
+            /**
+             * Coast
+             * @description Also report the Coast FI balance.
+             * @default false
+             */
+            coast: boolean;
+            /**
+             * Expenses
+             * @description Annual expenses (today's dollars).
+             */
+            expenses: number;
+            /**
+             * History
+             * @description Tickers whose equal-weight monthly returns the bootstrap resamples.
+             */
+            history?: string[] | null;
+            /**
+             * History Start
+             * Format: date
+             * @description First date of the bootstrap history.
+             * @default 2000-01-01
+             */
+            history_start: string;
+            /**
+             * Income
+             * @description Annual after-tax income.
+             */
+            income: number;
+            /**
+             * Inflation
+             * @description Annual inflation for --real; default: trailing 10-year CPI (FRED CPIAUCSL).
+             */
+            inflation?: number | null;
+            /**
+             * Method
+             * @description Simulation method.
+             * @default montecarlo
+             * @enum {string}
+             */
+            method: "montecarlo" | "bootstrap";
+            /**
+             * Nominal
+             * @description Nominal dollars: no inflation adjustment.
+             * @default false
+             */
+            nominal: boolean;
+            /**
+             * Portfolio
+             * @description Current invested balance.
+             * @default 0
+             */
+            portfolio: number;
+            /**
+             * Real
+             * @description Today's dollars: the return is deflated by inflation (the default).
+             * @default false
+             */
+            real: boolean;
+            /**
+             * Retire Age
+             * @description Target age (for --coast).
+             */
+            retire_age?: number | null;
+            /**
+             * Return
+             * @description Expected annual return (nominal), decimal; default 7%.
+             */
+            return?: number | null;
+            /**
+             * Seed
+             * @description Seed; printed even when auto-generated.
+             */
+            seed?: number | null;
+            /**
+             * Simulate
+             * @description Simulated paths; 0 for a deterministic answer only.
+             * @default 10000
+             */
+            simulate: number;
+            /**
+             * Timing
+             * @description Contribution timing: end (ordinary annuity) or begin (due).
+             * @default end
+             * @enum {string}
+             */
+            timing: "end" | "begin";
+            /**
+             * Vol
+             * @description Annual return volatility for the simulation.
+             * @default 0.15
+             */
+            vol: number;
+            /**
+             * Withdrawal Rate
+             * @description Safe withdrawal rate.
+             * @default 0.04
+             */
+            withdrawal_rate: number;
         };
         /** RiskParams */
         RiskParams: {
@@ -3077,6 +3712,171 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["RiskParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_car_api_v1_plan_car_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CarParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_education_api_v1_plan_education_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EducationParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_goal_api_v1_plan_goal_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GoalParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_house_api_v1_plan_house_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["HouseParams"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    plan_retire_api_v1_plan_retire_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RetireParams"];
             };
         };
         responses: {
