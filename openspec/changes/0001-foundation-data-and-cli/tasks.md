@@ -161,6 +161,34 @@ Estimates are focused hours. Each task names the test that proves it.
       → `tests/cli/test_cache_commands.py::test_clear_requires_confirmation`
 - [ ] **C4. `qf config` group** (1h) — `set`, `show` (masked), `path`.
       → `tests/cli/test_config_commands.py::test_show_masks_api_keys`
+- [ ] **C4b. Settings registry** (2h)
+      `settings.py`: `@setting` declarations with env, secret, required,
+      description, obtain, optional live validator; `qf config set|show`
+      re-pointed at it.
+      → `tests/cli/test_settings.py::test_every_env_var_read_is_a_declared_setting`,
+        `::test_config_show_masks_secrets_to_last_four`
+- [ ] **C4c. `qf init`** (3h)
+      Rich-prompt wizard over the registry; no-echo secrets; idempotent re-run
+      showing masked current values; live validation with consent;
+      `--non-interactive`; sets up storage; ends by running doctor and printing
+      one first command; first-run hint on other commands.
+      → `tests/cli/test_init.py::test_rerun_without_changes_is_byte_identical`,
+        `::test_non_interactive_missing_required_exits_3_naming_it`,
+        `::test_failed_live_validation_never_stores_silently`,
+        `::test_ends_by_running_doctor`
+- [ ] **C4d. `qf doctor`** (3h)
+      `Check` registry with `run` and optional `fix`; the 0001 check set;
+      grouped TTY rendering and `--format json`; exit 0/1 with `--strict`;
+      `--offline`; 5s network caps; `--fix` never touches secrets.
+      → `tests/cli/test_doctor.py::test_every_setting_and_provider_has_a_check`,
+        `::test_failure_lines_always_carry_a_next_step`,
+        `::test_offline_skips_rather_than_fails`,
+        `::test_fix_never_writes_a_secret`,
+        `::test_warnings_do_not_change_exit_code_without_strict`
+- [ ] **C4e. `qf upgrade`** (1h)
+      Installer detection (pip / pipx / uv / container); exact command;
+      confirmation; `--check`.
+      → `tests/cli/test_upgrade.py::test_detects_installer_and_prints_matching_command`
 - [ ] **C5. Disclaimer footer** (0.5h) — table format only.
       → `tests/cli/test_disclaimer.py::test_absent_from_json_and_csv`
 
@@ -171,7 +199,9 @@ Estimates are focused hours. Each task names the test that proves it.
       re-recording is a reviewable diff rather than an ad-hoc action.
 - [ ] **D2. README quickstart** (1h) — install, the three `qf data` commands, the
       no-key promise, and the not-advice disclaimer.
-- [ ] **D3. CI green** (1h) — ruff, ruff format, mypy --strict, pytest on 3.11+3.12.
+- [ ] **D3. CI green** (1.5h) — ruff, ruff format, mypy --strict, pytest; the
+      build job's clean-venv smoke extended to `qf init --non-interactive` →
+      `qf doctor --offline` → one data command on a fixture.
 - [ ] **D4. Port reuse audit** (1h)
       Diff `NewsWaveMetrics/fetch_yfinance.py` and `extract_economic_data.py` against
       B4/B5; lift anything that handles a real-world edge case these specs missed.
@@ -181,8 +211,9 @@ Estimates are focused hours. Each task names the test that proves it.
       per the placement rule in `design.md`.
       → `tests/test_architecture.py::test_core_imports_no_logging_or_tracing`
 
-**Total: ~58h** (was ~27h; the storage port and observability added ~19h, the
-currency model ~5h, the registry, test scaffolding, and data quality ~7h). Wave B is the critical path; B6 and B0b are the tasks with
+**Total: ~67h** (was ~27h; the storage port and observability added ~19h, the
+currency model ~5h, the registry, test scaffolding, and data quality ~7h,
+onboarding ~9h). Wave B is the critical path; B6 and B0b are the tasks with
 real unknowns.
 
 ## Definition of done
@@ -195,6 +226,8 @@ real unknowns.
 - [ ] stdout is byte-identical across log levels and with tracing on and off
 - [ ] No call site outside `data/currency.py` multiplies or divides by a rate
 - [ ] A single-currency run fetches no rates and matches a no-conversion build
+- [ ] `pip install` → `qf init --non-interactive` → `qf doctor --offline` exits 0 in a clean venv, in CI
+- [ ] Every env var the code reads is a declared setting; every setting and provider has a doctor check
 - [ ] No Typer command exists that is not a registry declaration
 - [ ] `tests/architecture/` and `tests/invariants/` run against every registered command
 - [ ] `pytest -m "not network"` passes with networking disabled

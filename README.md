@@ -54,7 +54,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | # | Milestone | Ships | State |
 |---|---|---|---|
 | [0000](openspec/changes/0000-release-engineering/) | Release engineering | CI gate, version-gated PyPI publishing | ✅ Done |
-| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | Command registry, storage port, providers, currency, observability, `qf data` | 📋 Planned |
+| [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | `init`/`doctor` onboarding, command registry, storage port, providers, currency, observability, `qf data` | 📋 Planned |
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | 📋 Planned |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `qf db` | 📋 Planned |
 | [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `qf serve` | 📋 Planned |
@@ -75,7 +75,13 @@ docker run -p 8787:8787 -v quantfolio:/data espin086/quantfolio serve --host 0.0
 
 ```bash
 pip install quantfolio-cli          # (once the first release is published)
+qf init                             # guided setup: keys, storage — ends by running doctor
+qf doctor                           # every check tells you what's wrong and how to fix it
 ```
+
+That's the whole onboarding path, and it stays three commands as the tool grows.
+`qf doctor --fix` applies the safe repairs; `qf upgrade` detects how you
+installed and runs the matching upgrade.
 
 Or for development:
 
@@ -93,7 +99,7 @@ pre-commit install                  # optional: run CI's checks before each comm
 **No API key is required** for the core tool. Prices come from yfinance and factor
 returns from the Ken French Data Library, both keyless. A free
 [FRED key](https://fred.stlouisfed.org/docs/api/api_key.html) unlocks macro series
-and the live risk-free rate:
+and the live risk-free rate — `qf init` asks for it and offers to verify it, or:
 
 ```bash
 qf config set fred_api_key <YOUR_KEY>

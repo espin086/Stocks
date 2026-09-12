@@ -12,9 +12,10 @@ status: proposed
 Someone with a fresh `pip install quantfolio` and **no API keys** can run:
 
 ```bash
+pip install quantfolio-cli
+qf init          # configure keys and storage, interactively; ends by running doctor
+qf doctor        # every check actionable; exit 0 means it works
 qf data prices AAPL MSFT NVDA --start 2015-01-01 --format table
-qf data factors --model ff5 --start 2015-01-01
-qf cache info
 ```
 
 …and get clean tabular output, cached locally, with the second run served from
@@ -44,6 +45,11 @@ the codebase is small enough that the rule is free to follow.
 - **New capability `observability`** — structured logging on by default and
   OpenTelemetry tracing behind an optional extra, instrumenting the adapters and
   the I/O layer while `core/` stays pure.
+- **New capability `onboarding`** — `qf init`, `qf doctor`, `qf upgrade`, and a
+  settings registry they all derive from. Every configurable value is declared
+  once; init prompts for it, doctor checks it, `qf config` accepts it, and the
+  0004 settings page renders it. Doctor's checks are a registry too, and a test
+  asserts every setting and provider has one.
 - **New capability `command-registry`** — every command declared once with a
   pydantic parameter model and a typed result; the Typer CLI is generated from
   it. 0004 later derives the HTTP API and UI forms from the same declarations,
@@ -100,6 +106,9 @@ the codebase is small enough that the rule is free to follow.
 | Instrumentation changes behavior or output | A test asserts stdout is byte-identical across log levels and with tracing on and off |
 | A rate is applied in the wrong direction | Direction is carried by `CurrencyPair(base, quote)`, call sites never touch a raw rate, and round-trip conversion is a test |
 | A listing quoted in a sub-unit (GBp, ZAc) is read as the major unit | The data layer normalizes to the major unit and a test covers a real pence-quoted listing — a silent hundred-fold error otherwise |
+| A later milestone adds an API key or provider and forgets to make it configurable or diagnosable | Settings and checks are registries; a test asserts every env var the code reads is a declared setting and every setting and provider has a doctor check |
+| `qf init` hangs a container or CI on a prompt | `--non-interactive` takes values from flags and environment only and exits 3 naming any missing required value |
+| Doctor hangs on a dead network | Every network check has a five-second cap and `--offline` skips them; skipped is not failed |
 | Hand-written commands in 0001 have to be rewritten when 0004 needs API and UI surfaces | The registry lands here; 0004 adds consumers of existing declarations rather than restructuring them |
 | "A test SHALL assert" in later specs never becomes a test | The `testing` spec defines the suites and a scenario-coverage test that fails on an unreferenced scenario once a change is marked implemented |
 | Bad provider rows produce plausible-looking wrong results | Validation on ingest; implausible moves flagged in `attrs` and surfaced beside results; missing-data handling requires an explicit policy |

@@ -72,6 +72,20 @@
 - **WHEN** the image is running `serve`
 - **THEN** a health endpoint SHALL report readiness
 - **AND** the image SHALL declare a `HEALTHCHECK` against it
+- **AND** both SHALL run 0001's doctor checks rather than a separate notion of
+  health
+
+#### Scenario: Doctor in the container
+- **WHEN** `docker run <image> doctor` runs
+- **THEN** it SHALL diagnose the container's own install — `/data` writability,
+  non-root user, resolved database URL, configured settings — with the same
+  actionable lines as a local install
+
+#### Scenario: Non-interactive init in the container
+- **WHEN** `qf init` runs inside the container
+- **THEN** it SHALL default to `--non-interactive`, reading settings from the
+  environment, and SHALL exit 3 naming any missing required value rather than
+  block on a prompt
 
 #### Scenario: Signals
 - **WHEN** the container receives SIGTERM
@@ -182,7 +196,8 @@
 
 #### Scenario: Preflight
 - **WHEN** `qf deploy check` runs
-- **THEN** it SHALL report the image and version, the resolved database path and
+- **THEN** it SHALL run doctor's checks plus the deployment-specific ones below
+- **AND** it SHALL report the image and version, the resolved database path and
   whether it is writable, the bind address and port, whether a token is required
   and configured, and which credentials are present — naming each by key only
 

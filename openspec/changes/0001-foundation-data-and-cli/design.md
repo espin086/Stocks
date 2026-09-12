@@ -51,6 +51,47 @@ model as a validator, so it is written once and cannot drift between commands.
 And results are typed, carrying their own provenance, so one renderer handles
 every command and no command formats its own output.
 
+## Onboarding: settings and checks are registries
+
+The user's path is `pip install` → `qf init` → `qf doctor`, and the design
+problem is keeping it that short as ten milestones add keys, providers, and
+runtime dependencies. The answer is the same one the command registry gives:
+declare once, derive everywhere.
+
+```python
+@setting
+class FredApiKey:
+    key = "fred_api_key"
+    env = "FRED_API_KEY"
+    secret = True
+    required = False
+    description = "Unlocks FRED macro series and the live risk-free rate."
+    obtain = "https://fred.stlouisfed.org/docs/api/api_key.html"
+    def validate_live(self, value: str) -> CheckResult: ...   # one cheap request
+```
+
+From that one declaration: `qf init` prompts (no echo, masked on re-run, live
+verification offered), `qf doctor` checks presence and validity, `qf config
+set|show` accepts it, and 0004 renders a settings field. A milestone that adds
+a key adds a declaration, and gets all four for free — and a test asserts that
+every environment variable the code reads is a declared setting, so the
+shortcut of reading `os.environ` directly fails the build.
+
+Doctor is the same shape: a `Check` registry with `run` and an optional
+idempotent `fix`. 0003 registers the migration check, 0004 the server checks,
+0010 the FX provider check. Every line doctor prints carries its next step, on
+the principle that a diagnostic without a fix is a complaint. `qf deploy check`
+and the container `HEALTHCHECK` (0005) call doctor rather than re-implementing
+health, so there is one definition of "this install works".
+
+`qf init` ends by running doctor and printing one runnable first command
+tailored to what was configured — the last step of onboarding is the first step
+of use.
+
+"GUI" here means a guided terminal wizard built on Rich prompts. 0004's
+settings page is the browser form of the same registry; a `qf init --web` that
+opens it is a natural addition there, not here.
+
 ## Storage: a port, not a database
 
 Two protocols and a registry:
@@ -311,6 +352,9 @@ must never need a `grep -v`.
 | Instrument adapters | Instrument `core/` | Preserves purity, and adapter-observed timings are what a trace reader wants |
 | OTel API with optional SDK | Always-on tracing, or none | Zero dependency and zero overhead by default, same call sites either way |
 | structlog | stdlib `logging` alone | Typed key/value context and bound scopes; still routes third-party stdlib records through one handler |
+| Settings and checks as registries | Prompts and checks hand-written per key | A milestone that adds a key must add init, doctor, config, and UI handling; a registry makes forgetting one a build failure |
+| Doctor exits 1 only on failures; warnings need `--strict` | Warnings fail | A warning-fails default trains users to ignore doctor |
+| Network checks capped at 5s with `--offline` | Uncapped | A diagnostic that hangs is worse than none |
 | Registry in 0001 | Registry in 0004 when the API needs it | Adding consumers to declarations is a generator each; retrofitting declarations onto hand-written commands is a rewrite of every one |
 | pydantic parameter models | Typer-native annotations | One validation path serves CLI, API, and UI; cross-field rules live in one validator |
 | `CurrencyPair` type carrying direction | A string like `"EURUSD"` plus a convention | Conventions are remembered wrongly; a type is checked |

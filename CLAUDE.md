@@ -53,6 +53,14 @@ the same declaration, and a parity test fails the build if one is missing.
 Cross-field rules (weights match tickers, `--portfolio` excludes `--tickers`)
 are model validators, never handler code.
 
+**Never read `os.environ` for a setting.** Declare it in `settings.py` — env
+var, secret flag, how to obtain it, optional live validator — and `qf init`,
+`qf doctor`, `qf config`, and the 0004 settings page derive from that. A test
+fails the build on an undeclared env var. **When you add a provider, a setting,
+or a runtime dependency, register a doctor `Check` in the same change**; a
+test asserts every setting and provider has one. Every failing doctor line
+carries its fix.
+
 **Tests are organized by what they prove** — `tests/core/` (known answers),
 `tests/data/` (recorded fixtures, conformance), `tests/cli/`,
 `tests/architecture/` (import and literal rules), `tests/invariants/` (every

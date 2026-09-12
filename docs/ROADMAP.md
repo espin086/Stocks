@@ -11,7 +11,7 @@ far ahead goes stale before it is used.
 | # | Milestone | Depends on | Est. | Planning depth |
 |---|---|---|---|---|
 | 0000 | Release engineering: CI gate + PyPI pipeline | — | done | proposal + spec + tasks |
-| 0001 | Foundation: registry, storage port, data layer + quality, currency, observability, testing | 0000 | ~58h | proposal + 7 specs + design + tasks |
+| 0001 | Foundation: onboarding, registry, storage port, data layer + quality, currency, observability, testing | 0000 | ~67h | proposal + 8 specs + design + tasks |
 | 0002 | **Portfolio optimization → v1.0.0** | 0001 | ~48h | proposal + spec + design + tasks |
 | 0003 | Local persistence (SQLite) → v1.1 | 0002 | ~25h est. | proposal + spec |
 | 0004 | Web UI (FastAPI + React) → v1.2 | 0003 | ~70h est. | proposal + 2 specs + design |
@@ -22,7 +22,7 @@ far ahead goes stale before it is used.
 | 0009 | Econometrics & forecasting → v1.5 | 0007 | ~40h est. | proposal + spec |
 | 0010 | Exchange rates & PPP → v1.6 | 0002, 0008 | ~35h est. | proposal + 2 specs |
 
-**v1.0.0 = 0001 + 0002 (~106h).** **v1.2, the deployable product = 0003–0006
+**v1.0.0 = 0001 + 0002 (~115h).** **v1.2, the deployable product = 0003–0006
 (~150h more).**
 
 ## Sequencing rationale

@@ -48,6 +48,32 @@
 - **AND** it SHALL update live as fields change, so the UI teaches the CLI rather
   than replacing it
 
+### Requirement: Settings and health in the UI
+
+#### Scenario: Settings page is generated
+- **WHEN** the settings view renders
+- **THEN** every setting declared in 0001's settings registry SHALL appear as a
+  field, with its description and how-to-obtain link, secrets masked and never
+  echoed back
+- **AND** saving SHALL write through the same code path as `qf config set`
+
+#### Scenario: Live validation in the browser
+- **WHEN** a setting with a live validator is saved
+- **THEN** the UI SHALL offer to verify it and show the result, mirroring
+  `qf init`
+
+#### Scenario: Doctor has a view
+- **WHEN** the health view renders
+- **THEN** it SHALL show `qf doctor`'s checks with the same statuses, messages,
+  and next steps, from the same check registry
+- **AND** a check with a registered fix SHALL offer to run it, never touching a
+  secret
+
+#### Scenario: `qf init --web`
+- **WHEN** `qf init --web` runs once this change has landed
+- **THEN** it SHALL start the server bound to loopback and open the settings
+  page, as the browser form of the same wizard
+
 ### Requirement: Dark mode
 
 #### Scenario: Dark by default
