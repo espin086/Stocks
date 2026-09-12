@@ -48,6 +48,8 @@
     "watchlist.delete": "/commands/watchlist.delete",
     "watchlist.list": "/commands/watchlist.list",
     "watchlist.remove": "/commands/watchlist.remove",
-    "watchlist.show": "/commands/watchlist.show"
+    "watchlist.show": "/commands/watchlist.show",
+    "analyze.stock": "/commands/analyze.stock",
+    "analyze.factors": "/commands/analyze.factors"
   }
 }

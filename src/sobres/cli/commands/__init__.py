@@ -3,6 +3,7 @@
 import importlib
 
 MODULES: tuple[str, ...] = (
+    "analyze",
     "cache",
     "commands",
     "config",

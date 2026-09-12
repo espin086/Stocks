@@ -52,8 +52,35 @@ class RawHistory:
     meta: dict[str, Any] = field(default_factory=dict)
 
 
+@dataclass(frozen=True)
+class Fundamentals:
+    """Current (not point-in-time) fundamentals for one symbol, as the vendor reports them."""
+
+    symbol: str
+    name: str | None
+    sector: str | None
+    market_cap: float | None
+    pe_ratio: float | None
+    price_to_book: float | None
+    dividend_yield: float | None
+    currency: str | None
+
+    def as_dict(self) -> dict[str, Any]:
+        return dict(self.__dict__)
+
+
+FUNDAMENTALS_NOTE = (
+    "fundamentals are current values as the vendor reports them today, not point-in-time; "
+    "they are unsuitable for backtesting"
+)
+
+
 class YahooSource(Protocol):
     def history(self, ticker: str, start: date, end: date) -> RawHistory: ...
+
+    def fundamentals(self, ticker: str) -> dict[str, Any] | None:
+        """The vendor's ``info`` document, or None when it has none (common for ETFs)."""
+        ...
 
 
 class LiveYahooSource:
@@ -87,6 +114,25 @@ class LiveYahooSource:
             ) from exc
         currency = meta.get("currency")
         return RawHistory(frame=frame, currency=currency, meta=meta)
+
+    def fundamentals(self, ticker: str) -> dict[str, Any] | None:
+        try:
+            import yfinance as yf
+        except ImportError as exc:  # pragma: no cover - the [data] extra installs it
+            raise ProviderError(
+                "yfinance is not installed",
+                provider=PROVIDER_NAME,
+                hint="run: pip install 'sobres[data]'",
+            ) from exc
+        try:
+            info = dict(yf.Ticker(ticker).info or {})
+        except Exception as exc:
+            raise ProviderError(
+                f"{type(exc).__name__}: {exc}",
+                provider=PROVIDER_NAME,
+                hint="check the symbol and your network, or retry later",
+            ) from exc
+        return info if info.get("quoteType") not in (None, "ETF", "MUTUALFUND", "INDEX") else None
 
 
 class YFinanceProvider:
@@ -154,6 +200,15 @@ class YFinanceProvider:
         frame.attrs["flags"] = flags
         return frame
 
+    def get_fundamentals(self, ticker: str) -> Fundamentals | None:
+        """Current fundamentals, or None when the vendor has none for the symbol."""
+        with span("provider.get_fundamentals", {"provider": self.name, "symbol": ticker}):
+            info = self._source.fundamentals(ticker)
+        if not info:
+            self._log.info("fundamentals.missing", symbol=ticker)
+            return None
+        return parse_fundamentals(ticker, info)
+
     def _fetch(self, symbols: Sequence[str], start: date, end: date, field: str) -> pd.DataFrame:
         columns: dict[str, pd.Series] = {}
         series_meta: dict[str, dict[str, Any]] = {}
@@ -207,3 +262,22 @@ class YFinanceProvider:
             series_meta.setdefault(flag["symbol"], {}).setdefault("flags", []).append(flag)
         frame.attrs["series_meta"] = series_meta
         return frame
+
+
+def parse_fundamentals(symbol: str, info: dict[str, Any]) -> Fundamentals:
+    """Pick the documented keys out of the vendor's ``info`` document; absent keys stay None."""
+
+    def num(key: str) -> float | None:
+        value = info.get(key)
+        return float(value) if isinstance(value, int | float) and value == value else None
+
+    return Fundamentals(
+        symbol=symbol.upper(),
+        name=info.get("longName") or info.get("shortName"),
+        sector=info.get("sector"),
+        market_cap=num("marketCap"),
+        pe_ratio=num("trailingPE"),
+        price_to_book=num("priceToBook"),
+        dividend_yield=num("dividendYield"),
+        currency=info.get("currency"),
+    )

@@ -2,8 +2,8 @@
 change: 0007-equity-factor-analysis
 milestone: v1.3
 depends_on: [0001-foundation-data-and-cli, 0002-portfolio-optimization]
-status: proposed
-planning_depth: proposal + spec delta (design and tasks written when 0006 lands)
+status: implemented
+planning_depth: proposal + spec delta + design + tasks
 ---
 
 # 0007 — Equity and factor analysis

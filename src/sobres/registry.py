@@ -148,6 +148,7 @@ GROUP_HELP: dict[str, str] = {
     "db": "Inspect, back up and repair the database.",
     "token": "Manage the deployment token.",
     "deploy": "Generate and check the container deployment.",
+    "analyze": "Single-stock dashboards and factor-model regressions.",
 }
 
 
