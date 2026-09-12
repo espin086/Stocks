@@ -5,11 +5,16 @@ driver is imported."""
 from sobres.data.storage.base import (
     DateRange,
     FetchRecord,
+    GoalRecord,
+    JobRecord,
     Observation,
     ObservationQuery,
     ObservationStore,
+    PortfolioRecord,
+    RunRecord,
     SeriesKey,
     Storage,
+    WatchlistRecord,
     open_storage,
     registered_backends,
 )
@@ -17,11 +22,16 @@ from sobres.data.storage.base import (
 __all__ = [
     "DateRange",
     "FetchRecord",
+    "GoalRecord",
+    "JobRecord",
     "Observation",
     "ObservationQuery",
     "ObservationStore",
+    "PortfolioRecord",
+    "RunRecord",
     "SeriesKey",
     "Storage",
+    "WatchlistRecord",
     "open_storage",
     "registered_backends",
 ]

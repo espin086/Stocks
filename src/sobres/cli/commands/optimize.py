@@ -52,7 +52,13 @@ IN_SAMPLE_NOTE = (
 
 
 class UniverseParams(Params):
-    tickers: TickerList = Field(description="Ticker symbols, e.g. AAPL MSFT NESN.SW.")
+    tickers: TickerList | None = Field(
+        default=None, description="Ticker symbols, e.g. AAPL MSFT NESN.SW (or use --portfolio)."
+    )
+    portfolio: str | None = Field(
+        default=None, description="A saved portfolio's name in place of --tickers."
+    )
+    save_run: bool = Field(default=False, description="Record this run in the run history.")
     start: date = Field(description="First date, YYYY-MM-DD.")
     end: date | None = Field(default=None, description="Last date (default: today).")
     fill: FillPolicy = Field(description="Provider-gap policy: drop, ffill or raise. No default.")
@@ -70,7 +76,16 @@ class UniverseParams(Params):
     def _window(self) -> UniverseParams:
         if self.end is not None and self.end < self.start:
             raise ValueError(f"end {self.end} precedes start {self.start}")
+        if self.portfolio and self.tickers:
+            raise ValueError("--portfolio and --tickers are mutually exclusive")
+        if not self.portfolio and not self.tickers:
+            raise ValueError("one of --tickers or --portfolio is required")
         return self
+
+    @property
+    def symbols(self) -> list[str]:
+        """Tickers after ``--portfolio`` resolution (set by the loader)."""
+        return list(self.tickers or [])
 
 
 class EstimatorParams(UniverseParams):
@@ -102,9 +117,20 @@ class Universe:
     provenance: Provenance
 
 
+def resolve_symbols(p: UniverseParams, ctx: Context) -> tuple[list[str], list[float] | None]:
+    """The ticker list and, from a saved portfolio, its weights."""
+    if p.portfolio:
+        from sobres.cli.commands.portfolio import resolve_portfolio
+
+        record = resolve_portfolio(p.portfolio, ctx)
+        return list(record.tickers), None if record.weights is None else list(record.weights)
+    return list(p.tickers or []), None
+
+
 def load_universe(p: UniverseParams, ctx: Context) -> Universe:
     end = p.end or ctx.today()
-    prices = ctx.price_provider().get_prices(p.tickers, p.start, end)
+    tickers, _ = resolve_symbols(p, ctx)
+    prices = ctx.price_provider().get_prices(tickers, p.start, end)
     currencies = frame_currencies(prices)
     target = require_single_currency(currencies.values(), target=p.base)
     notes: list[str] = []
@@ -391,8 +417,9 @@ def frontier(p: FrontierParams, ctx: Context) -> FrontierResult:
         row["min_variance"] = point.is_min_variance
         row["max_sharpe"] = point.is_max_sharpe
         rows.append(row)
+    tickers, _ = resolve_symbols(p, ctx)
     frame = pd.DataFrame(
-        rows, columns=["ret", "vol", "sharpe", *p.tickers, "min_variance", "max_sharpe"]
+        rows, columns=["ret", "vol", "sharpe", *tickers, "min_variance", "max_sharpe"]
     )
     u.provenance.notes.append(IN_SAMPLE_NOTE)
     return FrontierResult(
@@ -531,15 +558,21 @@ def backtest(p: BacktestParams, ctx: Context) -> BacktestReport:
 
 
 class RiskParams(UniverseParams):
-    weights: Weights = Field(description="Portfolio weights, one per ticker, summing to 1.")
+    weights: Weights = Field(
+        default_factory=list,
+        description="Portfolio weights, one per ticker, summing to 1 (from --portfolio if saved).",
+    )
 
     @model_validator(mode="after")
     def _weights_match(self) -> RiskParams:
-        if len(self.weights) != len(self.tickers):
+        if self.tickers and not self.weights:
+            raise ValueError("--weights is required with --tickers")
+        if self.weights and self.tickers and len(self.weights) != len(self.tickers):
             raise ValueError(f"{len(self.weights)} weights for {len(self.tickers)} tickers")
-        total = sum(self.weights)
-        if abs(total - 1.0) > 1e-6:
-            raise ValueError(f"weights sum to {total:.6f}, not 1.0")
+        if self.weights:
+            total = sum(self.weights)
+            if abs(total - 1.0) > 1e-6:
+                raise ValueError(f"weights sum to {total:.6f}, not 1.0")
         return self
 
 
@@ -550,8 +583,17 @@ class RiskParams(UniverseParams):
     uses_providers=True,
 )
 def risk(p: RiskParams, ctx: Context) -> RiskPanelResult:
+    tickers, saved_weights = resolve_symbols(p, ctx)
+    weight_values = list(p.weights) if p.weights else saved_weights
+    if weight_values is None:
+        raise UsageError(
+            f"portfolio {p.portfolio!r} has no weights",
+            hint="pass --weights or save it with weights",
+        )
+    if len(weight_values) != len(tickers):
+        raise UsageError(f"{len(weight_values)} weights for {len(tickers)} tickers")
     u = load_universe(p, ctx)
-    weights = dict(zip(p.tickers, p.weights, strict=True))
+    weights = dict(zip(tickers, weight_values, strict=True))
     series = portfolio_returns(u.returns, weights)
     panel = risk_metrics(series, u.risk_free, u.frequency)
     rows = [

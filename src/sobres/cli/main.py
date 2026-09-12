@@ -156,6 +156,8 @@ def invoke(cmd: Command, raw: dict[str, Any], typer_ctx: typer.Context) -> None:
             )
             result = cmd.handler(params, context)
             context.log.info("command.done", command=cmd.name)
+            if getattr(params, "save_run", False):
+                record_run(cmd, params, result, context)
         if fmt is None and (cmd.human_default or not cmd.emits_data):
             fmt = "table"
         render(result, fmt)
@@ -174,6 +176,28 @@ def invoke(cmd: Command, raw: dict[str, Any], typer_ctx: typer.Context) -> None:
         shutdown()
     if code:
         raise typer.Exit(code)
+
+
+def record_run(cmd: Command, params: Any, result: Any, context: Context) -> None:
+    """Persist a run: resolved parameters (after defaults), provenance and the result."""
+    import uuid
+
+    from sobres.data.storage.base import RunRecord
+
+    payload = result.payload()
+    provenance = payload.get("provenance", {}) if isinstance(payload, dict) else {}
+    resolved = params.model_dump(mode="json", exclude={"save_run"})
+    run = RunRecord(
+        id=uuid.uuid4().hex[:12],
+        command=cmd.name,
+        params=resolved,
+        result=payload,
+        summary=result.summary_line(),
+        estimators=dict(payload.get("estimators", {})) if isinstance(payload, dict) else {},
+        window={k: provenance.get(k) for k in ("start", "end") if provenance.get(k)},
+    )
+    context.storage.runs.record(run)
+    context.note(f"saved run {run.id} (`sobres run show {run.id}`)")
 
 
 def _report(exc: BaseException, rid: str, debug: bool, *, internal: bool = False) -> None:

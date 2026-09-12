@@ -11,6 +11,15 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 
 ## [Unreleased]
 
+### Added
+- **Local persistence (change 0003).** Schema version 2 with saved portfolios,
+  watchlists, goals, run history and job records behind the storage port;
+  `sobres portfolio`, `sobres watchlist`, `sobres run` and `sobres db` groups;
+  `--portfolio <name>` wherever `--tickers` is accepted and `--save-run` on
+  the analytical commands; `sobres db export` (SQLite backup API) and
+  `sobres db repair` (recovery into a new file, original untouched);
+  migrations tested against recorded prior-version fixtures.
+
 ## [1.0.0] - 2026-09-12
 
 The first release: the foundation plus portfolio optimization. From here the

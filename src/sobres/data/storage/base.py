@@ -13,7 +13,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Iterator, Sequence
 from contextlib import AbstractContextManager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime
 from typing import Any, Protocol
 
@@ -114,6 +114,76 @@ class StorageInfo:
     table_rows: dict[str, int]
 
 
+@dataclass(frozen=True)
+class PortfolioRecord:
+    """A saved, named ticker list with optional weights (an unweighted universe)."""
+
+    name: str
+    tickers: tuple[str, ...]
+    weights: tuple[float, ...] | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+    @property
+    def holdings(self) -> int:
+        return len(self.tickers)
+
+
+@dataclass(frozen=True)
+class WatchlistRecord:
+    name: str
+    symbols: tuple[str, ...]
+    updated_at: datetime | None = None
+
+
+@dataclass(frozen=True)
+class GoalRecord:
+    """A saved goal: its kind (retire, house, goal…), parameters and assumptions."""
+
+    name: str
+    kind: str
+    params: dict[str, Any]
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+
+@dataclass(frozen=True)
+class RunRecord:
+    """One recorded analysis: resolved parameters, provenance and result."""
+
+    id: str
+    command: str
+    params: dict[str, Any]
+    result: dict[str, Any]
+    summary: str
+    estimators: dict[str, Any] = field(default_factory=dict)
+    window: dict[str, Any] = field(default_factory=dict)
+    created_at: datetime | None = None
+
+
+JobState = str  # queued | running | succeeded | failed | cancelled
+JOB_STATES: tuple[str, ...] = ("queued", "running", "succeeded", "failed", "cancelled")
+TERMINAL_JOB_STATES: frozenset[str] = frozenset({"succeeded", "failed", "cancelled"})
+
+
+@dataclass(frozen=True)
+class JobRecord:
+    """A unit of long-running work persisted so it survives a restart (0004 runs them)."""
+
+    id: str
+    command: str
+    params: dict[str, Any]
+    state: JobState = "queued"
+    progress: float = 0.0
+    result: dict[str, Any] | None = None
+    error: dict[str, Any] | None = None
+    run_id: str | None = None
+    trace_context: dict[str, Any] | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    finished_at: datetime | None = None
+
+
 # --------------------------------------------------------------------------- #
 # Repository protocols
 # --------------------------------------------------------------------------- #
@@ -157,6 +227,68 @@ class KeyValueStore(Protocol):
     def items(self) -> dict[str, Any]: ...
 
 
+class PortfolioRepository(Protocol):
+    def save(self, portfolio: PortfolioRecord, *, force: bool = False) -> PortfolioRecord:
+        """Persist; ``StorageConflictError`` on an existing name unless ``force``."""
+        ...
+
+    def get(self, name: str) -> PortfolioRecord | None: ...
+
+    def list(self) -> list[PortfolioRecord]: ...
+
+    def delete(self, name: str) -> bool: ...
+
+
+class WatchlistRepository(Protocol):
+    def add(self, name: str, symbols: Sequence[str]) -> WatchlistRecord:
+        """Add symbols, creating the list if absent; a present symbol is a no-op."""
+        ...
+
+    def remove(self, name: str, symbols: Sequence[str]) -> WatchlistRecord | None: ...
+
+    def get(self, name: str) -> WatchlistRecord | None: ...
+
+    def list(self) -> list[WatchlistRecord]: ...
+
+    def delete(self, name: str) -> bool: ...
+
+
+class GoalRepository(Protocol):
+    def save(self, goal: GoalRecord, *, force: bool = False) -> GoalRecord: ...
+
+    def get(self, name: str) -> GoalRecord | None: ...
+
+    def list(self) -> list[GoalRecord]: ...
+
+    def delete(self, name: str) -> bool: ...
+
+
+class RunRepository(Protocol):
+    def record(self, run: RunRecord) -> RunRecord: ...
+
+    def get(self, run_id: str) -> RunRecord | None: ...
+
+    def list(self, limit: int = 20, command: str | None = None) -> list[RunRecord]:
+        """Newest first."""
+        ...
+
+    def delete(self, run_id: str) -> bool: ...
+
+
+class JobRepository(Protocol):
+    def create(self, job: JobRecord) -> JobRecord: ...
+
+    def update(self, job_id: str, **changes: Any) -> JobRecord:
+        """Merge ``changes`` (state, progress, result, error…) into the record."""
+        ...
+
+    def get(self, job_id: str) -> JobRecord | None: ...
+
+    def list(self, limit: int = 20, state: str | None = None) -> list[JobRecord]: ...
+
+    def next_queued(self) -> JobRecord | None: ...
+
+
 class Storage(Protocol):
     """One opened backend. Repositories hang off it; transactions wrap them."""
 
@@ -173,6 +305,21 @@ class Storage(Protocol):
 
     @property
     def kv(self) -> KeyValueStore: ...
+
+    @property
+    def portfolios(self) -> PortfolioRepository: ...
+
+    @property
+    def watchlists(self) -> WatchlistRepository: ...
+
+    @property
+    def goals(self) -> GoalRepository: ...
+
+    @property
+    def runs(self) -> RunRepository: ...
+
+    @property
+    def jobs(self) -> JobRepository: ...
 
     def transaction(self) -> AbstractContextManager[None]:
         """A unit of work: every operation inside commits or rolls back together."""
@@ -191,6 +338,10 @@ class Storage(Protocol):
     def integrity_check(self) -> bool: ...
 
     def info(self) -> StorageInfo: ...
+
+    def export_to(self, destination: Any) -> None:
+        """A consistent copy of the whole state, safe while in use."""
+        ...
 
     def close(self) -> None: ...
 

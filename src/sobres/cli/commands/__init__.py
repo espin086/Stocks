@@ -7,10 +7,14 @@ MODULES: tuple[str, ...] = (
     "commands",
     "config",
     "data",
+    "db",
     "doctor",
     "init",
     "optimize",
+    "portfolio",
+    "run",
     "upgrade",
+    "watchlist",
 )
 
 for _name in MODULES:

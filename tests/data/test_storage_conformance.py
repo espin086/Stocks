@@ -18,7 +18,7 @@ import sqlalchemy as sa
 from sobres.data.storage.adapters import schema
 from sobres.data.storage.adapters.sqlite import SqliteStorage
 from sobres.data.storage.base import OpenOptions, Storage, open_storage, registered_backends
-from tests.data.storage_conformance import StorageConformance
+from tests.data.storage_conformance import ApplicationStateConformance, StorageConformance
 
 # One entry per adapter: (scheme, factory taking a tmp dir). Adding a backend
 # means adding to this list and nothing else in the suite.
@@ -82,4 +82,8 @@ def storage(request: pytest.FixtureRequest, tmp_path: Path) -> Iterator[Storage]
 
 
 class TestConformance(StorageConformance):
+    pass
+
+
+class TestApplicationState(ApplicationStateConformance):
     pass
