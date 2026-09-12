@@ -103,6 +103,8 @@ class Command:
     uses_providers: bool = False
     human_default: bool = False
     """Render as a table even when piped (reports such as doctor); data commands default to CSV."""
+    long_running: bool = False
+    """Dispatched as a job over HTTP (0004): the request returns an id, progress streams."""
     aliases: tuple[str, ...] = ()
     """Deprecated former names, kept for one minor version with a warning."""
     param_aliases: dict[str, str] = field(default_factory=dict)
@@ -111,6 +113,10 @@ class Command:
     @property
     def group(self) -> str | None:
         return self.name.rsplit(".", 1)[0] if "." in self.name else None
+
+    @property
+    def group_path(self) -> tuple[str, ...]:
+        return tuple(self.name.split(".")[:-1])
 
     @property
     def leaf(self) -> str:
@@ -124,6 +130,11 @@ class Command:
     def report(self) -> bool:
         return bool(self.result.report)
 
+    @property
+    def route(self) -> str:
+        """The HTTP route 0004 generates: ``POST /api/v1/<group>/<name>``."""
+        return "/api/v1/" + "/".join(self.name.split("."))
+
 
 _COMMANDS: dict[str, Command] = {}
 GROUP_HELP: dict[str, str] = {
@@ -135,6 +146,7 @@ GROUP_HELP: dict[str, str] = {
     "watchlist": "Named symbol lists.",
     "run": "Browse, inspect and compare recorded analysis runs.",
     "db": "Inspect, back up and repair the database.",
+    "token": "Manage the deployment token.",
 }
 
 
@@ -146,6 +158,7 @@ def register(
     emits_data: bool = True,
     uses_providers: bool = False,
     human_default: bool = False,
+    long_running: bool = False,
     aliases: Sequence[str] = (),
     param_aliases: dict[str, str] | None = None,
 ) -> Callable[[Handler], Handler]:
@@ -170,6 +183,7 @@ def register(
             emits_data=emits_data,
             uses_providers=uses_providers,
             human_default=human_default,
+            long_running=long_running,
             aliases=tuple(aliases),
             param_aliases=dict(param_aliases or {}),
         )
@@ -243,6 +257,8 @@ def command_schema(cmd: Command) -> dict[str, Any]:
         "result": cmd.result.__name__,
         "report": cmd.report,
         "emits_data": cmd.emits_data,
+        "long_running": cmd.long_running,
+        "route": cmd.route,
         "aliases": list(cmd.aliases),
         "params": field_schema(cmd.params),
         "json_schema": cmd.params.model_json_schema(),
@@ -452,28 +468,70 @@ def make_typer_callable(
 def build_app(
     root: typer.Typer, invoke: Callable[[Command, dict[str, Any], typer.Context], None]
 ) -> typer.Typer:
-    """Attach every registered command to ``root`` under its group."""
-    groups: dict[str, typer.Typer] = {}
-    for cmd in all_commands():
+    """Attach every registered command to ``root`` under its (possibly nested) group.
+
+    A command whose name is also a prefix of other commands (``serve`` beside
+    ``serve.token.rotate``) becomes a group that runs the command when invoked
+    without a subcommand.
+    """
+    commands = all_commands()
+    names = {c.name for c in commands}
+    groups: dict[tuple[str, ...], typer.Typer] = {(): root}
+
+    def group_for(path: tuple[str, ...]) -> typer.Typer:
+        if path in groups:
+            return groups[path]
+        parent = group_for(path[:-1])
+        leaf = path[-1]
+        default_cmd = next((c for c in commands if c.name == ".".join(path)), None)
+        app = typer.Typer(
+            name=leaf,
+            help=(default_cmd.help if default_cmd else GROUP_HELP.get(leaf, f"{leaf} commands")),
+            no_args_is_help=default_cmd is None,
+            invoke_without_command=default_cmd is not None,
+        )
+        if default_cmd is not None:
+            fn, greedy = make_typer_callable(default_cmd, invoke)
+            cls = type(f"Greedy_{leaf}", (_GreedyListCommand,), {"greedy_options": greedy})
+            parent.add_typer(app, name=leaf)
+            _attach_default(app, default_cmd, fn)
+            _ = cls
+        else:
+            parent.add_typer(app, name=leaf)
+        groups[path] = app
+        return app
+
+    for cmd in commands:
+        is_group_default = any(n.startswith(cmd.name + ".") for n in names)
+        if is_group_default:
+            group_for((*cmd.group_path, cmd.leaf))
+            continue
+        target = group_for(cmd.group_path)
         fn, greedy = make_typer_callable(cmd, invoke)
         cls = type(f"Greedy_{cmd.leaf}", (_GreedyListCommand,), {"greedy_options": greedy})
-        target = root
-        if cmd.group is not None:
-            if cmd.group not in groups:
-                groups[cmd.group] = typer.Typer(
-                    name=cmd.group,
-                    help=GROUP_HELP.get(cmd.group, f"{cmd.group} commands"),
-                    no_args_is_help=True,
-                )
-                root.add_typer(groups[cmd.group], name=cmd.group)
-            target = groups[cmd.group]
         target.command(name=cmd.leaf.replace("_", "-"), help=cmd.help, cls=cls)(fn)
         for alias in cmd.aliases:
             alias_leaf = alias.rsplit(".", 1)[-1]
             target.command(
-                name=alias_leaf, help=f"Deprecated alias of `{cmd.cli_name}`.", cls=cls, hidden=True
+                name=alias_leaf,
+                help=f"Deprecated alias of `{cmd.cli_name}`.",
+                cls=cls,
+                hidden=True,
             )(fn)
     return root
+
+
+def _attach_default(app: typer.Typer, cmd: Command, fn: Callable[..., None]) -> None:
+    """Run ``cmd`` when its group is invoked without a subcommand."""
+
+    def callback(ctx: typer.Context, **kwargs: Any) -> None:
+        if ctx.invoked_subcommand is None:
+            fn(ctx, **kwargs)
+
+    callback.__signature__ = fn.__signature__  # type: ignore[attr-defined]
+    callback.__annotations__ = dict(fn.__annotations__)
+    callback.__doc__ = cmd.help
+    app.callback(invoke_without_command=True)(callback)
 
 
 def validate_params(cmd: Command, raw: dict[str, Any]) -> BaseModel:

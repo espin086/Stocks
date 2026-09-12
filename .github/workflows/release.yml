@@ -82,8 +82,18 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Build the SPA into the wheel
+        # Built assets ship at sobres/api/static; users never need Node.
+        run: npm ci && npm run build
+        working-directory: frontend
       - run: pip install build twine
       - run: python -m build
+      - run: unzip -l dist/*.whl | grep -q "sobres/api/static/index.html"
       - run: twine check --strict dist/*
 
       - name: Assert the built version matches the decision

@@ -45,7 +45,8 @@ otel = [
   "opentelemetry-sdk>=1.25",
   "opentelemetry-exporter-otlp-proto-http>=1.25",
 ]
-all = ["sobres[data,econ,opt,otel]"]
+web = ["fastapi>=0.115", "uvicorn>=0.30"]
+all = ["sobres[data,econ,opt,otel,web]"]
 dev = [
   "sobres[all]",
   "pytest>=8.2",
@@ -71,6 +72,8 @@ path = "src/sobres/__about__.py"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/sobres"]
+# The built SPA ships in the wheel so `pip install sobres[web]` needs no Node.
+artifacts = ["src/sobres/api/static/**"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -119,5 +122,5 @@ strict = true
 warn_unreachable = true
 
 [[tool.mypy.overrides]]
-module = ["yfinance.*", "pandas_datareader.*", "statsmodels.*", "cvxpy.*", "scipy.*", "opentelemetry.*"]
+module = ["yfinance.*", "pandas_datareader.*", "statsmodels.*", "cvxpy.*", "scipy.*", "opentelemetry.*", "uvicorn.*"]
 ignore_missing_imports = true

@@ -35,6 +35,10 @@ class InitParams(Params):
     offline: bool = Field(
         default=False, description="Skip network checks in the closing doctor run."
     )
+    web: bool = Field(
+        default=False,
+        description="Open the settings page in the browser instead (sobres open settings).",
+    )
     set_values: list[str] = Field(
         default_factory=list,
         alias="set",
@@ -123,6 +127,19 @@ def _prompt_setting(setting: Setting, current: Any, ctx: Context, *, verify: boo
     human_default=True,
 )
 def init(p: InitParams, ctx: Context) -> InitReport:
+    if p.web:
+        from sobres.cli.commands.serve import OpenParams, open_view
+
+        opened = open_view(OpenParams(target=["settings"]), ctx)
+        return InitReport(
+            checks=[],
+            summary={"ok": 0, "warn": 0, "fail": 0, "skip": 0},
+            exit_code=0,
+            config_path=str(ctx.config.path),
+            db_location="",
+            first_command=opened.summary_line(),
+            changed=[],
+        )
     existing = read_config_file(ctx.config.path)
     values: dict[str, Any] = dict(existing)
     explicit = _parse_set(p.set_values)

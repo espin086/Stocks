@@ -12,6 +12,15 @@ describe. See [docs/RELEASING.md](docs/RELEASING.md).
 ## [Unreleased]
 
 ### Added
+- **Web UI and HTTP API (change 0004).** `sobres serve` (FastAPI over the same
+  registry: `POST /api/v1/<group>/<name>` for every command, `/api/docs`,
+  jobs with progress over SSE and cancellation, settings and doctor endpoints)
+  and `sobres open` (starts the server if needed and opens a view). A React +
+  TypeScript single-page app derived from the registry: generated forms with
+  the equivalent command line, results with provenance and the disclaimer,
+  an interactive efficient frontier, backtest charts, run history, saved
+  portfolios and a settings page. Loopback by default; a hashed deployment
+  token guards any other bind address. Install with `pip install "sobres[web]"`.
 - **Local persistence (change 0003).** Schema version 2 with saved portfolios,
   watchlists, goals, run history and job records behind the storage port;
   `sobres portfolio`, `sobres watchlist`, `sobres run` and `sobres db` groups;

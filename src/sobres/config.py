@@ -38,6 +38,11 @@ def user_data_dir() -> Path:
     return Path(platformdirs.user_data_dir(APP_NAME))
 
 
+def process_environment() -> dict[str, str]:
+    """A copy of the process environment, for adapters that were not handed one."""
+    return dict(os.environ)
+
+
 def legacy_dirs() -> list[Path]:
     """Where the pre-rename tool kept its config and data, for the doctor check."""
     old = "".join(("quant", "folio"))

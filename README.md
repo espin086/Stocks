@@ -60,7 +60,7 @@ the milestone plans in [`openspec/changes/`](openspec/changes/).
 | [0001](openspec/changes/0001-foundation-data-and-cli/) | Foundation | `init`/`doctor` onboarding, command registry, storage port, providers, currency, observability, `sobres data` | ✅ Done |
 | [0002](openspec/changes/0002-portfolio-optimization/) | **Portfolio optimization (v1)** | Returns, risk, Markowitz, frontier, backtest | ✅ Done |
 | [0003](openspec/changes/0003-local-persistence/) | Local persistence | Saved portfolios, goals, run history, `sobres db` | ✅ Done |
-| [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | 📋 Planned |
+| [0004](openspec/changes/0004-web-ui/) | Web UI | FastAPI + React SPA derived from the registry, `sobres serve`, `sobres open` | ✅ Done |
 | [0005](openspec/changes/0005-docker-distribution/) | Docker | One image on Docker Hub, `sobres deploy` | 📋 Planned |
 | [0006](openspec/changes/0006-landing-page/) | Landing page | Animated dark GitHub Pages site | 📋 Planned |
 | [0007](openspec/changes/0007-equity-factor-analysis/) | Factor analysis | CAPM, Fama-French 3/5 + momentum | 📋 Planned |
@@ -85,8 +85,8 @@ sobres doctor                           # every check tells you what's wrong and
 
 That's the whole onboarding path, and it stays three commands as the tool grows.
 `sobres doctor --fix` applies the safe repairs; `sobres upgrade` detects how you
-installed and runs the matching upgrade. Once the web UI lands, `sobres open` starts
-it and puts it in your browser — `sobres open doctor` goes straight to a view.
+installed and runs the matching upgrade. `sobres open` starts the web UI and puts
+it in your browser — `sobres open doctor` goes straight to a view.
 
 Or for development:
 
@@ -161,6 +161,29 @@ and the live risk-free rate — `sobres init` asks for it and offers to verify i
 ```bash
 sobres config set fred_api_key <YOUR_KEY>
 ```
+
+## Quickstart: the web UI
+
+```bash
+pip install "sobres[web]"
+sobres open                        # starts the server if needed, opens the browser
+sobres open doctor                 # straight to a view: settings, doctor, runs, run <id>, ...
+sobres serve                       # http://127.0.0.1:8787, no browser
+sobres serve --host 0.0.0.0        # prints a token once; required off loopback
+```
+
+Every command in the registry is an HTTP route (`POST /api/v1/<group>/<name>`,
+documented at `/api/docs`) and a form in the single-page app. The form shows the
+equivalent `sobres` command line as you fill it in. Long computations
+(`markowitz`, `frontier`, `backtest`) run as jobs with real progress and a cancel
+button; results carry the same provenance header, in-sample label and disclaimer
+the CLI prints. A parity test fails the build if a command lacks a route or a
+view, and the same inputs give byte-identical JSON on both surfaces.
+
+The server binds loopback by default. Binding any other address requires a
+deployment token, generated once and stored hashed; `sobres serve token rotate`
+replaces it. Cookies are `HttpOnly`, `SameSite=Strict` and the token is never
+accepted on a query string.
 
 ## Data sources
 

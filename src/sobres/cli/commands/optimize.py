@@ -22,7 +22,7 @@ from sobres.core import backtest as bt
 from sobres.core import moments
 from sobres.core import optimize as opt
 from sobres.core.conventions import infer_frequency
-from sobres.core.errors import UsageError
+from sobres.core.errors import InsufficientDataError, UsageError
 from sobres.core.returns import apply_nan_policy, portfolio_returns, simple_returns
 from sobres.core.risk import RiskPanel, risk_metrics
 from sobres.data.currency import (
@@ -162,7 +162,10 @@ def load_universe(p: UniverseParams, ctx: Context) -> Universe:
         )
     returns = pd.DataFrame(apply_nan_policy(simple_returns(filled), "drop"))
     if len(returns) < 3:
-        raise UsageError("fewer than three return observations", hint="widen --start/--end")
+        raise InsufficientDataError(
+            f"{len(returns)} return observations; at least three are needed",
+            hint="widen --start/--end",
+        )
     frequency = infer_frequency(pd.DatetimeIndex(returns.index))
     rf, rf_source = resolve_risk_free(p.risk_free, p.start, end, ctx)
     provenance = Provenance.from_attrs(
@@ -352,6 +355,7 @@ class MarkowitzParams(EstimatorParams):
     "Optimal weights for one objective, with the risk/return profile that produced them.",
     result=PortfolioResult,
     uses_providers=True,
+    long_running=True,
 )
 def markowitz(p: MarkowitzParams, ctx: Context) -> PortfolioResult:
     u = load_universe(p, ctx)
@@ -399,6 +403,7 @@ class FrontierParams(EstimatorParams):
     "The efficient frontier: one row per portfolio from min variance to max return.",
     result=FrontierResult,
     uses_providers=True,
+    long_running=True,
 )
 def frontier(p: FrontierParams, ctx: Context) -> FrontierResult:
     u = load_universe(p, ctx)
@@ -485,6 +490,7 @@ def parse_lookback(text: str, frequency: str) -> int:
     "Walk-forward test: re-solve at each rebalance on prior data only, versus equal weight.",
     result=BacktestReport,
     uses_providers=True,
+    long_running=True,
 )
 def backtest(p: BacktestParams, ctx: Context) -> BacktestReport:
     # Fetch enough history before --start for the first rebalance to have a full
@@ -510,7 +516,7 @@ def backtest(p: BacktestParams, ctx: Context) -> BacktestReport:
         return pd.Series(portfolio.weights)
 
     def progress(done: int, total: int) -> None:
-        ctx.log.info("backtest.progress", done=done, total=total)
+        ctx.report_progress(done / total, f"rebalance {done} of {total}")
 
     result = bt.walk_forward(
         u.returns,
